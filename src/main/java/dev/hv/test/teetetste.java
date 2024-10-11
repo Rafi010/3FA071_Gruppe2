@@ -13,11 +13,7 @@ public class teetetste {
 
         try {
             // Versucht eine Verbindung zur Datenbank herzustellen.
-            final Connection con = DriverManager.getConnection(
-                    "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true", // URL der Datenbank
-                    "root", // Benutzername
-                    "Ag2x~pdA@xQi4DCs2vXThq4N3aSMivZ~"      // Passwort (leer)
-            );
+            final Connection con = Util.getConnection("hv");
 
             // Bestätigt die erfolgreiche Verbindung.
             System.out.println("... connected");
@@ -41,7 +37,7 @@ public class teetetste {
             );
 
             // Schließt die Verbindung zur Datenbank.
-            con.close();
+            Util.close(con);
         } catch (final SQLException e) {
             // Fehlerbehandlung bei SQL-Ausnahmen.
             System.out.println("Fehler: " + e.getMessage());

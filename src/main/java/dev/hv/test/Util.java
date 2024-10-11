@@ -9,14 +9,19 @@ import java.util.Properties;
 
 public class Util {
 
-    public static void main(String [] args){
+    /*public static void main(String [] args){
         getConnection("hv");
-    }
+    }*/
 
 
     private static Connection con = null;
 
-    public static void getConnection(final String db){
+    private Util(){
+
+
+    }
+
+    public static Connection getConnection(final String db){
         if (con == null){
             try{
                 final Properties prop = new Properties();
@@ -32,6 +37,17 @@ public class Util {
                 throw new RuntimeException(e);
             }
         }
-        //return con;
+        return con;
+    }
+
+    public static void close(final AutoCloseable obj){
+        if (obj != null){
+            try{
+                obj.close();
+            } catch (final Exception e) {
+                //ignore
+            }
+        }
+
     }
 }
