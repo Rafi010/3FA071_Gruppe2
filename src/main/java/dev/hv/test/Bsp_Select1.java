@@ -40,6 +40,7 @@ public class Bsp_Select1 {
             while(rs.next()){
                 String tabellenname = rs.getString(1);
                 System.out.println(tabellenname);
+                Util.printRs(rs);
                 ResultSet rs2 = st.executeQuery("DESCRIBE " + tabellenname);
                 final ResultSetMetaData md2 = rs.getMetaData();
                 final int colcount2 = md2.getColumnCount();
