@@ -18,6 +18,7 @@ public class Util {
     private Util() {
     }
 
+    //This method checks whether the system is a Mac or Windows computer.
     private static String backOrForward() {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("mac")) {
