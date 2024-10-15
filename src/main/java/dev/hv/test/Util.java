@@ -2,34 +2,36 @@ package dev.hv.test;
 
 import org.nocrala.tools.texttablefmt.Table;
 
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Properties;
 
 public class Util {
 
-    /*public static void main(String [] args){
-        getConnection("hv");
-    }*/
-
-
     private static Connection con = null;
+    private static Properties properties = new Properties();
 
     private Util() {
+    }
 
 
+    private static String getDatabaseProperty(String key){
+        String userName = System.getProperty("user.name");
+        return properties.getProperty(userName + ".db." + key);
     }
 
     public static Connection getConnection(final String db) {
         if (con == null) {
             try {
-                final Properties prop = new Properties();
                 final String home = System.getProperty("user.home");
-                prop.load(new FileReader(db + ".properties"));
-                final String dburl = prop.getProperty("DBURL");
-                final String dbuser = prop.getProperty("DBUSER");
-                final String dbpw = prop.getProperty("DBPW");
+                properties.load(new FileReader(home + "\\" + db + ".properties"));
+                String dburl = getDatabaseProperty("url");
+                String dbuser = getDatabaseProperty("user");
+                String dbpw = getDatabaseProperty("pw");
                 System.out.println(home);
 
                 con = DriverManager.getConnection(dburl, dbuser, dbpw);
