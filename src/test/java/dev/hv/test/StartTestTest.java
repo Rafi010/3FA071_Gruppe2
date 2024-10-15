@@ -1,6 +1,6 @@
 package dev.hv.test;
 
-import org.junit.jupiter.api.Test;
+import dev.hv.dbComm.DatabaseConnection;
 
 class StartTestTest {
    DatabaseConnection connection = new DatabaseConnection();

@@ -1,6 +1,6 @@
-package dev.hv.test;
+package dev.hv.dbComm;
 
-public class StartTest {
+public class Start {
    public static void main(String[] args) {
       CreateProperties createProp = new CreateProperties();
       DatabaseConnection connection = new DatabaseConnection();

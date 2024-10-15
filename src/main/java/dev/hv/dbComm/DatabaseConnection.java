@@ -1,11 +1,8 @@
-package dev.hv.test;
+package dev.hv.dbComm;
 
 import dev.hv.model.IDatebaseConnection;
+import dev.hv.test.Util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
