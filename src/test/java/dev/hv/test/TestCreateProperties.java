@@ -1,12 +1,18 @@
 package dev.hv.test;
 
-import dev.hv.dbComm.CreateProperties;
-import org.junit.jupiter.api.*;
-import java.io.*;
-import java.nio.file.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCreateProperties {
     private Path configFilePath;
