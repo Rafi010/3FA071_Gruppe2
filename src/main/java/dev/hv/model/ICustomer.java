@@ -2,6 +2,9 @@ package dev.hv.model;
 
 import java.time.LocalDate;
 
+/**
+ * Interface representing a customer entity with basic personal information.
+ */
 public interface ICustomer extends IId {
 
    enum Gender {

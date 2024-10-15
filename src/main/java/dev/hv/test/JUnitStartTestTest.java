@@ -6,6 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+/**
+ * Unit tests for the `StartTest` class.
+ * This class uses JUnit for testing and Mockito for mocking dependencies.
+ */
 class JUnitStartTest {
     private CreateProperties createProp;
     private DatabaseConnection connection;
