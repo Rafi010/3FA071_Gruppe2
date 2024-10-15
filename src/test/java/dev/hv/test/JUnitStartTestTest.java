@@ -2,6 +2,8 @@ package dev.hv.test;
 
 import static org.mockito.Mockito.*;
 
+import dev.hv.dbComm.CreateProperties;
+import dev.hv.dbComm.DatabaseConnection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
