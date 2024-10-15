@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 class JUnitStartTest {
     private CreateProperties createProp;
     private DatabaseConnection connection;
-    private JUnitStartTest startTest;
+    private StartTest startTest;
 
     @BeforeEach
     void setUp() {
@@ -17,7 +17,7 @@ class JUnitStartTest {
         createProp = Mockito.mock(CreateProperties.class);
         connection = Mockito.mock(DatabaseConnection.class);
         // Creating an instance of StartTest to call the main method
-        startTest = new JUnitStartTest(createProp, connection);
+        startTest = new StartTest(createProp, connection);
     }
 
     @Test
@@ -26,24 +26,34 @@ class JUnitStartTest {
         doNothing().when(createProp).Start();
         when(connection.openConnection(any())).thenReturn(connection);
         doNothing().when(connection).createAllTables();
+
         // Calling the main method
         startTest.main(new String[]{});
+
         // Verifying that the methods were called with correct arguments
         verify(createProp).Start();
         verify(connection).openConnection(any());
         verify(connection).createAllTables();
     }
 
-    // Constructor for dependency injection in tests
-    public JUnitStartTest(CreateProperties createProp, DatabaseConnection connection) {
-        this.createProp = createProp;
-        this.connection = connection;
+    // Constructor for dependency injection in tests (optional, not needed anymore)
+    public JUnitStartTest() {
     }
 
     // The main method
-    public void main(String[] args) {
-        createProp.Start();
-        connection.openConnection(null);
-        connection.createAllTables();
+    public static class StartTest {
+        private final CreateProperties createProp;
+        private final DatabaseConnection connection;
+
+        public StartTest(CreateProperties createProp, DatabaseConnection connection) {
+            this.createProp = createProp;
+            this.connection = connection;
+        }
+
+        public void main(String[] args) {
+            createProp.Start();
+            connection.openConnection(null);
+            connection.createAllTables();
+        }
     }
 }
