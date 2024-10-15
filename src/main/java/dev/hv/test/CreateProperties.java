@@ -2,6 +2,7 @@ package dev.hv.test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +14,11 @@ public class CreateProperties {
         // Define the file path for the config file
         String homeDir = System.getProperty("user.home");
         Path configFilePath = Paths.get(homeDir, "hv.properties");
+        String userName = System.getProperty("user.name");
+
+        String URL = userName + ".db.url";
+        String USER = userName + ".db.user";
+        String PW = userName + ".db.pw";
 
         // Check if the config file already exists
         if (Files.exists(configFilePath)) {
@@ -22,9 +28,9 @@ public class CreateProperties {
             Properties config = new Properties();
 
             // Add the key-value pairs to the config
-            config.setProperty("rapha.db.url", "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
-            config.setProperty("rapha.db.user", "root");
-            config.setProperty("rapha.db.pw", "lol");
+            config.setProperty(URL, "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
+            config.setProperty(USER, "root");
+            config.setProperty(PW, "lol");
 
             // Save the properties to the file
             try (FileOutputStream output = new FileOutputStream(configFilePath.toFile())) {
