@@ -18,6 +18,16 @@ public class Util {
     private Util() {
     }
 
+    private static String backOrForward() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("mac")) {
+            return "/";
+        }
+        else if (os.contains("win")) {
+            return "\\";
+        }
+        return "";
+    }
 
     private static String getDatabaseProperty(String key){
         String userName = System.getProperty("user.name");
@@ -28,7 +38,7 @@ public class Util {
         if (con == null) {
             try {
                 final String home = System.getProperty("user.home");
-                properties.load(new FileReader(home + "\\" + db + ".properties"));
+                properties.load(new FileReader(home + backOrForward() + db + ".properties"));
                 String dburl = getDatabaseProperty("url");
                 String dbuser = getDatabaseProperty("user");
                 String dbpw = getDatabaseProperty("pw");
