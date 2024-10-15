@@ -2,51 +2,50 @@ package dev.hv.test;
 
 import org.nocrala.tools.texttablefmt.Table;
 
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Properties;
 
 public class Util {
-
-    private static Connection con = null;
-    private static Properties properties = new Properties();
+    private static volatile Connection con = null;
+    private static final Properties properties = new Properties();
+    private static final String FORWARD_SLASH = "/";
+    private static final String BACKWARD_SLASH = "\\";
 
     private Util() {
+        // Private constructor to prevent instantiation
     }
 
-    private static String backOrForward() {
+    private static String getFileSeparator() {
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("mac")) {
-            return "/";
-        }
-        else if (os.contains("win")) {
-            return "\\";
-        }
-        return "";
+        return os.contains("mac") ? FORWARD_SLASH : os.contains("win") ? BACKWARD_SLASH : "";
     }
 
-    private static String getDatabaseProperty(String key){
+    private static String getDatabaseProperty(String key) {
         String userName = System.getProperty("user.name");
         return properties.getProperty(userName + ".db." + key);
     }
 
+    private static void loadProperties(String db) throws IOException {
+        String home = System.getProperty("user.home");
+        properties.load(new FileReader(home + getFileSeparator() + db + ".properties"));
+    }
+
     public static Connection getConnection(final String db) {
         if (con == null) {
-            try {
-                final String home = System.getProperty("user.home");
-                properties.load(new FileReader(home + backOrForward() + db + ".properties"));
-                String dburl = getDatabaseProperty("url");
-                String dbuser = getDatabaseProperty("user");
-                String dbpw = getDatabaseProperty("pw");
-                System.out.println(home);
-
-                con = DriverManager.getConnection(dburl, dbuser, dbpw);
-            } catch (SQLException | IOException e) {
-                throw new RuntimeException(e);
+            synchronized (Util.class) {
+                if (con == null) {
+                    try {
+                        loadProperties(db);
+                        String dburl = getDatabaseProperty("url");
+                        String dbuser = getDatabaseProperty("user");
+                        String dbpw = getDatabaseProperty("pw");
+                        con = DriverManager.getConnection(dburl, dbuser, dbpw);
+                    } catch (SQLException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
         return con;
@@ -60,7 +59,6 @@ public class Util {
                 //ignore
             }
         }
-
     }
 
     public static void printRs(final ResultSet rs) {
@@ -70,8 +68,7 @@ public class Util {
             final Table t = new Table(cols);
 
             for (int i = 1; i <= cols; i++){
-                final String label = rsmeta.getColumnLabel(i);
-                t.addCell(label);
+                t.addCell(rsmeta.getColumnLabel(i));
             }
             while(rs.next()){
                 for (int i = 1; i <= cols; i++){

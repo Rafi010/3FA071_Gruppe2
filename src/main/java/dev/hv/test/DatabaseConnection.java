@@ -1,7 +1,6 @@
 package dev.hv.test;
 
 import dev.hv.model.IDatebaseConnection;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,15 +12,13 @@ import java.sql.Statement;
 import java.util.Properties;
 
 public class DatabaseConnection implements IDatebaseConnection {
+    private static final String SHOW_TABLES_QUERY = "SHOW TABLES";
     private Connection connection;
 
-
     @Override
-    public IDatebaseConnection openConnection(Properties properties){
-
+    public IDatebaseConnection openConnection(Properties properties) {
         connection = Util.getConnection("hv");
         //TODO DATENBANKÖFFNUNG IMPLEMENTIERUNG
-
         return this;
     }
 
@@ -31,10 +28,9 @@ public class DatabaseConnection implements IDatebaseConnection {
             throw new IllegalStateException("No open database connection");
         }
 
-        try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SHOW TABLES");
-
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(SHOW_TABLES_QUERY)) {
+            Util.printRs(rs);
         } catch (SQLException e) {
             e.printStackTrace();  // Prints detailed information about the exception
         }
