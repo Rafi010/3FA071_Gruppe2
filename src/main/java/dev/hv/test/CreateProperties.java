@@ -20,6 +20,8 @@ public class CreateProperties {
         String USER = userName + ".db.user";
         String PW = userName + ".db.pw";
 
+        String DatabaseComment = "Database Configuration for " + userName;
+
         // Check if the config file already exists
         if (Files.exists(configFilePath)) {
             System.out.println("Config file already exists at " + configFilePath.toString());
@@ -30,11 +32,11 @@ public class CreateProperties {
             // Add the key-value pairs to the config
             config.setProperty(URL, "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
             config.setProperty(USER, "root");
-            config.setProperty(PW, "lol");
+            config.setProperty(PW, "");
 
             // Save the properties to the file
             try (FileOutputStream output = new FileOutputStream(configFilePath.toFile())) {
-                config.store(output, "Database Configuration for Rapha");
+                config.store(output, DatabaseComment);
                 System.out.println("Config file created at " + configFilePath.toString());
             } catch (IOException e) {
                 e.printStackTrace();
