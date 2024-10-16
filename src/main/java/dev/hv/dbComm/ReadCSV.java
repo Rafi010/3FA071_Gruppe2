@@ -13,7 +13,7 @@ public class ReadCSV {
     private static final Logger log = LoggerFactory.getLogger(ReadCSV.class);
 
     public static void main(String[] args) {
-        String csvFile = "C:\\Git\\3FA071_Gruppe2\\src\\main\\resources\\heizung.csv";
+        String csvFile = "C:\\Git\\3FA071_Gruppe2\\src\\main\\resources\\kunden_utf8.csv";
         try (CSVReader reader = new CSVReader(new FileReader(csvFile))) {
             String[] line;
             while ((line = reader.readNext()) != null) {
