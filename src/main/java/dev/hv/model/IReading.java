@@ -2,6 +2,9 @@ package dev.hv.model;
 
 import java.time.LocalDate;
 
+/**
+ * Interface representing a reading from various types of meters associated with a customer.
+ */
 public interface IReading extends IId {
 
    enum KindOfMeter {
