@@ -1,5 +1,6 @@
 package dev.hv.test;
 
+import dev.hv.dbComm.CreateProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
