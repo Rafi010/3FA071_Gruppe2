@@ -26,3 +26,10 @@ CREATE TABLE IF NOT EXISTS kunde (
     vorname VARCHAR(255),
     geburtsdatum DATE
 );
+CREATE TABLE IF NOT EXISTS test_kunde (
+    uuid VARCHAR(255),
+    anrede VARCHAR(255),
+    nachname VARCHAR(255),
+    vorname VARCHAR(255),
+    geburtsdatum DATE
+);
