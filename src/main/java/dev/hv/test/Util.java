@@ -8,11 +8,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.*;
+import java.util.Properties;
 
 public class Util {
+
+    private static Connection con = null;
+    private static Properties properties = new Properties();
+
     private Util() {
     }
-
+    //This method checks whether the system is a Mac or Windows computer.
     public static String backOrForward() {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("mac")) {
@@ -69,6 +74,4 @@ public class Util {
             throw new RuntimeException(e);
         }
     }
-
-
 }
