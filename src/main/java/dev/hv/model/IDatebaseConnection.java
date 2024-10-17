@@ -1,6 +1,5 @@
 package dev.hv.model;
 
-import java.sql.Connection;
 import java.util.Properties;
 
 /**
