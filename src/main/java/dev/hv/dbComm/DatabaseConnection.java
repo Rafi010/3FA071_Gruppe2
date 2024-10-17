@@ -33,12 +33,19 @@ public class DatabaseConnection implements IDatabaseConnection {
         return this;
     }
 
+    public void createDatabase(){
+        if (connection == null) {
+            throw new IllegalStateException("No open database connection");
+        }
+        Util.executeSQL(connection, "dateien/sql/create_db_hv.sql");
+    }
+
     @Override
     public void createAllTables() {
         if (connection == null) {
             throw new IllegalStateException("No open database connection");
         }
-        Util.executeSQL(connection, "C:\\Users\\rapha\\IdeaProjects\\3FA071_Gruppe2\\dateien\\sql\\create_db_hv.sql");
+        Util.executeSQL(connection, "dateien/sql/create_table.sql");
     }
 
     @Override
@@ -54,6 +61,13 @@ public class DatabaseConnection implements IDatabaseConnection {
     @Override
     public void closeConnection(){
         //TODO
+    }
+
+    public void fillDatabase(){
+        if (connection == null) {
+            throw new IllegalStateException("No open database connection");
+        }
+        Util.executeSQL(connection, "dateien/sql/load_csv_file_in_table.sql");
     }
 
     public Connection getConnection() {

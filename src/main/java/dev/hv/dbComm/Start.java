@@ -11,5 +11,6 @@ public class Start {
       createProp.Start();
       connection.openConnection(properties);
       connection.createAllTables();
+      connection.fillDatabase();
    }
 }
