@@ -17,50 +17,37 @@ import java.util.Properties;
 public class CreateProperties {
 
     private static final Logger log = LoggerFactory.getLogger(CreateProperties.class);
-    private static final String DB_URL_PROPERTY_SUFFIX = ".db.url";
-    private static final String DB_USER_PROPERTY_SUFFIX = ".db.user";
-    private static final String DB_PASSWORD_PROPERTY_SUFFIX = ".db.pw";
-    private static final String DB_JDBC_URL = "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true";
-    private static final String DB_DEFAULT_USER = "root";
-    private static final String DB_DEFAULT_PASSWORD = "";
 
-    public void Start() {
-        // Extracted method for getting user.home property
-        Path configFilePath = getConfigFilePath("hv.properties");
-
-        String userName = System.getProperty("user.name");
-        String urlKey = userName + DB_URL_PROPERTY_SUFFIX;
-        String userKey = userName + DB_USER_PROPERTY_SUFFIX;
-        String passwordKey = userName + DB_PASSWORD_PROPERTY_SUFFIX;
-        String databaseComment = getDatabaseComment(userName);
-
-        if (Files.exists(configFilePath)) {
-            log.info("Config file already exists at {}", configFilePath);
-        } else {
-            createConfigFile(configFilePath, urlKey, userKey, passwordKey, databaseComment);
-        }
-    }
-
-    private Path getConfigFilePath(String fileName) {
+    public void Start(){
         String homeDir = System.getProperty("user.home");
-        return Paths.get(homeDir, fileName);
-    }
+        Path configFilePath = Paths.get(homeDir, "hv.properties");
+        String userName = System.getProperty("user.name");
 
-    private String getDatabaseComment(String userName) {
-        return "Database Configuration for " + userName;
-    }
+        String URL = userName + ".db.url";
+        String USER = userName + ".db.user";
+        String PW = userName + ".db.pw";
 
-    private void createConfigFile(Path configFilePath, String urlKey, String userKey, String passwordKey, String comment) {
-        Properties config = new Properties();
-        config.setProperty(urlKey, DB_JDBC_URL);
-        config.setProperty(userKey, DB_DEFAULT_USER);
-        config.setProperty(passwordKey, DB_DEFAULT_PASSWORD);
+        String DatabaseComment = "Database Configuration for " + userName;
 
-        try (FileOutputStream output = new FileOutputStream(configFilePath.toFile())) {
-            config.store(output, comment);
-            log.info("Config file created at {}", configFilePath);
-        } catch (IOException e) {
-            log.error("Error creating config file: ", e);
+        // Check if the config file already exists
+        if (Files.exists(configFilePath)) {
+            System.out.println("Config file already exists at " + configFilePath);
+        } else {
+            // Create the Properties object
+            Properties config = new Properties();
+
+            // Add the key-value pairs to the config
+            config.setProperty(URL, "jdbc:mariadb://localhost:3306/?allowMultiQueries=true");
+            config.setProperty(USER, "root");
+            config.setProperty(PW, "");
+
+            // Save the properties to the file
+            try (FileOutputStream output = new FileOutputStream(configFilePath.toFile())) {
+                config.store(output, DatabaseComment);
+                System.out.println("Config file created at " + configFilePath);
+            } catch (IOException e) {
+                log.error("error: ", e);
+            }
         }
     }
 }
