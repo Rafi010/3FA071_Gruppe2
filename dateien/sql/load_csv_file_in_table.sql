@@ -1,5 +1,5 @@
 LOAD DATA LOCAL INFILE 'src/main/resources/kunden_utf8.csv'
-INTO TABLE test_kunde
+INTO TABLE kunde
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'

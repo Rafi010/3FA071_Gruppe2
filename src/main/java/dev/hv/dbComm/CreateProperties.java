@@ -18,14 +18,15 @@ public class CreateProperties {
 
     private static final Logger log = LoggerFactory.getLogger(CreateProperties.class);
 
-    public void Start(){
+    public void Create(){
         String homeDir = System.getProperty("user.home");
         Path configFilePath = Paths.get(homeDir, "hv.properties");
         String userName = System.getProperty("user.name");
 
-        String URL = userName + ".db.url";
-        String USER = userName + ".db.user";
-        String PW = userName + ".db.pw";
+        final String URL = userName + ".db.url";
+        final String URL_DB = userName + ".db.url_db";
+        final String USER = userName + ".db.user";
+        final String PW = userName + ".db.pw";
 
         String DatabaseComment = "Database Configuration for " + userName;
 
@@ -38,6 +39,7 @@ public class CreateProperties {
 
             // Add the key-value pairs to the config
             config.setProperty(URL, "jdbc:mariadb://localhost:3306/?allowMultiQueries=true");
+            config.setProperty(URL_DB, "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
             config.setProperty(USER, "root");
             config.setProperty(PW, "");
 
