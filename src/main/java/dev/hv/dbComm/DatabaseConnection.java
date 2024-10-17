@@ -43,17 +43,7 @@ public class DatabaseConnection implements IDatabaseConnection {
         if (connection == null) {
             throw new IllegalStateException("No open database connection");
         }
-        try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SHOW TABLES");
-            while(rs.next()){
-                String tabellenname = rs.getString(1);
-                System.out.println(tabellenname);
-            }
-
-        } catch (SQLException e) {
-            log.error("error: ", e);  // Prints detailed information about the exception
-        }
+        Util.executeSQL(connection, "C:\\Users\\rapha\\IdeaProjects\\3FA071_Gruppe2\\dateien\\sql\\create_db_hv.sql");
     }
 
     @Override

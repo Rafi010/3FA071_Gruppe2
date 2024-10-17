@@ -33,7 +33,7 @@ public class CreateProperties {
             Properties config = new Properties();
 
             // Add the key-value pairs to the config
-            config.setProperty(URL, "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
+            config.setProperty(URL, "jdbc:mariadb://localhost:3306/?allowMultiQueries=true");
             config.setProperty(USER, "root");
             config.setProperty(PW, "");
 

@@ -1,7 +1,12 @@
 package dev.hv.test;
 
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.nocrala.tools.texttablefmt.Table;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.*;
 
 public class Util {
@@ -17,6 +22,19 @@ public class Util {
             return "\\";
         }
         return "";
+    }
+
+    public static void executeSQL(Connection con, String filePath){
+        try {
+
+            ScriptRunner sr = new ScriptRunner(con);
+            Reader reader = new BufferedReader(new FileReader(filePath));
+            sr.runScript(reader);
+
+        }
+        catch (IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     public static void close(final AutoCloseable obj) {
@@ -51,4 +69,6 @@ public class Util {
             throw new RuntimeException(e);
         }
     }
+
+
 }
