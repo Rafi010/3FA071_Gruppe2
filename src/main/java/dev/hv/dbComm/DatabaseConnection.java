@@ -2,6 +2,8 @@ package dev.hv.dbComm;
 
 import dev.hv.model.IDatabaseConnection;
 import dev.hv.test.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,8 +17,9 @@ import java.util.Properties;
 
 
 public class DatabaseConnection implements IDatabaseConnection {
-    Properties properties = new Properties();
+
     private Connection connection;
+    private static final Logger log = LoggerFactory.getLogger(DatabaseConnection.class);
 
     @Override
     public IDatabaseConnection openConnection(Properties properties){
@@ -49,7 +52,7 @@ public class DatabaseConnection implements IDatabaseConnection {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();  // Prints detailed information about the exception
+            log.error("error: ", e);  // Prints detailed information about the exception
         }
     }
 
