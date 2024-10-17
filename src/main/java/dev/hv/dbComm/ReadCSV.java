@@ -44,6 +44,9 @@ public class ReadCSV {
             String[] line;
             boolean readingMeta = true;
             List<String[]> dataList = new ArrayList<>();
+            List<String> sqlList = new ArrayList<>();
+            boolean bo = true;
+            String toCommand;
 
             // Variables to store meta information
             String kunde = null;
@@ -78,17 +81,27 @@ public class ReadCSV {
 
             // Output the actual data
             System.out.println("\nDaten:");
+
             for (String[] dataLine : dataList) {
-                if (dataLine.length == 3) {
+                if (bo) {
+                    toCommand = """                
+                            "Kunde", "Zaehlernummer","%s","%s","%s"
+                            """.formatted(dataLine[0], dataLine[1], dataLine[2]);
+                    bo = false;
+                } else {
+                    dataLine[1] = dataLine[1].replace(",", ".");
                     System.out.println(dataLine[0] + ", " + dataLine[1] + ", " + dataLine[2]);
-                } else if (dataLine.length == 2) {
-                    System.out.println(dataLine[0] + ", " + dataLine[1]);
+                    toCommand = """                
+                            "%s","%s","%s","%s","%s"
+                            """.formatted(kunde, zaehlernummer, dataLine[0], dataLine[1], dataLine[2]);
+                    //kunde + zaehlernummer + dataLine[0] + dataLine[1] + dataLine[2];
                 }
+                sqlList.add(toCommand);
             }
 
-        } catch(IOException e){
+        } catch (IOException e) {
             log.error("IOException: ", e);
-        } catch(CsvValidationException e){
+        } catch (CsvValidationException e) {
             throw new RuntimeException(e);
         }
     }
