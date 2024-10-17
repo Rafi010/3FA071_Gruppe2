@@ -8,14 +8,14 @@ class TestUtilbackorForward {
 
     @Test
     void testBackOrForwardOnMac() {
-        System.setProperty("os.name", "Mac OS X");
+        System.setProperty("os.name", "Mac");
         String result = Util.backOrForward();
         assertEquals("/", result, "Sollte für Mac OS '/' zurückgeben");
     }
 
     @Test
     void testBackOrForwardOnWindows() {
-        System.setProperty("os.name", "Windows 10");
+        System.setProperty("os.name", "Windows");
         String result = Util.backOrForward();
         assertEquals("\\", result, "Sollte für Windows '\\' zurückgeben");
     }
