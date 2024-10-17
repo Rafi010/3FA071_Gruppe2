@@ -11,10 +11,6 @@ import java.sql.*;
 import java.util.Properties;
 
 public class Util {
-
-    private static Connection con = null;
-    private static Properties properties = new Properties();
-
     private Util() {
     }
     //This method checks whether the system is a Mac or Windows computer.
