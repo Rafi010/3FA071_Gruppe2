@@ -1,0 +1,35 @@
+package dev.hv.test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class TestUtilbackorForward {
+
+    @Test
+    void testBackOrForwardOnMac() {
+        System.setProperty("os.name", "Mac OS X");
+        String result = Util.backOrForward();
+        assertEquals("/", result, "Sollte für Mac OS '/' zurückgeben");
+    }
+
+    @Test
+    void testBackOrForwardOnWindows() {
+        System.setProperty("os.name", "Windows 10");
+        String result = Util.backOrForward();
+        assertEquals("\\", result, "Sollte für Windows '\\' zurückgeben");
+    }
+
+    @Test
+    void testBackOrForwardOnOther() {
+        System.setProperty("os.name", "Linux");
+        String result = Util.backOrForward();
+        assertEquals("", result, "Sollte für andere Systeme leeren String zurückgeben");
+    }
+
+    // Hilfsmethode, um das Systemproperty zurückzusetzen
+    @Test
+    public void restoreSystemProperties() {
+        System.clearProperty("os.name");
+    }
+}
