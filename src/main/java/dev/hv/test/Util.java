@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.*;
-import java.util.Properties;
 
 public class Util {
     private Util() {
@@ -27,11 +26,9 @@ public class Util {
 
     public static void executeSQL(Connection con, String filePath){
         try {
-
             ScriptRunner sr = new ScriptRunner(con);
             Reader reader = new BufferedReader(new FileReader(filePath));
             sr.runScript(reader);
-
         }
         catch (IOException e){
             throw new RuntimeException(e);

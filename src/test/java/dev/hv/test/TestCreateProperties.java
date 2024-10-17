@@ -45,7 +45,7 @@ public class TestCreateProperties {
         // new CreateProperties().setConfigPath(configFilePath.toString());
 
         // Aufruf der Start-Methode
-        new CreateProperties().Start();
+        new CreateProperties().Create();
 
         // Überprüft, ob die Konfigurationsdatei erstellt wurde bzw. bereits existiert
         assertTrue(Files.exists(configFilePath), "Config file should be created or already exist");

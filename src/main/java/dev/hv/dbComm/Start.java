@@ -8,9 +8,17 @@ public class Start {
       CreateProperties createProp = new CreateProperties();
       DatabaseConnection connection = new DatabaseConnection();
 
-      createProp.Start();
+      createProp.Create();
       connection.openConnection(properties);
+
+      connection.createDatabase();
+
+      connection.closeConnection();
+      connection.openHvConnection(properties);
+
       connection.createAllTables();
       connection.fillDatabase();
+
+      connection.closeConnection();
    }
 }

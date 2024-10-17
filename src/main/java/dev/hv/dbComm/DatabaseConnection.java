@@ -26,11 +26,26 @@ public class DatabaseConnection implements IDatabaseConnection {
             String dbuser = properties.getProperty(userName + ".db.user");
             String dbpw = properties.getProperty(userName + ".db.pw");
             this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
-            System.out.println("Connected");
+            System.out.println("Connected to MySql");
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
         return this;
+    }
+
+    public void openHvConnection (Properties properties){
+        String userName = System.getProperty("user.name");
+        try {
+            final String home = System.getProperty("user.home");
+            properties.load(new FileReader(home + Util.backOrForward() + "hv.properties"));
+            String dburl = properties.getProperty(userName + ".db.url_db");
+            String dbuser = properties.getProperty(userName + ".db.user");
+            String dbpw = properties.getProperty(userName + ".db.pw");
+            this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
+            System.out.println("Connected to: hv");
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void createDatabase(){
@@ -60,7 +75,13 @@ public class DatabaseConnection implements IDatabaseConnection {
 
     @Override
     public void closeConnection(){
-        //TODO
+        try {
+            connection.close();
+            System.out.println("Connection closed");
+        }
+        catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void fillDatabase(){
