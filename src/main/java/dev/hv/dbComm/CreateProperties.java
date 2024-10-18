@@ -19,15 +19,20 @@ public class CreateProperties {
     private static final Logger log = LoggerFactory.getLogger(CreateProperties.class);
 
     public void Create(){
+
+        // Get the filepath of the properties file
         String homeDir = System.getProperty("user.home");
         Path configFilePath = Paths.get(homeDir, "hv.properties");
+        //get the username of the pc
         String userName = System.getProperty("user.name");
 
+        //create the keys under wich the information is saved in the file
         final String URL = userName + ".db.url";
         final String URL_DB = userName + ".db.url_db";
         final String USER = userName + ".db.user";
         final String PW = userName + ".db.pw";
 
+        //comment on the top of the file
         String DatabaseComment = "Database Configuration for " + userName;
 
         // Check if the config file already exists
@@ -37,7 +42,7 @@ public class CreateProperties {
             // Create the Properties object
             Properties config = new Properties();
 
-            // Add the key-value pairs to the config
+            // Add the values to the keys in the file
             config.setProperty(URL, "jdbc:mariadb://localhost:3306/?allowMultiQueries=true");
             config.setProperty(URL_DB, "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
             config.setProperty(USER, "root");
