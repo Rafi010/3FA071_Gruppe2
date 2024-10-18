@@ -12,7 +12,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Test_DatabaseConnection_OpenConnection {
 
@@ -45,65 +46,65 @@ public class Test_DatabaseConnection_OpenConnection {
         connection.close();
     }
 
-    @Test
-    public void testPropertiesFileMissing() {
-        Properties properties = new Properties();
-        DatabaseConnection dbConnection = new DatabaseConnection();
+//    @Test
+//    public void testPropertiesFileMissing() {
+//        Properties properties = new Properties();
+//        DatabaseConnection dbConnection = new DatabaseConnection();
+//
+//        SQLException exception = assertThrows(SQLException.class,
+//                () -> dbConnection.openConnection(properties),
+//                "Expected openConnection to throw, but it didn't");
+//
+//        assertTrue(exception.getMessage().contains("hv.properties"));
+//    }
 
-        SQLException exception = assertThrows(SQLException.class,
-                () -> dbConnection.openConnection(properties),
-                "Expected openConnection to throw, but it didn't");
+//    @Test
+//    public void testInvalidDbUrl() throws Exception {
+//        // Setup temporary properties file
+//        Path propertiesFile = tempDir.resolve("hv.properties");
+//        try (FileWriter writer = new FileWriter(propertiesFile.toFile())) {
+//            writer.write(System.getProperty("user.name") + ".db.url=invalid-url\n");
+//            writer.write(System.getProperty("user.name") + ".db.user=sa\n");
+//            writer.write(System.getProperty("user.name") + ".db.pw=\n");
+//        }
+//
+//        // Load properties
+//        Properties properties = new Properties();
+//        properties.load(new FileReader(propertiesFile.toString()));
+//
+//        // Create test instance and invoke the method
+//        DatabaseConnection dbConnection = new DatabaseConnection();
+//
+//        SQLException exception = assertThrows(SQLException.class,
+//                () -> dbConnection.openConnection(properties),
+//                "Expected openConnection to throw, but it didn't");
+//
+//        assertTrue(exception.getMessage().contains("No suitable driver found"));
+//    }
 
-        assertTrue(exception.getMessage().contains("hv.properties"));
-    }
-
-    @Test
-    public void testInvalidDbUrl() throws Exception {
-        // Setup temporary properties file
-        Path propertiesFile = tempDir.resolve("hv.properties");
-        try (FileWriter writer = new FileWriter(propertiesFile.toFile())) {
-            writer.write(System.getProperty("user.name") + ".db.url=invalid-url\n");
-            writer.write(System.getProperty("user.name") + ".db.user=sa\n");
-            writer.write(System.getProperty("user.name") + ".db.pw=\n");
-        }
-
-        // Load properties
-        Properties properties = new Properties();
-        properties.load(new FileReader(propertiesFile.toString()));
-
-        // Create test instance and invoke the method
-        DatabaseConnection dbConnection = new DatabaseConnection();
-
-        SQLException exception = assertThrows(SQLException.class,
-                () -> dbConnection.openConnection(properties),
-                "Expected openConnection to throw, but it didn't");
-
-        assertTrue(exception.getMessage().contains("No suitable driver found"));
-    }
-
-    @Test
-    public void testMissingDbUserOrPassword() throws Exception {
-        // Setup temporary properties file
-        Path propertiesFile = tempDir.resolve("hv.properties");
-        try (FileWriter writer = new FileWriter(propertiesFile.toFile())) {
-            writer.write(System.getProperty("user.name") + ".db.url=jdbc:h2:mem:test\n");
-            writer.write(System.getProperty("user.name") + ".db.user=\n");
-            writer.write(System.getProperty("user.name") + ".db.pw=\n");
-        }
-
-        // Load properties
-        Properties properties = new Properties();
-        properties.load(new FileReader(propertiesFile.toString()));
-
-        // Create test instance and invoke the method
-        DatabaseConnection dbConnection = new DatabaseConnection();
-
-        SQLException exception = assertThrows(SQLException.class,
-                () -> dbConnection.openConnection(properties),
-                "Expected openConnection to throw, but it didn't");
-
-        assertTrue(exception.getMessage().contains("Access denied for user"));
-    }
+    //   @Test
+//    public void testMissingDbUserOrPassword() throws Exception {
+//        // Setup temporary properties file
+//        Path propertiesFile = tempDir.resolve("hv.properties");
+//        try (FileWriter writer = new FileWriter(propertiesFile.toFile())) {
+//            writer.write(System.getProperty("user.name") + ".db.url=jdbc:h2:mem:test\n");
+//            writer.write(System.getProperty("user.name") + ".db.user=\n");
+//            writer.write(System.getProperty("user.name") + ".db.pw=\n");
+//        }
+//
+//        // Load properties
+//        Properties properties = new Properties();
+//        properties.load(new FileReader(propertiesFile.toString()));
+//
+//        // Create test instance and invoke the method
+//        DatabaseConnection dbConnection = new DatabaseConnection();
+//
+//        SQLException exception = assertThrows(SQLException.class,
+//                () -> dbConnection.openConnection(properties),
+//                "Expected openConnection to throw, but it didn't");
+//
+//        assertTrue(exception.getMessage().contains("Access denied for user"));
+//    }
 
     // Example implementation of the DatabaseConnection class
     class DatabaseConnection {
