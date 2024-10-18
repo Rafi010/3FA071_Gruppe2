@@ -73,7 +73,10 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     @Override
     public void truncateAllTables(){
-        //TODO
+        if (connection == null) {
+            throw new IllegalStateException("No open database connection");
+        }
+        Util.executeSQL(connection, "dateien/sql/truncate_table.sql");
     }
 
     @Override
