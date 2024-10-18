@@ -1,7 +1,6 @@
-package dev.hv.dbComm;
+package dev.hv.projectFiles;
 
 import dev.hv.model.IDatebaseConnection;
-import dev.hv.test.Util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

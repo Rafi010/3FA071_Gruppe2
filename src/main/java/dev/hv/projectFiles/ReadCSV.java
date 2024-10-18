@@ -1,4 +1,4 @@
-package dev.hv.dbComm;
+package dev.hv.projectFiles;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;

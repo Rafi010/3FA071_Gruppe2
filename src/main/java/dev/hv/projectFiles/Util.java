@@ -1,4 +1,4 @@
-package dev.hv.test;
+package dev.hv.projectFiles;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.nocrala.tools.texttablefmt.Table;
