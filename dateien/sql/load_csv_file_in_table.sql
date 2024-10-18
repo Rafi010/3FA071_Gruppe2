@@ -6,4 +6,4 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (UUID, Anrede, Vorname, Nachname, @Geburtsdatum)
-SET Geburtsdatum = STR_TO_DATE(@Geburtsdatum, '%d.%m.%Y');
+SET Geburtsdatum = IF(@Geburtsdatum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@Geburtsdatum, '%d.%m.%Y'));
