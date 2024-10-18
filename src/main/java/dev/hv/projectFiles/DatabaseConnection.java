@@ -22,7 +22,7 @@ public class DatabaseConnection implements IDatebaseConnection {
         final String home = System.getProperty("user.home");
         try {
             //loads the key-value pairs into the properties object
-            properties.load(new FileReader(home + Util.backOrForward() + "hv.properties"));
+            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
             //gets the needed values out of the properties file
             final String dburl = properties.getProperty(userName + ".db.url");
             final String dbuser = properties.getProperty(userName + ".db.user");
@@ -42,7 +42,7 @@ public class DatabaseConnection implements IDatebaseConnection {
         final String home = System.getProperty("user.home");
         try {
             //loads the key-value pairs into the properties object
-            properties.load(new FileReader(home + Util.backOrForward() + "hv.properties"));
+            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
             //gets the needed values out of the properties file
             String dburl = properties.getProperty(userName + ".db.url_db");
             String dbuser = properties.getProperty(userName + ".db.user");

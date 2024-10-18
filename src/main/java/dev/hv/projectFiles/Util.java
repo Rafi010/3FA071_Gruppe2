@@ -3,6 +3,7 @@ package dev.hv.projectFiles;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.nocrala.tools.texttablefmt.Table;
 
+import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,15 +14,8 @@ public class Util {
     private Util() {
     }
     //This method checks whether the system is a Mac or Windows computer.
-    public static String backOrForward() {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("mac")) {
-            return "/";
-        }
-        else if (os.contains("win")) {
-            return "\\";
-        }
-        return "";
+    public static String getRightSystemPath(String path) {
+        return path.replace("\\", File.separator);
     }
 
     public static void executeSQL(Connection con, String filePath){
