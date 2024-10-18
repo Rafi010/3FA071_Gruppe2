@@ -122,18 +122,39 @@ public class ReadCSV {
 
     public static void writeCSV(String outputFile, List<String> sqlList) {
         try (CSVWriter writer = (CSVWriter) new CSVWriterBuilder(new FileWriter(outputFile))
-                .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)  // No quotes around fields
                 .build()) {
+
             // Iterate over each string in sqlList
             for (String line : sqlList) {
+                // Skip empty or blank lines
+                if (line == null || line.trim().isEmpty()) {
+                    continue;
+                }
+
                 // Split the line by comma into individual columns
                 String[] columns = line.split(",");
-                // Write the split columns to the CSV file
-                writer.writeNext(columns);
+
+                // Remove trailing empty or unnecessary columns
+                List<String> trimmedColumns = new ArrayList<>();
+                for (String column : columns) {
+                    // Trim spaces and remove unnecessary quotes
+                    column = column.trim();
+                    if (!column.isEmpty() && !column.equals("\"")) {  // Ignore empty or just quotes
+                        trimmedColumns.add(column);
+                    }
+                }
+
+                // Convert the trimmed columns back to an array
+                String[] finalColumns = trimmedColumns.toArray(new String[0]);
+
+                // Write the cleaned columns to the CSV file
+                writer.writeNext(finalColumns);
             }
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
         }
     }
+
 
 }
