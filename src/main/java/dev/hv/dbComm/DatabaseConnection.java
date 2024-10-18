@@ -81,7 +81,10 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     @Override
     public void removeAllTables(){
-        //TODO
+        if (connection == null) {
+            throw new IllegalStateException("No open database connection");
+        }
+        Util.executeSQL(connection, "dateien/sql/remove_table.sql");
     }
 
     @Override
