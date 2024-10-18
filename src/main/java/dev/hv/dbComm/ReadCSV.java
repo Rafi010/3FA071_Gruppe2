@@ -14,20 +14,18 @@ import java.util.List;
 public class ReadCSV {
 
     private static final Logger log = LoggerFactory.getLogger(ReadCSV.class);
-    private static List<String> heizung;
-    private static List<String> strom;
-    private static List<String> wasser;
 
+    //main not necessary but for testing purpose
     public static void main(String[] args) {
         String csvFile = "src\\main\\resources\\heizung.csv";
-        heizung = readFlexibleCSV(csvFile, 0);
+        readFlexibleCSV(csvFile, 0);
         csvFile = "src\\main\\resources\\strom.csv";
-        strom = readFlexibleCSV(csvFile, 1);
+        readFlexibleCSV(csvFile, 1);
         csvFile = "src\\main\\resources\\wasser.csv";
-        wasser = readFlexibleCSV(csvFile, 2);
-
+        readFlexibleCSV(csvFile, 2);
     }
 
+    // read and write csv files, params: path to csv (example in main method) and int for heizung (0), strom (1), wasser (2)
     public static List<String> readFlexibleCSV(String csvFile, int type) {
         try {
             //Create CSVParser
@@ -88,11 +86,14 @@ public class ReadCSV {
                             """.formatted(dataLine[0], dataLine[1], dataLine[2]);
                     bo = false;
                 } else {
-                    dataLine[1] = dataLine[1].replace(",", ".");
+                    //dataLine[1] = dataLine[1].replace(",", ".");
                     toCommand = """                
                             %s,%s,%s,%s,%s
-                            """.formatted(kunde, zaehlernummer, dataLine[0], dataLine[1], dataLine[2]);
-                    //kunde + zaehlernummer + dataLine[0] + dataLine[1] + dataLine[2];
+                            """.formatted(kunde, zaehlernummer,
+                            dataLine[0].trim(),  // Datum
+                            dataLine[1].replace(",", ".").trim(),  // Zählerstand
+                            dataLine.length > 2 && dataLine[2].trim().isEmpty() ? "null" : dataLine[2].trim()); // Kommentar
+
                 }
                 // Skip empty commands
                 if (!toCommand.trim().isEmpty()) {
