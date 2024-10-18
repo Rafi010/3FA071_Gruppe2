@@ -1,6 +1,6 @@
 package dev.hv.test;
 
-import dev.hv.dbComm.DatabaseConnection;
+import dev.hv.projectFiles.DatabaseConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,21 +18,21 @@ public class Test_DatabaseConnection_createDatabase {
     private Connection connection;
 
     @InjectMocks
-    private DatabaseConnection dbConnection;
+    private dev.hv.projectFiles.DatabaseConnection dbConnection;
 
     @Before
     public void setUp() throws Exception {
-        setConnection(dbConnection, connection);
+        setConnection(dbConnection, connection);  // Korrigierte Parameter und Methode
     }
 
     @Test
     public void testCreateDatabase() {
-        dbConnection.createDatabase();
+        dbConnection.createDatabase();  // Korrigierter Methodenaufruf
         // Überprüfungen und Assertions hier
     }
 
     private void setConnection(DatabaseConnection dbConnection, Connection connection) throws Exception {
-        Field connectionField = DatabaseConnection.class.getDeclaredField("connection");
+        Field connectionField = dbConnection.getClass().getDeclaredField("connection");  // Dynamisches Feldabruf
         connectionField.setAccessible(true);
         connectionField.set(dbConnection, connection);
     }
