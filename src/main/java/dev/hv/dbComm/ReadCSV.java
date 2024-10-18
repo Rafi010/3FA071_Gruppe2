@@ -1,14 +1,12 @@
 package dev.hv.dbComm;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
+import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,20 +14,21 @@ import java.util.List;
 public class ReadCSV {
 
     private static final Logger log = LoggerFactory.getLogger(ReadCSV.class);
+    private static List<String> heizung;
+    private static List<String> strom;
+    private static List<String> wasser;
 
     public static void main(String[] args) {
-        String csvFile = "C:\\Git\\3FA071_Gruppe2\\src\\main\\resources\\heizung.csv";
-        readFlexibleCSV(csvFile);
-        csvFile = "C:\\Git\\3FA071_Gruppe2\\src\\main\\resources\\strom.csv";
-        readFlexibleCSV(csvFile);
-        csvFile = "C:\\Git\\3FA071_Gruppe2\\src\\main\\resources\\wasser.csv";
-        readFlexibleCSV(csvFile);
+        String csvFile = "src\\main\\resources\\heizung.csv";
+        heizung = readFlexibleCSV(csvFile, 0);
+        csvFile = "src\\main\\resources\\strom.csv";
+        strom = readFlexibleCSV(csvFile, 1);
+        csvFile = "src\\main\\resources\\wasser.csv";
+        wasser = readFlexibleCSV(csvFile, 2);
 
     }
 
-    public static void readFlexibleCSV(String csvFile) {
-
-
+    public static List<String> readFlexibleCSV(String csvFile, int type) {
         try {
             //Create CSVParser
             CSVParser parser = new CSVParserBuilder()
@@ -81,28 +80,60 @@ public class ReadCSV {
 
             // Output the actual data
             System.out.println("\nDaten:");
-
+            //Output SQL ready
             for (String[] dataLine : dataList) {
                 if (bo) {
                     toCommand = """                
-                            "Kunde", "Zaehlernummer","%s","%s","%s"
+                            Kunde,Zaehlernummer,%s,%s,%s
                             """.formatted(dataLine[0], dataLine[1], dataLine[2]);
                     bo = false;
                 } else {
                     dataLine[1] = dataLine[1].replace(",", ".");
-                    System.out.println(dataLine[0] + ", " + dataLine[1] + ", " + dataLine[2]);
                     toCommand = """                
-                            "%s","%s","%s","%s","%s"
+                            %s,%s,%s,%s,%s
                             """.formatted(kunde, zaehlernummer, dataLine[0], dataLine[1], dataLine[2]);
                     //kunde + zaehlernummer + dataLine[0] + dataLine[1] + dataLine[2];
                 }
-                sqlList.add(toCommand);
+                // Skip empty commands
+                if (!toCommand.trim().isEmpty()) {
+                    sqlList.add(toCommand);
+                }
+            }
+            switch (type) {
+                case 0:
+                    writeCSV("src\\main\\resources\\heizung_sql.csv", sqlList);
+                    break;
+                case 1:
+                    writeCSV("src\\main\\resources\\strom_sql.csv", sqlList);
+                    break;
+                case 2:
+                    writeCSV("src\\main\\resources\\wasser_sql.csv", sqlList);
+                    break;
             }
 
+            return sqlList;
         } catch (IOException e) {
             log.error("IOException: ", e);
         } catch (CsvValidationException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
+
+    public static void writeCSV(String outputFile, List<String> sqlList) {
+        try (CSVWriter writer = (CSVWriter) new CSVWriterBuilder(new FileWriter(outputFile))
+                .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
+                .build()) {
+            // Iterate over each string in sqlList
+            for (String line : sqlList) {
+                // Split the line by comma into individual columns
+                String[] columns = line.split(",");
+                // Write the split columns to the CSV file
+                writer.writeNext(columns);
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
+
 }
