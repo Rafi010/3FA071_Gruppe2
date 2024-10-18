@@ -1,6 +1,6 @@
 package dev.hv.rest;
 
-public class server {
+public class Server {
 
     static void startServer (String url) {
         return;
