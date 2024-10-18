@@ -1,25 +1,19 @@
 package dev.hv.test;
 
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.nocrala.tools.texttablefmt.Table;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
+import java.io.Reader;
 import java.sql.*;
-import java.util.Properties;
 
 public class Util {
-
-    private static Connection con = null;
-    private static Properties properties = new Properties();
-
     private Util() {
     }
-
     //This method checks whether the system is a Mac or Windows computer.
-    private static String backOrForward() {
+    public static String backOrForward() {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("mac")) {
             return "/";
@@ -30,27 +24,15 @@ public class Util {
         return "";
     }
 
-    private static String getDatabaseProperty(String key){
-        String userName = System.getProperty("user.name");
-        return properties.getProperty(userName + ".db." + key);
-    }
-
-    public static Connection getConnection(final String db) {
-        if (con == null) {
-            try {
-                final String home = System.getProperty("user.home");
-                properties.load(new FileReader(home + backOrForward() + db + ".properties"));
-                String dburl = getDatabaseProperty("url");
-                String dbuser = getDatabaseProperty("user");
-                String dbpw = getDatabaseProperty("pw");
-                System.out.println(home);
-
-                con = DriverManager.getConnection(dburl, dbuser, dbpw);
-            } catch (SQLException | IOException e) {
-                throw new RuntimeException(e);
-            }
+    public static void executeSQL(Connection con, String filePath){
+        try {
+            ScriptRunner sr = new ScriptRunner(con);
+            Reader reader = new BufferedReader(new FileReader(filePath));
+            sr.runScript(reader);
         }
-        return con;
+        catch (IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     public static void close(final AutoCloseable obj) {
