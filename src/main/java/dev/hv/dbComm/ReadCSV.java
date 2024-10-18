@@ -72,12 +72,7 @@ public class ReadCSV {
                 }
             }
 
-            // Output the meta data
-            System.out.println("Kunde: " + kunde);
-            System.out.println("Zählernummer: " + zaehlernummer);
 
-            // Output the actual data
-            System.out.println("\nDaten:");
             //Output SQL ready
             for (String[] dataLine : dataList) {
                 if (bo) {
