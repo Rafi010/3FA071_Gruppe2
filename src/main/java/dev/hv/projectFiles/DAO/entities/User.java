@@ -1,4 +1,4 @@
-package dev.hv.projectFiles.DAO.entitys;
+package dev.hv.projectFiles.DAO.entities;
 
 import dev.hv.model.ICustomer;
 
