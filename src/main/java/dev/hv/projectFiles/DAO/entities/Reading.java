@@ -1,8 +1,7 @@
-package dev.hv.projectFiles.DAO;
+package dev.hv.projectFiles.DAO.entities;
 
 import dev.hv.model.ICustomer;
 import dev.hv.model.IReading;
-import net.bytebuddy.asm.Advice;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
