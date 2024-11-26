@@ -22,16 +22,16 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
 
     @Override
     public void addReading(Reading reading) {
-        String zaehlerstand = "";
-        switch (reading.getKindOfMeter()) {
-            case STROM -> zaehlerstand = "zaehlerstand_in_kwh";
-            case WASSER -> zaehlerstand = "zaehlerstand_in_m³";
-            case HEIZUNG -> zaehlerstand = "zaehlerstand_in_mwh";
-            case UNBEKANNT -> {
-                return;
-            }
-        }
         try {
+            String zaehlerstand = "";
+            switch (reading.getKindOfMeter()) {
+                case STROM -> zaehlerstand = "zaehlerstand_in_kwh";
+                case WASSER -> zaehlerstand = "zaehlerstand_in_m³";
+                case HEIZUNG -> zaehlerstand = "zaehlerstand_in_mwh";
+                case UNBEKANNT -> {
+                    return;
+                }
+            }
             String query = "INSERT INTO ? (kundenid, zaehlernummer, datum, ?, kommentar) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getKindOfMeter().toString());
@@ -42,7 +42,8 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             stmt.setDouble(6, reading.getMeterCount());
             stmt.setString(7, reading.getComment());
             stmt.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException|NullPointerException e) {
+            System.out.println("Es wurden nicht alle erforderlichen Werte des Objekts erfüllt.\nEs wurde nicht in die Datenbank gespeichert.");
             e.printStackTrace();
         }
     }
@@ -105,16 +106,16 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
 
     @Override
     public void updateReading(Reading reading) {
-        String zaehlerstand = "";
-        switch (reading.getKindOfMeter()) {
-            case STROM -> zaehlerstand = "zaehlerstand_in_kwh";
-            case WASSER -> zaehlerstand = "zaehlerstand_in_m³";
-            case HEIZUNG -> zaehlerstand = "zaehlerstand_in_mwh";
-            case UNBEKANNT -> {
-                return;
-            }
-        }
         try {
+            String zaehlerstand = "";
+            switch (reading.getKindOfMeter()) {
+                case STROM -> zaehlerstand = "zaehlerstand_in_kwh";
+                case WASSER -> zaehlerstand = "zaehlerstand_in_m³";
+                case HEIZUNG -> zaehlerstand = "zaehlerstand_in_mwh";
+                case UNBEKANNT -> {
+                    return;
+                }
+            }
             String query = "UPDATE ? SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, ? = ? WHERE zaehlernummer = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getKindOfMeter().toString());
@@ -126,7 +127,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             stmt.setDouble(7, reading.getMeterCount());
             stmt.setString(8, reading.getMeterId());
             stmt.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException|NullPointerException e) {
             e.printStackTrace();
         }
     }

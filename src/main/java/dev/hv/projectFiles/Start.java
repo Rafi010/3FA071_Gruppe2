@@ -6,6 +6,7 @@ import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
+import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.User;
 
 import java.time.LocalDate;
@@ -32,22 +33,13 @@ public class Start {
       connection.openHvConnection(properties);
       //create the tables and fill them
       connection.createAllTables();
+      connection.fillDatabase();
 
       //create the customer dao
       CustomerDao customerDao = new CustomerDaoImpl(connection.getConnection());
       //create the reading dao
       ReadingDao readingDao = new ReadingDaoImpl(connection.getConnection());
 
-      User user1 = new User();
-      user1.setId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
-      user1.setGender(ICustomer.Gender.M);
-      user1.setFirstName("Raphael");
-      user1.setLastName("Rauch");
-      user1.setBirthDate(LocalDate.of(2006, 5, 2));
-
-      customerDao.addUser(user1);
-
-      connection.fillDatabase();
       //close the connection
       connection.closeConnection();
    }
