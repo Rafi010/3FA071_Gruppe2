@@ -1,6 +1,8 @@
 package dev.hv.projectFiles;
 
 import dev.hv.model.IDatebaseConnection;
+import io.
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,16 +19,13 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     //opens a connection to mySql (uses the url in the properties file wich does not connect to the hv database)
     @Override
-    public IDatebaseConnection openConnection(Properties properties){
-        final String userName = System.getProperty("user.name");
-        final String home = System.getProperty("user.home");
+    public IDatebaseConnection openConnection(){
         try {
-            //loads the key-value pairs into the properties object
-            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
+            Dotenv dotenv
             //gets the needed values out of the properties file
             final String dburl = properties.getProperty(userName + ".db.url");
             final String dbuser = properties.getProperty(userName + ".db.user");
-            final String dbpw = properties.getProperty(userName + ".db.pw");
+            final String dbpw =
             //uses the values to create the connection and save it
             this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
             System.out.println("Connected to MySql");

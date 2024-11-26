@@ -21,8 +21,6 @@ public class Start {
          port = "8080";  // default port for local development
       }
       String baseUri = "http://0.0.0.0:" + port + "/";
-      //create properties object for use as parameter
-      Properties properties = new Properties();
       //create createProp object to create the properties file
       CreateProperties createProp = new CreateProperties();
       //create connection object used for database communication
@@ -31,7 +29,7 @@ public class Start {
       //create the properties file
       createProp.Create();
       //open the general connection to mySql
-      connection.openConnection(properties);
+      connection.openConnection();
       //create the hv database
       connection.createDatabase();
       //close the old connection and open the new one with the hv database
