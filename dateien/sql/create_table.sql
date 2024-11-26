@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS strom (
 
 CREATE TABLE IF NOT EXISTS kunde (
     uuid VARCHAR(255),
-    anrede VARCHAR(255),
+    anrede VARCHAR(1),
     nachname VARCHAR(255),
     vorname VARCHAR(255),
     geburtsdatum DATE

@@ -5,8 +5,15 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(UUID, Anrede, Vorname, Nachname, @Geburtsdatum)
-SET Geburtsdatum = IF(@Geburtsdatum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@Geburtsdatum, '%d.%m.%Y'))
+(UUID, @Anrede, Vorname, Nachname, @Geburtsdatum)
+SET
+    Anrede = CASE
+                WHEN @Anrede COLLATE utf8mb4_general_ci = 'Herr' THEN 'M'
+                WHEN @Anrede COLLATE utf8mb4_general_ci = 'Frau' THEN 'W'
+                WHEN @Anrede COLLATE utf8mb4_general_ci = 'k.A.' THEN 'U'
+                ELSE NULL
+             END,
+    Geburtsdatum = IF(@Geburtsdatum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@Geburtsdatum, '%d.%m.%Y'))
 ;
 LOAD DATA LOCAL INFILE 'src/test/resources/heizung_sql.csv'
 INTO TABLE heizung
