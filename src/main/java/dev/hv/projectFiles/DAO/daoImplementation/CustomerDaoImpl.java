@@ -18,7 +18,6 @@ private Connection connection;
         this.connection = connection;
     }
 
-
     @Override
     public void addUser(User user) {
 
@@ -40,11 +39,11 @@ private Connection connection;
     }
 
     @Override
-    public User getUserById(int id) {
+    public ICustomer getUserById(String id) {
         try {
             String query = "SELECT * FROM users WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -86,11 +85,11 @@ private Connection connection;
     }
 
     @Override
-    public void deleteUser(int id) {
+    public void deleteUser(String id) {
         try {
             String query = "DELETE FROM kunde WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
