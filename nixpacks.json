@@ -1,0 +1,3 @@
+{
+  "pkgs": ["openjdk-21", "maven"]
+}
