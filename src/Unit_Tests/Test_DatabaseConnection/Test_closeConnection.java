@@ -46,7 +46,7 @@ class Test_closeConnection {
     @Test
     void testCloseConnection() {
         // Erstellt eine Instanz von DatabaseConnection mit der aktuellen Verbindung
-        DatabaseConnection dbConnection = new DatabaseConnection(connection);
+        DbConnector dbConnection = new DbConnector(connection);
         // Überprüft, dass die Methode closeConnection keine Ausnahme wirft
         assertDoesNotThrow(dbConnection::closeConnection);
         // Überprüft, ob die Verbindung geschlossen ist
@@ -72,7 +72,7 @@ class Test_closeConnection {
  * Diese Klasse stellt eine Verbindung zu einer Datenbank dar.
  * Sie bietet Methoden zum Schließen der Datenbankverbindung.
  */
-class DatabaseConnection {
+class DbConnector {
 
     private final Connection connection;
 
@@ -80,7 +80,7 @@ class DatabaseConnection {
      * Konstruktor, der die Datenbankverbindung initialisiert.
      * @param connection die zu verwendende Verbindung.
      */
-    public DatabaseConnection(Connection connection) {
+    public DbConnector(Connection connection) {
         this.connection = connection;
     }
 
