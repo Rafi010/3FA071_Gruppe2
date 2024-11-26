@@ -1,17 +1,11 @@
 package dev.hv.projectFiles;
 
 import dev.hv.model.IDatebaseConnection;
-import io.
-import io.github.cdimascio.dotenv.Dotenv;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
-
-
 
 public class DatabaseConnection implements IDatebaseConnection {
     //connection is saved locally so all db interaction can happen only within this class
@@ -19,16 +13,21 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     //opens a connection to mySql (uses the url in the properties file wich does not connect to the hv database)
     @Override
-    public IDatebaseConnection openConnection(){
+    public IDatebaseConnection openConnection(Properties properties) {
+        final String userName = System.getProperty("user.name");
+        final String home = System.getProperty("user.home");
         try {
-            Dotenv dotenv
+            //loads the key-value pairs into the properties object
+            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
             //gets the needed values out of the properties file
             final String dburl = properties.getProperty(userName + ".db.url");
             final String dbuser = properties.getProperty(userName + ".db.user");
-            final String dbpw =
+            final String dbpw = properties.getProperty(userName + ".db.pw");
             //uses the values to create the connection and save it
             this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
             System.out.println("Connected to MySql");
+
+
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -36,7 +35,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     }
 
     //opens a connection to mySql (uses the url in the properties file wich does connect to the hv database)
-    public void openHvConnection (Properties properties){
+    public void openHvConnection(Properties properties) {
         String userName = System.getProperty("user.name");
         final String home = System.getProperty("user.home");
         try {
@@ -54,7 +53,7 @@ public class DatabaseConnection implements IDatebaseConnection {
         }
     }
 
-    public void createDatabase(){
+    public void createDatabase() {
         if (connection == null) {
             throw new IllegalStateException("No open database connection");
         }
@@ -70,7 +69,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     }
 
     @Override
-    public void truncateAllTables(){
+    public void truncateAllTables() {
         if (connection == null) {
             throw new IllegalStateException("No open database connection");
         }
@@ -78,7 +77,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     }
 
     @Override
-    public void removeAllTables(){
+    public void removeAllTables() {
         if (connection == null) {
             throw new IllegalStateException("No open database connection");
         }
@@ -86,17 +85,16 @@ public class DatabaseConnection implements IDatebaseConnection {
     }
 
     @Override
-    public void closeConnection(){
+    public void closeConnection() {
         try {
             connection.close();
             System.out.println("Connection closed");
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void fillDatabase(){
+    public void fillDatabase() {
         if (connection == null) {
             throw new IllegalStateException("No open database connection");
         }
