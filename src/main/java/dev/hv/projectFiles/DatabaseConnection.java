@@ -1,7 +1,6 @@
 package dev.hv.projectFiles;
 
 import dev.hv.model.IDatebaseConnection;
-import io.
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.sql.Connection;
@@ -21,15 +20,10 @@ public class DatabaseConnection implements IDatebaseConnection {
     @Override
     public IDatebaseConnection openConnection(){
         try {
-            Dotenv dotenv
-            //gets the needed values out of the properties file
-            final String dburl = properties.getProperty(userName + ".db.url");
-            final String dbuser = properties.getProperty(userName + ".db.user");
-            final String dbpw =
-            //uses the values to create the connection and save it
-            this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
+            Dotenv dotenv = Dotenv.load();
+            this.connection = DriverManager.getConnection(dotenv.get("MYSQL_URL"));
             System.out.println("Connected to MySql");
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return this;
@@ -40,14 +34,8 @@ public class DatabaseConnection implements IDatebaseConnection {
         String userName = System.getProperty("user.name");
         final String home = System.getProperty("user.home");
         try {
-            //loads the key-value pairs into the properties object
-            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
-            //gets the needed values out of the properties file
-            String dburl = properties.getProperty(userName + ".db.url_db");
-            String dbuser = properties.getProperty(userName + ".db.user");
-            String dbpw = properties.getProperty(userName + ".db.pw");
-            //uses the values to create the connection and save it
-            this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
+            Dotenv dotenv = Dotenv.load();
+            this.connection = DriverManager.getConnection(dotenv.get("MYSQL_URL"));
             System.out.println("Connected to: hv");
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);

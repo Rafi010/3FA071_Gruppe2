@@ -8,7 +8,7 @@ import java.util.Properties;
  */
 public interface IDatebaseConnection {
 
-    public IDatebaseConnection openConnection(Properties properties);
+    public IDatebaseConnection openConnection();
     public void createAllTables();
     public void truncateAllTables();
     public void removeAllTables();
