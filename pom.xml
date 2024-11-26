@@ -16,9 +16,9 @@
 		<mariadb.version>3.4.0</mariadb.version>
 		<junit-jupiter.version>5.10.3</junit-jupiter.version>
 
-		<maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
-		<maven.surefire.plugin.version>3.3.0</maven.surefire.plugin.version>
-		<maven.antrun.plugin.version>3.0.0</maven.antrun.plugin.version>
+		<maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+		<maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+		<maven.antrun.plugin.version>3.1.0</maven.antrun.plugin.version>
 
 	</properties>
 

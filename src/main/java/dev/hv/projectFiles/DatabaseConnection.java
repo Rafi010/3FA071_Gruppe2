@@ -29,19 +29,6 @@ public class DatabaseConnection implements IDatebaseConnection {
         return this;
     }
 
-    //opens a connection to mySql (uses the url in the properties file wich does connect to the hv database)
-    public void openHvConnection (Properties properties){
-        String userName = System.getProperty("user.name");
-        final String home = System.getProperty("user.home");
-        try {
-            Dotenv dotenv = Dotenv.load();
-            this.connection = DriverManager.getConnection(dotenv.get("MYSQL_URL"));
-            System.out.println("Connected to: hv");
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void createDatabase(){
         if (connection == null) {
             throw new IllegalStateException("No open database connection");

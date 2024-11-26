@@ -26,15 +26,7 @@ public class Start {
       //create connection object used for database communication
       DatabaseConnection connection = new DatabaseConnection();
 
-      //create the properties file
-      createProp.Create();
-      //open the general connection to mySql
       connection.openConnection();
-      //create the hv database
-      connection.createDatabase();
-      //close the old connection and open the new one with the hv database
-      connection.closeConnection();
-      connection.openHvConnection(properties);
       //create the tables and fill them
       connection.createAllTables();
       connection.fillDatabase();
@@ -44,7 +36,7 @@ public class Start {
       //create the reading dao
       ReadingDao readingDao = new ReadingDaoImpl(connection.getConnection());
 
-      Server.startServer("http://localhost:8080/");
+      Server.startServer(baseUri);
       //close the connection
    }
 }
