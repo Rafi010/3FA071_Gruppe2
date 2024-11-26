@@ -14,6 +14,7 @@ import java.util.Properties;
  * Class responsible for creating a properties file for database configuration.
  * This properties file specifies the URL, user, and password for the database.
  */
+
 public class CreateProperties {
 
     private static final Logger log = LoggerFactory.getLogger(CreateProperties.class);
