@@ -8,6 +8,7 @@ import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
 import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.rest.Server;
 
 import java.time.LocalDate;
 import java.util.Properties;
@@ -15,8 +16,11 @@ import java.util.UUID;
 
 public class Start {
    public static void main(String[] args) {
-      //create properties object for use as parameter
-      Properties properties = new Properties();
+      String port = System.getenv("PORT");
+      if (port == null) {
+         port = "8080";  // default port for local development
+      }
+      String baseUri = "http://0.0.0.0:" + port + "/";
       //create createProp object to create the properties file
       CreateProperties createProp = new CreateProperties();
       //create connection object used for database communication
@@ -25,7 +29,7 @@ public class Start {
       //create the properties file
       createProp.Create();
       //open the general connection to mySql
-      connection.openConnection(properties);
+      connection.openConnection();
       //create the hv database
       connection.createDatabase();
       //close the old connection and open the new one with the hv database
@@ -40,7 +44,7 @@ public class Start {
       //create the reading dao
       ReadingDao readingDao = new ReadingDaoImpl(connection.getConnection());
 
+      Server.startServer("http://localhost:8080/");
       //close the connection
-      connection.closeConnection();
    }
 }
