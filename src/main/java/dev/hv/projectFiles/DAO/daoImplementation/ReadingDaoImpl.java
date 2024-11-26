@@ -1,5 +1,6 @@
 package dev.hv.projectFiles.DAO.daoImplementation;
 
+import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
 import dev.hv.projectFiles.DAO.entities.Reading;
 
@@ -15,6 +16,8 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     public ReadingDaoImpl(Connection connection) {
         this.connection = connection;
     }
+
+    CustomerDao customerDao = new CustomerDaoImpl(connection);
 
     @Override
     public void addReading(Reading reading) {
@@ -36,19 +39,19 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     }
 
     @Override
-    public Reading getReadingById(int id) {
+    public Reading getReadingById(String id) {
         try {
             String query = "SELECT * FROM readings WHERE id = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 Reading reading = new Reading();
                 reading.setId(UUID.fromString(rs.getString("id")));
                 reading.setComment(rs.getString("comment"));
-                // Assuming `customer` is fetched separately using its ID
-                // reading.setCustomer(fetchCustomerById(rs.getString("customer_id")));
+                // `customer` is fetched separately using its ID
+                reading.setCustomer(customerDao.getUserById(rs.getString("customer_id")));
                 reading.setDateOfReading(rs.getDate("date_of_reading").toLocalDate());
                 reading.setKindOfMeter(Reading.KindOfMeter.valueOf(rs.getString("kind_of_meter")));
                 reading.setMeterCount(rs.getDouble("meter_count"));
@@ -75,7 +78,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 reading.setId(UUID.fromString(rs.getString("id")));
                 reading.setComment(rs.getString("comment"));
                 // Assuming `customer` is fetched separately using its ID
-                // reading.setCustomer(fetchCustomerById(rs.getString("customer_id")));
+                reading.setCustomer(customerDao.getUserById(rs.getString("customer_id")));
                 reading.setDateOfReading(rs.getDate("date_of_reading").toLocalDate());
                 reading.setKindOfMeter(Reading.KindOfMeter.valueOf(rs.getString("kind_of_meter")));
                 reading.setMeterCount(rs.getDouble("meter_count"));
@@ -109,11 +112,11 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     }
 
     @Override
-    public void deleteReading(int id) {
+    public void deleteReading(String id) {
         try {
             String query = "DELETE FROM readings WHERE id = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
