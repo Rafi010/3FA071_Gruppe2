@@ -1,4 +1,4 @@
-package Test_CreateDatabase;
+package Test_DatabaseConnection;
 
 public class Test_openConnection {
 }
