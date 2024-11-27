@@ -5,12 +5,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.*;
-import java.util.Properties;
-
-
 
 public class DatabaseConnection implements IDatebaseConnection {
     //connection is saved locally so all db interaction can happen only within this class

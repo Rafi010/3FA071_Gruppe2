@@ -17,8 +17,6 @@ import java.util.Properties;
 
 public class CreateProperties {
 
-    private static final Logger log = LoggerFactory.getLogger(CreateProperties.class);
-
     public void Create(){
 
         // Get the filepath of the properties file
@@ -54,7 +52,7 @@ public class CreateProperties {
                 config.store(output, DatabaseComment);
                 System.out.println("Config file created at " + configFilePath);
             } catch (IOException e) {
-                log.error("error: ", e);
+                e.printStackTrace();
             }
         }
     }
