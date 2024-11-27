@@ -15,14 +15,14 @@ public class DatabaseConnection implements IDatebaseConnection {
     @Override
     public IDatebaseConnection openConnection(){
         try {
-            Dotenv dotenv = null;
-            try {
-                dotenv = Dotenv.configure().load();
-            } catch (Exception e) {
-                System.out.println("No .env file found. Proceeding with environment variables.");
-            }
-            String dbUrl = dotenv != null ? dotenv.get("MYSQL_URL") : "mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway";
-            this.connection = DriverManager.getConnection(dbUrl);
+//            Dotenv dotenv = null;
+//            try {
+//                dotenv = Dotenv.configure().load();
+//            } catch (Exception e) {
+//                System.out.println("No .env file found. Proceeding with environment variables.");
+//            }
+//            String dbUrl = dotenv != null ? dotenv.get("MYSQL_URL") : "mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway";
+            this.connection = DriverManager.getConnection("jdbc:mysql://mysql.railway.internal:3306/railway)", "root", "YjltZVfpfIyxhXVDkluArCKdzvxffIgl");
             System.out.println("Connected to MySql");
         } catch (SQLException e) {
             throw new RuntimeException(e);
