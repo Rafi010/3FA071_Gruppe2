@@ -22,7 +22,12 @@ public class DatabaseConnection implements IDatebaseConnection {
 //                System.out.println("No .env file found. Proceeding with environment variables.");
 //            }
 //            String dbUrl = dotenv != null ? dotenv.get("MYSQL_URL") : "mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway";
-            this.connection = DriverManager.getConnection("mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway");
+
+            String jdbcUrl = "jdbc:mysql://junction.proxy.rlwy.net:49560/railway";
+            String username = "root";
+            String password = "YjltZVfpfIyxhXVDkluArCKdzvxffIgl";
+
+            this.connection = DriverManager.getConnection(jdbcUrl, username, password);
             System.out.println("Connected to MySql");
         } catch (SQLException e) {
             throw new RuntimeException(e);
