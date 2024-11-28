@@ -21,7 +21,7 @@ public class DatabaseConnection implements IDatebaseConnection {
                 this.connection = DriverManager.getConnection(dotenv.get("MYSQL_URL"));
             } catch (Exception e) {
                 System.out.println("No .env file found. Proceeding with environment variables.");
-                String url = "jdbc:mariadb://database.railway.internal:3306/" + System.getenv("MARIADB_DATABASE");
+                String url = "jdbc:mariadb://database.railway.internal:3306/hv";
                 this.connection = DriverManager.getConnection(url, "railway", "e2LBmjn0l~PjnOkGhn5sGGnGhWETLk_Z");
             }
             System.out.println("Connected to MySql");
