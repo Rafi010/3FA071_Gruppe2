@@ -15,31 +15,20 @@ public class DatabaseConnection implements IDatebaseConnection {
     @Override
     public IDatebaseConnection openConnection(){
         try {
-//            Dotenv dotenv = null;
-//            try {
-//                dotenv = Dotenv.configure().load();
-//            } catch (Exception e) {
-//                System.out.println("No .env file found. Proceeding with environment variables.");
-//            }
-//            String dbUrl = dotenv != null ? dotenv.get("MYSQL_URL") : "mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway";
-
-            String url = "jdbc:mariadb://mariadb.railway.internal:3306/railway";
-            String user = "railway";
-            String password = "e2LBmjn0l~PjnOkGhn5sGGnGhWETLk_Z";
-
-            this.connection = DriverManager.getConnection(url, user, password);
+            Dotenv dotenv = null;
+            try {
+                dotenv = Dotenv.configure().load();
+                this.connection = DriverManager.getConnection(dotenv.get("MYSQL_URL"));
+            } catch (Exception e) {
+                System.out.println("No .env file found. Proceeding with environment variables.");
+                String url = "jdbc:mariadb://database.railway.internal:3306/" + System.getenv("MARIADB_DATABASE");
+                this.connection = DriverManager.getConnection(url, System.getenv("MARIADB_USER"), System.getenv("MARIADB_PASSWORD"));
+            }
             System.out.println("Connected to MySql");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return this;
-    }
-
-    public void createDatabase(){
-        if (connection == null) {
-            throw new IllegalStateException("No open database connection");
-        }
-        Util.executeSQL(connection, "dateien/sql/create_db_hv.sql");
     }
 
     @Override
