@@ -40,8 +40,10 @@ public class Start {
       CustomerDao customerDao = new CustomerDaoImpl(connection.getConnection());
       //create the reading dao
       ReadingDao readingDao = new ReadingDaoImpl(connection.getConnection());
+      //close the connection
+      connection.closeConnection();
 
       Server.startServer("http://localhost:8080/");
-      //close the connection
+
    }
 }
