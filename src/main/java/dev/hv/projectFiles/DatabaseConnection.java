@@ -23,8 +23,11 @@ public class DatabaseConnection implements IDatebaseConnection {
 //            }
 //            String dbUrl = dotenv != null ? dotenv.get("MYSQL_URL") : "mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway";
 
+            String url = "jdbc:mariadb://mariadb.railway.internal:3306/railway";
+            String user = "railway";
+            String password = "e2LBmjn0l~PjnOkGhn5sGGnGhWETLk_Z";
 
-            this.connection = DriverManager.getConnection("jdbc:mariadb://railway:e2LBmjn0l~PjnOkGhn5sGGnGhWETLk_Z@mariadb.railway.internal:3306/railway");
+            this.connection = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to MySql");
         } catch (SQLException e) {
             throw new RuntimeException(e);
