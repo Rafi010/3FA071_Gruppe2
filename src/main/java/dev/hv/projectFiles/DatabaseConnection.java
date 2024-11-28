@@ -24,7 +24,7 @@ public class DatabaseConnection implements IDatebaseConnection {
 //            String dbUrl = dotenv != null ? dotenv.get("MYSQL_URL") : "mysql://root:YjltZVfpfIyxhXVDkluArCKdzvxffIgl@mysql.railway.internal:3306/railway";
 
 
-            this.connection = DriverManager.getConnection("mariadb://railway:e2LBmjn0l~PjnOkGhn5sGGnGhWETLk_Z@mariadb.railway.internal:3306/railway");
+            this.connection = DriverManager.getConnection("jdbc:mariadb://railway:e2LBmjn0l~PjnOkGhn5sGGnGhWETLk_Z@mariadb.railway.internal:3306/railway");
             System.out.println("Connected to MySql");
         } catch (SQLException e) {
             throw new RuntimeException(e);
