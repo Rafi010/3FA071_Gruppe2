@@ -8,24 +8,24 @@ import java.sql.*;
 import java.util.Properties;
 
 public class DatabaseConnection implements IDatebaseConnection {
-    //connection is saved locally so all db interaction can happen only within this class
+    // Die Verbindung wird lokal gespeichert, sodass alle DB-Interaktionen nur innerhalb dieser Klasse stattfinden können
     private Connection connection;
 
-    //opens a connection to mySql (uses the url in the properties file wich does not connect to the hv database)
+    // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die nicht mit der hv-Datenbank verbindet)
     @Override
     public IDatebaseConnection openConnection(Properties properties) {
         final String userName = System.getProperty("user.name");
         final String home = System.getProperty("user.home");
         try {
-            //loads the key-value pairs into the properties object
+            // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
             properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
-            //gets the needed values out of the properties file
+            // Holt die benötigten Werte aus der Properties-Datei
             final String dburl = properties.getProperty(userName + ".db.url");
             final String dbuser = properties.getProperty(userName + ".db.user");
             final String dbpw = properties.getProperty(userName + ".db.pw");
-            //uses the values to create the connection and save it
+            // Verwendet die Werte, um die Verbindung zu erstellen und speichert sie
             this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
-            System.out.println("Connected to MySql");
+            System.out.println("Mit MySQL verbunden");
 
 
         } catch (SQLException | IOException e) {
@@ -34,20 +34,20 @@ public class DatabaseConnection implements IDatebaseConnection {
         return this;
     }
 
-    //opens a connection to mySql (uses the url in the properties file wich does connect to the hv database)
+    // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die mit der hv-Datenbank verbindet)
     public void openHvConnection(Properties properties) {
         String userName = System.getProperty("user.name");
         final String home = System.getProperty("user.home");
         try {
-            //loads the key-value pairs into the properties object
+            // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
             properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
-            //gets the needed values out of the properties file
+            // Holt die benötigten Werte aus der Properties-Datei
             String dburl = properties.getProperty(userName + ".db.url_db");
             String dbuser = properties.getProperty(userName + ".db.user");
             String dbpw = properties.getProperty(userName + ".db.pw");
-            //uses the values to create the connection and save it
+            // Verwendet die Werte, um die Verbindung zu erstellen und speichert sie
             this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
-            System.out.println("Connected to: hv");
+            System.out.println("Mit der Datenbank verbunden: hv");
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,7 +55,7 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     public void createDatabase() {
         if (connection == null) {
-            throw new IllegalStateException("No open database connection");
+            throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
         Util.executeSQL(connection, "dateien/sql/create_db_hv.sql");
     }
@@ -63,7 +63,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     @Override
     public void createAllTables() {
         if (connection == null) {
-            throw new IllegalStateException("No open database connection");
+            throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
         Util.executeSQL(connection, "dateien/sql/create_table.sql");
     }
@@ -71,7 +71,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     @Override
     public void truncateAllTables() {
         if (connection == null) {
-            throw new IllegalStateException("No open database connection");
+            throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
         Util.executeSQL(connection, "dateien/sql/truncate_table.sql");
     }
@@ -79,7 +79,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     @Override
     public void removeAllTables() {
         if (connection == null) {
-            throw new IllegalStateException("No open database connection");
+            throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
         Util.executeSQL(connection, "dateien/sql/remove_table.sql");
     }
@@ -88,7 +88,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     public void closeConnection() {
         try {
             connection.close();
-            System.out.println("Connection closed");
+            System.out.println("Verbindung geschlossen");
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,7 +96,7 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     public void fillDatabase() {
         if (connection == null) {
-            throw new IllegalStateException("No open database connection");
+            throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
         Util.executeSQL(connection, "dateien/sql/load_csv_file_in_table.sql");
     }
