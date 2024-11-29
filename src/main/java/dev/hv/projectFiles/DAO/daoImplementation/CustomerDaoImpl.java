@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public class CustomerDaoImpl implements CustomerDao<User> {
 
-    private Connection connection; // Datenbankverbindung
+    private final Connection connection; // Datenbankverbindung
 
     /**
      * Konstruktor für CustomerDaoImpl.
@@ -148,7 +148,7 @@ public class CustomerDaoImpl implements CustomerDao<User> {
             stmt.setString(5, user.getId().toString()); // UUID
             stmt.executeUpdate(); // Query ausführen
         } catch (SQLException e) {
-            e.printStackTrace(); // Fehlerausgabe im Fehlerfall
+            throw new RuntimeException(e); // Fehlerausgabe im Fehlerfall
         }
     }
 }

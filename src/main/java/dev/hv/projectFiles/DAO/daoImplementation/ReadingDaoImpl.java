@@ -57,7 +57,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             System.out.println("Es wurden nicht alle erforderlichen Werte des Objekts erfüllt.\nEs wurde nicht in die Datenbank gespeichert.");
-            ;
+
         }
     }
 
