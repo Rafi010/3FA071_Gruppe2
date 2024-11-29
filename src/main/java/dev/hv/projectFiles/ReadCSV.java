@@ -26,7 +26,7 @@ public class ReadCSV {
     }
 
     // CSV-Dateien lesen und schreiben, Parameter: Pfad zur CSV-Datei (Beispiel in der main-Methode) und Integer für Heizung (0), Strom (1), Wasser (2)
-    public static List<String> readFlexibleCSV(String csvFile, int type) {
+    public static void readFlexibleCSV(String csvFile, int type) {
         try {
             // CSVParser erstellen
             CSVParser parser = new CSVParserBuilder()
@@ -105,13 +105,11 @@ public class ReadCSV {
                     break;
             }
 
-            return sqlList;
         } catch (IOException e) {
             log.error("IOException: ", e);
         } catch (CsvValidationException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     public static void writeCSV(String outputFile, List<String> sqlList) {
