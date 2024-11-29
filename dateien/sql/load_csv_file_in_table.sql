@@ -1,11 +1,19 @@
 --Importieren der CSV-Datei in die Tabelle "kunde".
-LOAD DATA LOCAL INFILE 'src/main/resources/kunden_utf8.csv' --"LOCAL" bedeutet, dass die Datei auf dem Rechner liegt.
-INTO TABLE kunde --Importiert die Daten aus der CSV-Datei in die Tabelle "kunde".
-CHARACTER SET utf8mb4 --Legt den Zeichensatz für die importierten Daten auf UTF-8 mb4 fest
-FIELDS TERMINATED BY ',' --Die Felder sind in der CSV-Datei durch Kommas (,) getrennt.
-ENCLOSED BY '"' --Gibt an, dass jede Zeile in der Datei mit einem Zeilenumbruch (\n) abgeschlossen wird.
-LINES TERMINATED BY '\n' --Gibt an, dass jede Zeile in der Datei mit einem Zeilenumbruch (\n) abgeschlossen wird.
-IGNORE 1 ROWS --Ignoriert die erste Spalte bzw. Spaltenüberschrift
+
+--"LOCAL" bedeutet, dass die Datei auf dem Rechner liegt.
+LOAD DATA LOCAL INFILE 'src/main/resources/kunden_utf8.csv'
+--Importiert die Daten aus der CSV-Datei in die Tabelle "kunde".
+INTO TABLE kunde
+--Legt den Zeichensatz für die importierten Daten auf UTF-8 mb4 fest
+CHARACTER SET utf8mb4
+--Die Felder sind in der CSV-Datei durch Kommas (,) getrennt.
+FIELDS TERMINATED BY ','
+--Gibt an, dass jede Zeile in der Datei mit einem Zeilenumbruch (\n) abgeschlossen wird.
+ENCLOSED BY '"'
+--Gibt an, dass jede Zeile in der Datei mit einem Zeilenumbruch (\n) abgeschlossen wird.
+LINES TERMINATED BY '\n'
+--Ignoriert die erste Spalte bzw. Spaltenüberschrift
+IGNORE 1 ROWS
 (UUID, @Anrede, Vorname, Nachname, @Geburtsdatum)
 SET
     Anrede = CASE
@@ -26,7 +34,8 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (kundenid, zaehlernummer, @datum, zaehlerstand_in_mwh, kommentar)
-SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y')) --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
+--Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
+SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
 ;
 --Importieren der CSV-Datei in dei Tabelle "wasser"
 LOAD DATA LOCAL INFILE 'src/unit_tests/resources/wasser_sql.csv'
@@ -37,7 +46,8 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (kundenid, zaehlernummer, @datum, zaehlerstand_in_m³, kommentar)
-SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y')) --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
+--Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
+SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
 ;
 --Importieren der CSV-Datei in die Tabelle "strom"
 LOAD DATA LOCAL INFILE 'src/unit_tests/resources/strom_sql.csv'
@@ -48,5 +58,6 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (kundenid, zaehlernummer, @datum, zaehlerstand_in_kwh, kommentar)
-SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y')) --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
+--Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
+SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
 ;
