@@ -9,7 +9,7 @@ IGNORE 1 ROWS --Ignoriert die erste Spalte bzw. Spaltenüberschrift
 (UUID, @Anrede, Vorname, Nachname, @Geburtsdatum)
 SET
     Anrede = CASE
-                --
+                --Setzt die Variable "Anrede" auf 'M', 'W', 'U' oder NULL, basierend auf dem Wert von "@Anrede".
                 WHEN @Anrede COLLATE utf8mb4_general_ci = 'Herr' THEN 'M'
                 WHEN @Anrede COLLATE utf8mb4_general_ci = 'Frau' THEN 'W'
                 WHEN @Anrede COLLATE utf8mb4_general_ci = 'k.A.' THEN 'U'
