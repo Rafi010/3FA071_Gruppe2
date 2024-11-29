@@ -15,8 +15,7 @@ public class CustomerResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    //@Path("/test")
-    public Response sayHello(User userData) {
+    public Response customerPost(User userData) {
         //Validierung der Daten
         if (userData.getGender() == null || userData.getBirthDate() == null || userData.getLastName() == null || userData.getFirstName() == null) {
             return Response.status(Response.Status.BAD_REQUEST)
