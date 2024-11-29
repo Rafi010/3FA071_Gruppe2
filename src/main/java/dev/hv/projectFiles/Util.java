@@ -1,7 +1,6 @@
 package dev.hv.projectFiles;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.nocrala.tools.texttablefmt.Table;
 
 import java.io.File;
 import java.io.BufferedReader;
@@ -11,54 +10,41 @@ import java.io.Reader;
 import java.sql.*;
 
 public class Util {
+    // Privater Konstruktor, um Instanziierung zu verhindern
     private Util() {
     }
-    //This method checks whether the system is a Mac or Windows computer.
+
+    /**
+     * Passt den angegebenen Dateipfad an das Betriebssystem an.
+     * Ersetzt Backslashes durch das systemabhängige Trennzeichen.
+     *
+     * @param path Der ursprüngliche Dateipfad (z. B. "C:\\Users\\file.txt").
+     * @return Der angepasste Dateipfad, basierend auf dem aktuellen Betriebssystem.
+     */
     public static String getRightSystemPath(String path) {
         return path.replace("\\", File.separator);
     }
 
-    public static void executeSQL(Connection con, String filePath){
+    /**
+     * Führt ein SQL-Skript aus einer Datei aus.
+     *
+     * @param con      Die aktive SQL-Verbindung, über die das Skript ausgeführt wird.
+     * @param filePath Der Pfad zur SQL-Datei, die das auszuführende Skript enthält.
+     */
+    public static void executeSQL(Connection con, String filePath) {
         try {
+            // Initialisiert den ScriptRunner mit der übergebenen Verbindung
             ScriptRunner sr = new ScriptRunner(con);
+
+            // Liest das SQL-Skript aus der Datei
             Reader reader = new BufferedReader(new FileReader(filePath));
+
+            // Führt das Skript aus
             sr.runScript(reader);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
+            // Wirft eine RuntimeException, falls ein Fehler beim Lesen der Datei auftritt
             throw new RuntimeException(e);
         }
     }
 
-    public static void close(final AutoCloseable obj) {
-        if (obj != null) {
-            try {
-                obj.close();
-            } catch (final Exception e) {
-                //ignore
-            }
-        }
-
-    }
-
-    public static void printRs(final ResultSet rs) {
-        try {
-            final ResultSetMetaData rsmeta = rs.getMetaData();
-            final int cols = rsmeta.getColumnCount();
-            final Table t = new Table(cols);
-
-            for (int i = 1; i <= cols; i++){
-                final String label = rsmeta.getColumnLabel(i);
-                t.addCell(label);
-            }
-            while(rs.next()){
-                for (int i = 1; i <= cols; i++){
-                    final Object obj = rs.getObject(i);
-                    t.addCell(obj == null ? "" : obj.toString());
-                }
-            }
-            System.out.println(t.render());
-        } catch (final SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

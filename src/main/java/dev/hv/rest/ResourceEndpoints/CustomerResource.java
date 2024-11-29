@@ -1,4 +1,4 @@
-package dev.hv.rest.ResourceEnpoints;
+package dev.hv.rest.ResourceEndpoints;
 
 import dev.hv.projectFiles.DAO.entities.User;
 import jakarta.ws.rs.*;

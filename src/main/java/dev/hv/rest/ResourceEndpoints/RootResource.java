@@ -1,4 +1,4 @@
-package dev.hv.rest.ResourceEnpoints;
+package dev.hv.rest.ResourceEndpoints;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
