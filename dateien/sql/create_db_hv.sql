@@ -1,3 +1,4 @@
+--Der Befehl erstellt die Datenbank hv mit UTF-8-Zeichensatz, legt einen Benutzer hv ohne Passwort an, entfernt vorhandene Datenbank und Benutzer und gewährt dem Benutzer vollständige Rechte auf die Datenbank.
 # create db hv, user hv - kein PW
 USE mysql;
 
