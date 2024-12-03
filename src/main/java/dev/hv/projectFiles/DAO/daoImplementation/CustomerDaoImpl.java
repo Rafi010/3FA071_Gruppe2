@@ -3,11 +3,16 @@ package dev.hv.projectFiles.DAO.daoImplementation;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -17,13 +22,15 @@ import java.util.UUID;
 public class CustomerDaoImpl implements CustomerDao<User> {
 
     private final Connection connection; // Datenbankverbindung
-
+    private final Validator validator;
     /**
      * Konstruktor für CustomerDaoImpl.
      * @param connection die Datenbankverbindung, die von dieser DAO genutzt wird.
      */
     public CustomerDaoImpl(Connection connection) {
         this.connection = connection;
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
     }
 
     /**
@@ -32,6 +39,8 @@ public class CustomerDaoImpl implements CustomerDao<User> {
      */
     @Override
     public void addUser(User user) throws NullPointerException{
+        validateUser(user);
+
         // Konvertieren des Geburtsdatums in das SQL-Format
         LocalDate birthDate = user.getBirthDate();
         Date sqlDate = Date.valueOf(birthDate);
@@ -149,6 +158,20 @@ public class CustomerDaoImpl implements CustomerDao<User> {
             stmt.executeUpdate(); // Query ausführen
         } catch (SQLException e) {
             throw new RuntimeException(e); // Fehlerausgabe im Fehlerfall
+        }
+    }
+
+    private void validateUser(User user) {
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder("Validation failed for User:\n");
+            for (ConstraintViolation<User> violation : violations) {
+                sb.append(violation.getPropertyPath())
+                        .append(": ")
+                        .append(violation.getMessage())
+                        .append("\n");
+            }
+            throw new IllegalArgumentException(sb.toString());
         }
     }
 }
