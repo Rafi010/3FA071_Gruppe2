@@ -34,41 +34,47 @@ public class ReadCSV {
                     .build();
 
             // Den Parser an den CSVReader übergeben
-            CSVReader reader = new CSVReaderBuilder(new FileReader(csvFile))
-                    .withCSVParser(parser)  // Verwendet den benutzerdefinierten Parser
-                    .build();
-
-            String[] line;
-            boolean readingMeta = true;
-            List<String[]> dataList = new ArrayList<>();
-            List<String> sqlList = new ArrayList<>();
-            boolean bo = true;
+            List<String[]> dataList;
+            List<String> sqlList;
+            boolean bo;
             String toCommand;
+            String kunde;
+            String zaehlernummer;
+            try (CSVReader reader = new CSVReaderBuilder(new FileReader(csvFile))
+                    .withCSVParser(parser)  // Verwendet den benutzerdefinierten Parser
+                    .build()) {
 
-            // Variablen zum Speichern von Metadaten
-            String kunde = null;
-            String zaehlernummer = null;
+                String[] line;
+                boolean readingMeta = true;
+                dataList = new ArrayList<>();
+                sqlList = new ArrayList<>();
+                bo = true;
 
-            while ((line = reader.readNext()) != null) {
-                // Leere Zeilen überspringen
-                if (line.length == 0 || (line.length == 1 && line[0].trim().isEmpty())) {
-                    continue;
-                }
+                // Variablen zum Speichern von Metadaten
+                kunde = null;
+                zaehlernummer = null;
 
-                // Überprüfen auf Metadaten: Kunde und Zählernummer
-                if (readingMeta) {
-                    if (line[0].equalsIgnoreCase("Kunde")) {
-                        kunde = line[1];  // Speichert den Wert von Kunde
-                    } else if (line[0].equalsIgnoreCase("Zählernummer")) {
-                        zaehlernummer = line[1];  // Speichert den Wert von Zählernummer
-                    } else if (line[0].equalsIgnoreCase("Datum")) {
-                        readingMeta = false;  // Erreicht den tatsächlichen Datenabschnitt
+                while ((line = reader.readNext()) != null) {
+                    // Leere Zeilen überspringen
+                    if (line.length == 0 || (line.length == 1 && line[0].trim().isEmpty())) {
+                        continue;
                     }
-                }
 
-                // Daten lesen, wenn wir über den Metadatenabschnitt hinaus sind
-                if (!readingMeta) {
-                    dataList.add(line);
+                    // Überprüfen auf Metadaten: Kunde und Zählernummer
+                    if (readingMeta) {
+                        if (line[0].equalsIgnoreCase("Kunde")) {
+                            kunde = line[1];  // Speichert den Wert von Kunde
+                        } else if (line[0].equalsIgnoreCase("Zählernummer")) {
+                            zaehlernummer = line[1];  // Speichert den Wert von Zählernummer
+                        } else if (line[0].equalsIgnoreCase("Datum")) {
+                            readingMeta = false;  // Erreicht den tatsächlichen Datenabschnitt
+                        }
+                    }
+
+                    // Daten lesen, wenn wir über den Metadatenabschnitt hinaus sind
+                    if (!readingMeta) {
+                        dataList.add(line);
+                    }
                 }
             }
 

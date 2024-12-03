@@ -30,8 +30,9 @@ public class CustomerDaoImpl implements CustomerDao<User> {
      */
     public CustomerDaoImpl(Connection connection) {
         this.connection = connection;
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        this.validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            this.validator = factory.getValidator();
+        }
     }
 
     /**
