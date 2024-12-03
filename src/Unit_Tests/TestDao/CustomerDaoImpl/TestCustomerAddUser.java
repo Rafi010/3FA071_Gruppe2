@@ -1,4 +1,4 @@
-package Test_DAO;
+package TestDao.CustomerDaoImpl;
 
 import dev.hv.exceptions.DuplicateUserException;
 import dev.hv.model.ICustomer;
