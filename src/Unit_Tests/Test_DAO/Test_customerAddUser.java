@@ -1,5 +1,6 @@
 package Test_DAO;
 
+import dev.hv.exceptions.DuplicateUserException;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
@@ -97,7 +98,7 @@ class Test_customerAddUser {
 
         CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         customerDao.addUser(user1);
-        assertThrows(SQLException.class, () -> customerDao.addUser(user2), "Es wurde erwartet, dass eine SQLException geworfen wird bei einer doppelten UUID.");
+        assertThrows(DuplicateUserException.class, () -> customerDao.addUser(user2), "Es wurde erwartet, dass eine SQLException geworfen wird bei einer doppelten UUID.");
     }
 
     /**

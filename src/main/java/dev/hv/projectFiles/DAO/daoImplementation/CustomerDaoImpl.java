@@ -1,5 +1,6 @@
 package dev.hv.projectFiles.DAO.daoImplementation;
 
+import dev.hv.exceptions.DuplicateUserException;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
@@ -56,7 +57,10 @@ public class CustomerDaoImpl implements CustomerDao<User> {
             stmt.setDate(5, sqlDate); // Geburtsdatum
             stmt.executeUpdate(); // SQL-Query ausführen
         } catch (SQLException e) {
-            throw new RuntimeException(e); // Fehlerausgabe im Fehlerfall
+            if (e.getErrorCode() == 23505) {  // Assuming the unique constraint error code is 23505
+                throw new DuplicateUserException("Duplicate UUID detected", e);
+            }
+            throw new RuntimeException("Database error", e);
         }
     }
 
