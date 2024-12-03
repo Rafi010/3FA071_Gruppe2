@@ -4,6 +4,7 @@ import dev.hv.model.IReading;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
 import dev.hv.projectFiles.DAO.entities.Reading;
+import dev.hv.projectFiles.DAO.entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.UUID;
  */
 public class ReadingDaoImpl implements ReadingDao<Reading> {
     private final Connection connection; // Verbindung zur Datenbank
-    private final CustomerDao customerDao; // DAO für Kunden
+    private final CustomerDao<User> customerDao; // DAO für Kunden
 
     /**
      * Konstruktor, der die Datenbankverbindung initialisiert.
