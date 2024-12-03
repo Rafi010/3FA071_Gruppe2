@@ -2,17 +2,31 @@ package dev.hv.projectFiles.DAO.entities;
 
 import dev.hv.model.ICustomer;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 public class User implements ICustomer {
 
-        String firstName;
-        String lastName;
-        LocalDate birthdate;
-        Gender gender;
-        UUID id;
+    @NotNull(message = "First name cannot be null")
+    @Size(min = 1, message = "First name cannot be empty")
+    String firstName;
+
+    @NotNull(message = "Last name cannot be null")
+    @Size(min = 1, message = "Last name cannot be empty")
+    String lastName;
+
+    @NotNull(message = "Birthdate cannot be null")
+    @Past(message = "Birthdate must be in the past")
+    LocalDate birthdate;
+
+    @NotNull(message = "Gender cannot be null")
+    Gender gender;
+
+    @NotNull(message = "ID cannot be null")
+    UUID id;
 
     @Override
     public LocalDate getBirthDate() {
