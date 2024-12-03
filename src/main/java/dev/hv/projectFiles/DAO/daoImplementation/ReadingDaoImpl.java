@@ -46,14 +46,15 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             }
 
             // SQL-Query für das Einfügen eines neuen Messwerts
-            String query = "INSERT INTO " + reading.getKindOfMeter().toString().toLowerCase() +
-                    " (kundenid, zaehlernummer, datum, " + zaehlerstand + ", kommentar) VALUES (?, ?, ?, ?, ?)";
+            String query = "INSERT INTO ? (kundenid, zaehlernummer, datum, ?, kommentar) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, reading.getCustomer().getId().toString()); // Kunden-ID
-            stmt.setString(2, reading.getMeterId()); // Zählernummer
-            stmt.setDate(3, Date.valueOf(reading.getDateOfReading())); // Datum
-            stmt.setDouble(4, reading.getMeterCount()); // Zählerstand
-            stmt.setString(5, reading.getComment()); // Kommentar
+            stmt.setString(1, reading.getKindOfMeter().toString().toLowerCase()); // table to insert into depending on kind of meter
+            stmt.setString(2, zaehlerstand); // name of column to change the zählerstand depending on kind of meter
+            stmt.setString(3, reading.getCustomer().getId().toString()); // Kunden-ID
+            stmt.setString(4, reading.getMeterId()); // Zählernummer
+            stmt.setDate(5, Date.valueOf(reading.getDateOfReading())); // Datum
+            stmt.setDouble(6, reading.getMeterCount()); // Zählerstand
+            stmt.setString(7, reading.getComment()); // Kommentar
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             System.out.println("Es wurden nicht alle erforderlichen Werte des Objekts erfüllt.\nEs wurde nicht in die Datenbank gespeichert.");
@@ -71,9 +72,10 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     public Reading getReadingById(IReading.KindOfMeter kindOfMeter, String id) {
         if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) return null; // Kein Abruf für unbekannte Zählerart
         try {
-            String query = "SELECT * FROM " + kindOfMeter.toString().toLowerCase() + " WHERE id = ?";
+            String query = "SELECT * FROM ? WHERE id = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, id);
+            stmt.setString(1, kindOfMeter.toString().toLowerCase());
+            stmt.setString(2, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -103,9 +105,10 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) return null; // Keine Abfrage für unbekannte Zählerart
         List<Reading> readings = new ArrayList<>();
         try {
-            String query = "SELECT * FROM " + kindOfMeter.toString().toLowerCase();
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+            String query = "SELECT * FROM ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, kindOfMeter.toString().toLowerCase());
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 Reading reading = new Reading();
@@ -142,15 +145,16 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             }
 
             // SQL-Query für das Aktualisieren eines Messwerts
-            String query = "UPDATE " + reading.getKindOfMeter().toString().toLowerCase() +
-                    " SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, " + zaehlerstand + " = ? WHERE zaehlernummer = ?";
+            String query = "UPDATE ? SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, ? = ? WHERE zaehlernummer = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, reading.getComment()); // Kommentar
-            stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
-            stmt.setDate(3, Date.valueOf(reading.getDateOfReading())); // Datum
-            stmt.setString(4, reading.getMeterId()); // Zählernummer
-            stmt.setDouble(5, reading.getMeterCount()); // Zählerstand
-            stmt.setString(6, reading.getMeterId()); // Zählernummer für WHERE-Bedingung
+            stmt.setString(1, reading.getKindOfMeter().toString().toLowerCase()); //table to update in depending on kind of meter
+            stmt.setString(2, reading.getComment()); // Kommentar
+            stmt.setString(3, reading.getCustomer().getId().toString()); // Kunden-ID
+            stmt.setDate(4, Date.valueOf(reading.getDateOfReading())); // Datum
+            stmt.setString(5, reading.getMeterId()); // Zählernummer
+            stmt.setString(6, zaehlerstand); //kind of Zählerstand depending on kind of meter
+            stmt.setDouble(7, reading.getMeterCount()); // Zählerstand
+            stmt.setString(8, reading.getMeterId()); // Zählernummer für WHERE-Bedingung
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
@@ -165,9 +169,10 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     @Override
     public void deleteReading(IReading.KindOfMeter kindOfMeter, String id) {
         try {
-            String query = "DELETE FROM " + kindOfMeter.toString().toLowerCase() + " WHERE id = ?";
+            String query = "DELETE FROM ? WHERE id = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, id);
+            stmt.setString(1, kindOfMeter.toString().toLowerCase());
+            stmt.setString(2, id);
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException e) {
             throw new RuntimeException(e);
