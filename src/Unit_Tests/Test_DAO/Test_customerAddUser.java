@@ -81,7 +81,7 @@ class Test_customerAddUser {
         testUser.setFirstName(""); // Setzt den Vornamen auf eine leere Zeichenkette
 
         CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
-        assertThrows(SQLException.class, () -> customerDao.addUser(testUser), "Es wurde erwartet, dass eine SQLException geworfen wird bei fehlendem Vornamen.");
+        assertThrows(IllegalArgumentException.class, () -> customerDao.addUser(testUser), "Es wurde erwartet, dass eine SQLException geworfen wird bei fehlendem Vornamen.");
     }
 
     /**
@@ -110,7 +110,7 @@ class Test_customerAddUser {
         invalidUser.setFirstName(null); // Setzt das Geschlecht auf null
 
         CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
-        assertThrows(SQLException.class, () -> customerDao.addUser(invalidUser), "Es wurde erwartet, dass eine NullPointerException geworfen wird falls ein wert null ist.");
+        assertThrows(IllegalArgumentException.class, () -> customerDao.addUser(invalidUser), "Es wurde erwartet, dass eine NullPointerException geworfen wird falls ein wert null ist.");
     }
 
     /**
