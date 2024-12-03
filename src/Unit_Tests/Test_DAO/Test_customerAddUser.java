@@ -23,10 +23,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Diese Klasse enthält Tests zum Hinzufügen von Nutzern in die Datenbank mittels der CustomerDao-Klasse.
  */
-class Test_customerAddUser {
+class TestCustomerAddUser {
 
     private DatabaseConnection databaseConnection;
-    private JdbcDataSource dataSource;
 
     /**
      * Diese Methode wird vor jedem einzelnen Test ausgeführt und initialisiert das `databaseConnection` Objekt.
@@ -35,7 +34,7 @@ class Test_customerAddUser {
     @BeforeEach
     void setUp() throws SQLException {
         // Initialisiert die Datenquelle und DatabaseConnection vor jedem Test
-        dataSource = new JdbcDataSource();
+        JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
         databaseConnection = new DatabaseConnection();
 
@@ -51,7 +50,7 @@ class Test_customerAddUser {
      * Dies stellt sicher, dass jeder Test in einer sauberen Umgebung ausgeführt wird.
      */
     @AfterEach
-    void tearDown() throws SQLException {
+    void tearDown() {
             databaseConnection.removeAllTables(); // Löscht alle Tabellen nach jedem Test
             databaseConnection.closeConnection();
 
@@ -66,7 +65,7 @@ class Test_customerAddUser {
     void testAddUserToDatabase() throws SQLException {
         User testUser = getTestUser(UUID.randomUUID());
 
-        CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         customerDao.addUser(testUser);
 
         verifyUserInDatabase(databaseConnection.getConnection(), testUser);
@@ -74,14 +73,13 @@ class Test_customerAddUser {
 
     /**
      * Testet, ob ein Nutzer mit fehlenden Daten (z.B. fehlendem Vornamen) nicht hinzugefügt werden kann.
-     * @throws SQLException falls ein SQL Fehler auftritt, wird dieser an das JUnit Framework übergeben zur Behandlung
      */
     @Test
-    void testAddUserWithMissingFirstName() throws SQLException {
+    void testAddUserWithMissingFirstName() {
         User testUser = getTestUser(UUID.randomUUID());
         testUser.setFirstName(""); // Setzt den Vornamen auf eine leere Zeichenkette
 
-        CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         assertThrows(IllegalArgumentException.class, () -> customerDao.addUser(testUser), "Es wurde erwartet, dass eine SQLException geworfen wird bei fehlendem Vornamen.");
     }
 
@@ -96,7 +94,7 @@ class Test_customerAddUser {
         User user1 = getTestUser(duplicateId);
         User user2 = getTestUser(duplicateId); // Gleiche UUID
 
-        CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         customerDao.addUser(user1);
         assertThrows(DuplicateUserException.class, () -> customerDao.addUser(user2), "Es wurde erwartet, dass eine SQLException geworfen wird bei einer doppelten UUID.");
     }
@@ -110,7 +108,7 @@ class Test_customerAddUser {
         User invalidUser = getTestUser(UUID.randomUUID());
         invalidUser.setFirstName(null); // Setzt das Geschlecht auf null
 
-        CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         assertThrows(IllegalArgumentException.class, () -> customerDao.addUser(invalidUser), "Es wurde erwartet, dass eine NullPointerException geworfen wird falls ein wert null ist.");
     }
 

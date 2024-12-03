@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Diese Klasse testet die ordnungsgemäße Schließung einer Datenbankverbindung.
  */
-class Test_closeConnection {
+class TestCloseConnection {
 
     private Connection connection;
 
