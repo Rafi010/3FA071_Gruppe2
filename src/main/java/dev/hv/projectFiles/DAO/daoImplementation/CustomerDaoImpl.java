@@ -31,7 +31,7 @@ public class CustomerDaoImpl implements CustomerDao<User> {
      * @param user das Nutzer-Objekt, das in die Datenbank eingefügt wird.
      */
     @Override
-    public void addUser(User user) {
+    public void addUser(User user) throws NullPointerException{
         // Konvertieren des Geburtsdatums in das SQL-Format
         LocalDate birthDate = user.getBirthDate();
         Date sqlDate = Date.valueOf(birthDate);

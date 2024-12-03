@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS wasser (
     kundenid VARCHAR(255),
     zaehlernummer VARCHAR(255),
     datum DATE,
-    zaehlerstand_in_m³ FLOAT,
+    zaehlerstand_in_m3 FLOAT,
     kommentar VARCHAR(255)
 );
 --Erstellt die Tabelle Strom mit den Spalten KundenID, Zaehlernummer, Datum, Zaehlernummer_in_khw und Kommentar.

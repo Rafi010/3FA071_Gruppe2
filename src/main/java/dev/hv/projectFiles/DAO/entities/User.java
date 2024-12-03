@@ -1,6 +1,7 @@
 package dev.hv.projectFiles.DAO.entities;
 
 import dev.hv.model.ICustomer;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,7 +13,6 @@ public class User implements ICustomer {
         LocalDate birthdate;
         Gender gender;
         UUID id;
-
 
     @Override
     public LocalDate getBirthDate() {

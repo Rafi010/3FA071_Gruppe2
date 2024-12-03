@@ -104,4 +104,8 @@ public class DatabaseConnection implements IDatebaseConnection {
     public Connection getConnection() {
         return connection;
     }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
 }
