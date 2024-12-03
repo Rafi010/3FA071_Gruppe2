@@ -1,13 +1,11 @@
 package dev.hv.rest.ResourceEnpoints;
 
-import com.sun.jna.platform.unix.X11;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;

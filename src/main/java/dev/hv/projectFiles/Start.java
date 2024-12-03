@@ -4,45 +4,45 @@ import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
+import dev.hv.projectFiles.DAO.entities.Reading;
+import dev.hv.projectFiles.DAO.entities.User;
 import dev.hv.rest.Server;
 
 import java.util.Properties;
 
 public class Start {
    public static void main(String[] args) {
-      String port = System.getenv("PORT");
-      if (port == null) {
-         port = "8080";  // default port for local development
-      }
-      String baseUri = "http://0.0.0.0:" + port + "/";
-      //create properties object for use as parameter
+      // Properties-Objekt erstellen, das als Parameter verwendet wird
       Properties properties = new Properties();
-      //create createProp object to create the properties file
+      // CreateProperties-Objekt erstellen, um die Properties-Datei zu erzeugen
       CreateProperties createProp = new CreateProperties();
-      //create connection object used for database communication
+      // Datenbankverbindungs-Objekt erstellen, das für die Kommunikation mit der Datenbank genutzt wird
       DatabaseConnection connection = new DatabaseConnection();
 
-      //create the properties file
+      // Properties-Datei erstellen
       createProp.Create();
-      //open the general connection to mySql
+      // Allgemeine Verbindung zu MySQL öffnen
       connection.openConnection(properties);
-      //create the hv database
+      // Datenbank "hv" erstellen
       connection.createDatabase();
-      //close the old connection and open the new one with the hv database
+
+      // Alte Verbindung schließen und eine neue Verbindung mit der "hv"-Datenbank öffnen
       connection.closeConnection();
 
       connection.openHvConnection(properties);
-      //create the tables and fill them
+
+      // Tabellen erstellen und mit Daten füllen
       connection.createAllTables();
+      // daten in DB laden
       connection.fillDatabase();
 
-      //create the customer dao
-      CustomerDao customerDao = new CustomerDaoImpl(connection.getConnection());
-      //create the reading dao
-      ReadingDao readingDao = new ReadingDaoImpl(connection.getConnection());
-      //close the connection
+      // CustomerDao erstellen
+      CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
+      // ReadingDao erstellen
+      ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
+      // Verbindung schließen
       connection.closeConnection();
-
+      // server starten
       Server.startServer("http://localhost:8080/");
 
    }

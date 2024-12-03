@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * Class responsible for creating a properties file for database configuration.
- * This properties file specifies the URL, user, and password for the database.
+ * Klasse, die für das Erstellen einer Properties-Datei für die Datenbankkonfiguration verantwortlich ist.
+ * Diese Properties-Datei gibt die URL, den Benutzer und das Passwort für die Datenbank an.
  */
 
 public class CreateProperties {
@@ -21,40 +21,40 @@ public class CreateProperties {
 
     public void Create(){
 
-        // Get the filepath of the properties file
+        // Erhalte den Dateipfad der Properties-Datei
         String homeDir = System.getProperty("user.home");
         Path configFilePath = Paths.get(homeDir, "hv.properties");
-        //get the username of the pc
+        // Hole den Benutzernamen des PCs
         String userName = System.getProperty("user.name");
 
-        //create the keys under wich the information is saved in the file
+        // Erstelle die Schlüssel, unter denen die Informationen in der Datei gespeichert werden
         final String URL = userName + ".db.url";
         final String URL_DB = userName + ".db.url_db";
         final String USER = userName + ".db.user";
         final String PW = userName + ".db.pw";
 
-        //comment on the top of the file
-        String DatabaseComment = "Database Configuration for " + userName;
+        // Kommentar zu Beginn der Datei
+        String DatabaseComment = "Datenbankkonfiguration für " + userName;
 
-        // Check if the config file already exists
+        // Überprüfen, ob die Konfigurationsdatei bereits existiert
         if (Files.exists(configFilePath)) {
-            System.out.println("Config file already exists at " + configFilePath);
+            System.out.println("Konfigurationsdatei existiert bereits unter " + configFilePath);
         } else {
-            // Create the Properties object
+            // Erstelle das Properties-Objekt
             Properties config = new Properties();
 
-            // Add the values to the keys in the file
+            // Füge die Werte den Schlüsseln in der Datei hinzu
             config.setProperty(URL, "jdbc:mariadb://localhost:3306/?allowMultiQueries=true");
             config.setProperty(URL_DB, "jdbc:mariadb://localhost:3306/hv?allowMultiQueries=true");
             config.setProperty(USER, "root");
             config.setProperty(PW, "");
 
-            // Save the properties to the file
+            // Speichere die Properties in der Datei
             try (FileOutputStream output = new FileOutputStream(configFilePath.toFile())) {
                 config.store(output, DatabaseComment);
-                System.out.println("Config file created at " + configFilePath);
+                System.out.println("Konfigurationsdatei erstellt unter " + configFilePath);
             } catch (IOException e) {
-                log.error("error: ", e);
+                log.error("Fehler: ", e);
             }
         }
     }
