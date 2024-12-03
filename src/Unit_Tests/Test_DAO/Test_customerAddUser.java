@@ -40,7 +40,6 @@ class TestCustomerAddUser {
 
         Connection connection = dataSource.getConnection();
         databaseConnection.setConnection(connection);
-        System.out.println("Connection gesetedt");
         databaseConnection.createAllTables();
 
     }
@@ -86,10 +85,9 @@ class TestCustomerAddUser {
     /**
      * Testet, ob beim Hinzufügen eines Nutzers mit derselben UUID eine Ausnahme geworfen wird.
      * Dieser Test überprüft, ob Duplikate im UUID-Feld korrekt behandelt werden.
-     * @throws SQLException falls ein SQL Fehler auftritt, wird dieser an das JUnit Framework übergeben zur Behandlung
      */
     @Test
-    void testAddDuplicateUser() throws SQLException {
+    void testAddDuplicateUser() {
         UUID duplicateId = UUID.randomUUID();
         User user1 = getTestUser(duplicateId);
         User user2 = getTestUser(duplicateId); // Gleiche UUID
@@ -120,21 +118,6 @@ class TestCustomerAddUser {
     private User getTestUser(UUID id) {
         User user = new User();
         user.setId(id);
-        user.setFirstName("Max");
-        user.setLastName("Mustermann");
-        user.setGender(ICustomer.Gender.M);
-        user.setBirthDate(LocalDate.of(2000, 1, 1));
-        return user;
-    }
-
-    /**
-     * Hilfsmethode, die einen User mit einer ungültigen UUID zurückgibt.
-     *
-     * @return der User mit der ungültigen UUID
-     */
-    private User getTestUserFromInvalidUUID() {
-        User user = new User();
-        user.setId(UUID.fromString("invalid-uuid-format")); // Diese Methode löst eine IllegalArgumentException aus, wenn die UUID ungültig ist
         user.setFirstName("Max");
         user.setLastName("Mustermann");
         user.setGender(ICustomer.Gender.M);
