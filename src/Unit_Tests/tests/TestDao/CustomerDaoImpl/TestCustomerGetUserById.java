@@ -1,13 +1,13 @@
-package TestDao.CustomerDaoImpl;
+package tests.TestDao.CustomerDaoImpl;
 
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
 import dev.hv.projectFiles.DatabaseConnection;
-import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tests.TestUtils;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -20,16 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCustomerGetUserById {
 
-    private DatabaseConnection databaseConnection;
+    private static DatabaseConnection databaseConnection;
 
-    @BeforeEach
-    void setUp() throws SQLException {
+    @BeforeAll
+    static void setUp() throws SQLException {
         // Initialisiert die Datenquelle und DatabaseConnection vor jedem Test
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+        Connection connection = TestUtils.getTestDbConnection();
         databaseConnection = new DatabaseConnection();
-
-        Connection connection = dataSource.getConnection();
         databaseConnection.setConnection(connection);
         databaseConnection.createAllTables();
 

@@ -1,4 +1,4 @@
-package TestDao.CustomerDaoImpl;
+package tests.TestDao.CustomerDaoImpl;
 
 import dev.hv.exceptions.DuplicateUserException;
 import dev.hv.model.ICustomer;
@@ -6,10 +6,9 @@ import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
 import dev.hv.projectFiles.DatabaseConnection;
-import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tests.TestUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,33 +24,19 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestCustomerAddUser {
 
-    private DatabaseConnection databaseConnection;
+    private static DatabaseConnection databaseConnection;
 
     /**
      * Diese Methode wird vor jedem einzelnen Test ausgeführt und initialisiert das `databaseConnection` Objekt.
      * Sie stellt sicher, dass eine neue Datenbankverbindung und eine leere Testdatenbank vor jedem Test vorhanden sind.
      */
-    @BeforeEach
-    void setUp() throws SQLException {
+    @BeforeAll
+    static void setUp() throws SQLException {
         // Initialisiert die Datenquelle und DatabaseConnection vor jedem Test
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+        Connection connection = TestUtils.getTestDbConnection();
         databaseConnection = new DatabaseConnection();
-
-        Connection connection = dataSource.getConnection();
         databaseConnection.setConnection(connection);
         databaseConnection.createAllTables();
-
-    }
-
-    /**
-     * Diese Methode wird nach jedem Test ausgeführt und löscht alle Tabellen der Testdatenbank.
-     * Dies stellt sicher, dass jeder Test in einer sauberen Umgebung ausgeführt wird.
-     */
-    @AfterEach
-    void tearDown() {
-            databaseConnection.removeAllTables(); // Löscht alle Tabellen nach jedem Test
-            databaseConnection.closeConnection();
 
     }
 

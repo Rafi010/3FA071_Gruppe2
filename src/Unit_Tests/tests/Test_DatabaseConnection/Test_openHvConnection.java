@@ -1,4 +1,4 @@
-package Test_DatabaseConnection;
+package tests.Test_DatabaseConnection;
 
 import dev.hv.projectFiles.DatabaseConnection;
 import org.junit.jupiter.api.Test;
