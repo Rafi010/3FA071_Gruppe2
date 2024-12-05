@@ -34,19 +34,12 @@ public class DatabaseConnection implements IDatebaseConnection {
         return this;
     }
 
-    public void createDatabase() {
-        if (connection == null) {
-            throw new IllegalStateException("Keine offene Datenbankverbindung");
-        }
-        Util.executeSQL(connection, "dateien/sql/create_db_hv.sql");
-    }
-
     @Override
     public void createAllTables() {
         if (connection == null) {
             throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
-        Util.executeSQL(connection, "dateien/sql/create_table.sql");
+        Util.executeSQL(connection, "src/main/resources/sql/create_table.sql");
     }
 
     @Override
@@ -54,7 +47,7 @@ public class DatabaseConnection implements IDatebaseConnection {
         if (connection == null) {
             throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
-        Util.executeSQL(connection, "dateien/sql/truncate_table.sql");
+        Util.executeSQL(connection, "src/main/resources/sql/truncate_table.sql");
     }
 
     @Override
@@ -62,7 +55,7 @@ public class DatabaseConnection implements IDatebaseConnection {
         if (connection == null) {
             throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
-        Util.executeSQL(connection, "dateien/sql/remove_table.sql");
+        Util.executeSQL(connection, "src/main/resources/sql/remove_table.sql");
     }
 
     @Override
@@ -79,7 +72,7 @@ public class DatabaseConnection implements IDatebaseConnection {
         if (connection == null) {
             throw new IllegalStateException("Keine offene Datenbankverbindung");
         }
-        Util.executeSQL(connection, "dateien/sql/load_csv_file_in_table.sql");
+        Util.executeSQL(connection, "src/main/resources/sql/load_csv_file_in_table.sql");
     }
 
     public Connection getConnection() {
