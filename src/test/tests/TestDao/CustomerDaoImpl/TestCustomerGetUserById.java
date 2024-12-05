@@ -44,10 +44,10 @@ public class TestCustomerGetUserById {
         CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         ICustomer user = customerDao.getUserById(randomUuid.toString());
 
-        assertEquals(user.getGender(), ICustomer.Gender.M);
-        assertEquals(user.getFirstName(), "Max");
-        assertEquals(user.getLastName(), "Mustermann");
-        assertEquals(Date.valueOf(user.getBirthDate()), date);
+        assertEquals(ICustomer.Gender.M, user.getGender());
+        assertEquals("Max", user.getFirstName());
+        assertEquals("Mustermann", user.getLastName());
+        assertEquals(date, Date.valueOf(user.getBirthDate()));
 
     }
 
