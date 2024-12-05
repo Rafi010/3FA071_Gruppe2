@@ -14,23 +14,11 @@ public class Start {
    public static void main(String[] args) {
       // Properties-Objekt erstellen, das als Parameter verwendet wird
       Properties properties = new Properties();
-      // CreateProperties-Objekt erstellen, um die Properties-Datei zu erzeugen
-      CreateProperties createProp = new CreateProperties();
-      // Datenbankverbindungs-Objekt erstellen, das für die Kommunikation mit der Datenbank genutzt wird
+      // Datenbankverbindung-Objekt erstellen, das für die Kommunikation mit der Datenbank genutzt wird
       DatabaseConnection connection = new DatabaseConnection();
 
-      // Properties-Datei erstellen
-      createProp.Create();
-      // Allgemeine Verbindung zu MySQL öffnen
+      // Verbindung zu MySQL öffnen
       connection.openConnection(properties);
-      // Datenbank "hv" erstellen
-      connection.createDatabase();
-
-      // Alte Verbindung schließen und eine neue Verbindung mit der "hv"-Datenbank öffnen
-      connection.closeConnection();
-
-      connection.openHvConnection(properties);
-
       // Tabellen erstellen und mit Daten füllen
       connection.createAllTables();
       // daten in DB laden
