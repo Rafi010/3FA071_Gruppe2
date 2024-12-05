@@ -34,25 +34,6 @@ public class DatabaseConnection implements IDatebaseConnection {
         return this;
     }
 
-    // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die mit der hv-Datenbank verbindet)
-    public void openHvConnection(Properties properties) {
-        String userName = System.getProperty("user.name");
-        final String home = System.getProperty("user.home");
-        try {
-            // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
-            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
-            // Holt die benötigten Werte aus der Properties-Datei
-            String dburl = properties.getProperty(userName + ".db.url_db");
-            String dbuser = properties.getProperty(userName + ".db.user");
-            String dbpw = properties.getProperty(userName + ".db.pw");
-            // Verwendet die Werte, um die Verbindung zu erstellen und speichert sie
-            this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
-            System.out.println("Mit der Datenbank verbunden: hv");
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void createDatabase() {
         if (connection == null) {
             throw new IllegalStateException("Keine offene Datenbankverbindung");
