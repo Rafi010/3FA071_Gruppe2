@@ -7,14 +7,17 @@ import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DatabaseConnection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.UUID;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class TestDeleteUser {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class TestUpdateUser {
 
     private static DatabaseConnection databaseConnection;
 
@@ -29,11 +32,10 @@ public class TestDeleteUser {
 
     }
 
-
     private void createUser(UUID id) throws SQLException {
         String query = "INSERT INTO kunde (UUID, Anrede, Vorname, Nachname, Geburtsdatum) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement statement = databaseConnection.getConnection().prepareStatement(query);
-         // UUID erstellen
+        // UUID erstellen
         statement.setString(1, id.toString()); // UUID
         statement.setString(2, ICustomer.Gender.M.toString()); // Anrede
         statement.setString(3, "Max"); // Vorname
@@ -44,18 +46,24 @@ public class TestDeleteUser {
     }
 
     @Test
-    public void testDeleteUser() throws SQLException {
+    public void testUpdateDeletedUser() throws SQLException {
         UUID uuid = UUID.randomUUID();
-        createUser(uuid);
+        createUser(uuid); // Erstelle einen Benutzer mit der UUID
         CustomerDao customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
-        customerDao.deleteUser(uuid.toString());
+        customerDao.deleteUser(uuid.toString()); // Lösche den Benutzer, um sicherzustellen, dass die UUID nicht existiert
 
-        String query = "SELECT * FROM kunde WHERE uuid = ?";
+        String query = "UPDATE kunde SET Vorname = ? WHERE uuid = ?";
         PreparedStatement statement = databaseConnection.getConnection().prepareStatement(query);
-        statement.setString(1, uuid.toString());
-        assertThrows(SQLException.class, () -> statement.executeUpdate(), "Diese UUID ist in der Tabelle nicht vorhanden");
+        statement.setString(1, "Thomas");
+        statement.setString(2, uuid.toString());
+
+        int rowsAffected = statement.executeUpdate(); // Führt das UPDATE aus
+        assertEquals(0, rowsAffected, "Das UPDATE sollte keine Zeilen betreffen");
+
     }
 
 
 
 }
+
+
