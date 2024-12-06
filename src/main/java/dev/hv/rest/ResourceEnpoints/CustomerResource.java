@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Path("/customer")
 public class CustomerResource {
-    DatabaseConnection databaseConnection = new DatabaseConnection();
+    DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
     Properties properties = new Properties();
 
 

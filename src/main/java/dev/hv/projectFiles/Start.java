@@ -15,7 +15,7 @@ public class Start {
       // Properties-Objekt erstellen, das als Parameter verwendet wird
       Properties properties = new Properties();
       // Datenbankverbindung-Objekt erstellen, das für die Kommunikation mit der Datenbank genutzt wird
-      DatabaseConnection connection = new DatabaseConnection();
+      DatabaseConnection connection = DatabaseConnection.getInstance();
 
       // Verbindung zu MySQL öffnen
       connection.openConnection(properties);
