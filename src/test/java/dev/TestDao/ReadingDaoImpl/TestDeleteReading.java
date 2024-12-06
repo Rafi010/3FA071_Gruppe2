@@ -1,4 +1,4 @@
-package dev.TestDao.CustomerDaoImpl;
+package dev.TestDao.ReadingDaoImpl;
 
 import dev.TestUtils;
 import dev.hv.model.IReading;

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Testklasse für die Überprüfung der Methode getConnection in DatabaseConnection.
  */
-public class Test_getConnection {
+public class TestGetConnection {
 
     private DatabaseConnection databaseConnection;
 

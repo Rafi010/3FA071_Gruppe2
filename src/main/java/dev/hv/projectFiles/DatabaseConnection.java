@@ -14,11 +14,9 @@ public class DatabaseConnection implements IDatebaseConnection {
     // singelton
     private static Connection connection = null;
     private static DatabaseConnection instance;
-    private static boolean isTestEnvironment = false;
 
     // Privater Konstruktor, um Instanziierung zu verhindern
-    private DatabaseConnection() {
-    }
+
 
     public static void setIsTestEnvironment(boolean testEnvironment) {
         isTestEnvironment = testEnvironment;
