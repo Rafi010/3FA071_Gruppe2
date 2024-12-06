@@ -1,4 +1,4 @@
-package tests.Test_DatabaseConnection;
+package dev.Test_DatabaseConnection;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

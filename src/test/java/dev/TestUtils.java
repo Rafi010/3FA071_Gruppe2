@@ -1,4 +1,4 @@
-package tests;
+package dev;
 
 import org.h2.jdbcx.JdbcDataSource;
 import java.sql.Connection;

@@ -1,4 +1,4 @@
-package tests.Test_DatabaseConnection;
+package dev.Test_DatabaseConnection;
 
 public class Test_truncateAllTables {
 }
