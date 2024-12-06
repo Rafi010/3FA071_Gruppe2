@@ -2,6 +2,7 @@ package dev.hv.projectFiles;
 
 import dev.hv.model.IDatebaseConnection;
 
+import javax.xml.crypto.Data;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -14,13 +15,14 @@ public class DatabaseConnection implements IDatebaseConnection {
     // singelton
     private static Connection connection = null;
     private static DatabaseConnection instance;
+    private static boolean isTestEnvironment = false;
 
-    // Privater Konstruktor, um Instanziierung zu verhindern
+    //TODO: setDatabaseConnection -> nur ausführbar wenn DatabaseConnection für Tests verwendet wird
 
+    // TODO Privater Konstruktor, um Instanziierung zu verhindern
+    // TODO private DatabaseConnection() {}
 
-    public static void setIsTestEnvironment(boolean testEnvironment) {
-        isTestEnvironment = testEnvironment;
-    }
+    // TODO Dilemma singelton/test -> Lehrer, ChatGPT, Eingenrecherche (kompliziert)
 
     public static synchronized DatabaseConnection getInstance() {
         if (instance == null) {
@@ -45,17 +47,14 @@ public class DatabaseConnection implements IDatebaseConnection {
         final String userName = System.getProperty("user.name");
         final String home = System.getProperty("user.home");
         try {
-            if (isTestEnvironment) {
-                connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", "sa", "");
-            } else {
-                // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
-                properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
-                // Holt die benötigten Werte aus der Properties-Datei
-                final String dburl = properties.getProperty(userName + ".db.url");
-                final String dbuser = properties.getProperty(userName + ".db.user");
-                final String dbpw = properties.getProperty(userName + ".db.pw");
-                connection = DriverManager.getConnection(dburl, dbuser, dbpw);
-            }
+            // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
+            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
+            // Holt die benötigten Werte aus der Properties-Datei
+            final String dburl = properties.getProperty(userName + ".db.url");
+            final String dbuser = properties.getProperty(userName + ".db.user");
+            final String dbpw = properties.getProperty(userName + ".db.pw");
+            connection = DriverManager.getConnection(dburl, dbuser, dbpw);
+
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -109,6 +108,6 @@ public class DatabaseConnection implements IDatebaseConnection {
     }
 
     public void setConnection(Connection connection) {
-        this.connection = connection;
+        DatabaseConnection.connection = connection;
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,10 +26,11 @@ class TestCreateAllTables {
     @BeforeAll
     static void setUp() throws SQLException {
         // Initialisiert die Datenquelle und DatabaseConnection vor jedem Test
-        Connection connection = TestUtils.getTestDbConnection();
-        databaseConnection = new DatabaseConnection();
-        databaseConnection.setConnection(connection);
-
+        databaseConnection = DatabaseConnection.getInstance();
+        databaseConnection.closeConnection();
+        databaseConnection.openConnection(new Properties());
+        databaseConnection.createAllTables();
+        databaseConnection.removeAllTables();
     }
 
     @Test
