@@ -4,33 +4,62 @@ import dev.hv.model.IDatebaseConnection;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseConnection implements IDatebaseConnection {
     // Die Verbindung wird lokal gespeichert, sodass alle DB-Interaktionen nur innerhalb dieser Klasse stattfinden können
-    private Connection connection;
+    // singelton
+    private static Connection connection = null;
+    private static DatabaseConnection instance;
+
+    // Privater Konstruktor, um Instanziierung zu verhindern
+
+
+    public static void setIsTestEnvironment(boolean testEnvironment) {
+        isTestEnvironment = testEnvironment;
+    }
+
+    public static synchronized DatabaseConnection getInstance() {
+        if (instance == null) {
+            instance = new DatabaseConnection();
+        }
+        return instance;
+    }
 
     // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die nicht mit der hv-Datenbank verbindet)
     @Override
     public IDatebaseConnection openConnection(Properties properties) {
+        if (connection != null) {
+            try {
+                if (!connection.isClosed()) {
+                    throw new IllegalStateException("Connection already open");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         final String userName = System.getProperty("user.name");
         final String home = System.getProperty("user.home");
         try {
-            // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
-            properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
-            // Holt die benötigten Werte aus der Properties-Datei
-            final String dburl = properties.getProperty(userName + ".db.url");
-            final String dbuser = properties.getProperty(userName + ".db.user");
-            final String dbpw = properties.getProperty(userName + ".db.pw");
-            // Verwendet die Werte, um die Verbindung zu erstellen und speichert sie
-            this.connection = DriverManager.getConnection(dburl, dbuser, dbpw);
-            System.out.println("Mit MySQL verbunden");
-
-
+            if (isTestEnvironment) {
+                connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", "sa", "");
+            } else {
+                // Lädt die Schlüssel-Wert-Paare in das Properties-Objekt
+                properties.load(new FileReader(Util.getRightSystemPath(home + "\\hv.properties")));
+                // Holt die benötigten Werte aus der Properties-Datei
+                final String dburl = properties.getProperty(userName + ".db.url");
+                final String dbuser = properties.getProperty(userName + ".db.user");
+                final String dbpw = properties.getProperty(userName + ".db.pw");
+                connection = DriverManager.getConnection(dburl, dbuser, dbpw);
+            }
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
+        System.out.println("Mit MySQL verbunden");
         return this;
     }
 

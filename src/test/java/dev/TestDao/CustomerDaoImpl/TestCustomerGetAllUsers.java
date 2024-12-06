@@ -35,21 +35,21 @@ public class TestCustomerGetAllUsers {
 
     @Test
     void testGetAllUsers() {
-        int s = 0; // erstellte Datenbankeinträge
+        int dbEntryCount = 0; // erstellte Datenbankeinträge
         for (int i = 0; i < 10; i++) {
             UUID randomUuid = UUID.randomUUID();
             Date date = Date.valueOf(LocalDate.now());
 
             try {
-                s = s + saveUserInDb(databaseConnection.getConnection(), randomUuid, date, i);
+                dbEntryCount = dbEntryCount + saveUserInDb(databaseConnection.getConnection(), randomUuid, date, i);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
         CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
         List<User> allUsers = customerDao.getAllUsers();
-        assertEquals(10, s); // Wurden alle Datenbankeinträge erstellt
-        assertEquals(10, allUsers.size()); // Wurde alle erstellten Datenbankeinträge in die Liste aufgenommen
+        assertEquals(10, dbEntryCount); // Wurden alle Datenbankeinträge erstellt
+        assertEquals(10, allUsers.size()); // Wurde alle erstellten Datenbankeinträge durch DAO in die Liste aufgenommen
     }
 
     private int saveUserInDb(Connection connection, UUID uuid, Date date, int i) throws SQLException {
@@ -60,7 +60,7 @@ public class TestCustomerGetAllUsers {
         pst.setString(3, "Max"+i); // Vorname
         pst.setString(4, "Mustermann"+i);
         pst.setDate(5, date);
-        return pst.executeUpdate();
+        return pst.executeUpdate(); // gibt Anzahl der veränderten einträge zurück in diesem fall immer eins
     }
 
 
