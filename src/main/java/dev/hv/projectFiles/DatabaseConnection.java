@@ -23,6 +23,7 @@ public class DatabaseConnection implements IDatebaseConnection {
     // TODO private DatabaseConnection() {}
 
     // TODO Dilemma singelton/test -> Lehrer, ChatGPT, Eingenrecherche (kompliziert)
+    // TODO Idee: getInstance zur Benutzung im prod / Möglichkeit new Object aber nur in test
 
     public static synchronized DatabaseConnection getInstance() {
         if (instance == null) {
