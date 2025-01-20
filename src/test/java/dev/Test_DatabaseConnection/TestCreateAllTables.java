@@ -1,13 +1,10 @@
 package dev.Test_DatabaseConnection;
 
-import dev.TestUtils;
-import dev.hv.projectFiles.DatabaseConnection;
-import org.junit.jupiter.api.BeforeAll;
+import dev.BaseTest;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,44 +12,28 @@ import static org.junit.jupiter.api.Assertions.*;
  * Diese Klasse ist eine JUnit-Testklasse, die verschiedene Tests für die Methode `createAllTables`
  * der Klasse `DatabaseConnection` durchführt.
  */
-class TestCreateAllTables {
-
-    private static DatabaseConnection databaseConnection;
-
-    /**
-     * Diese Methode wird vor jedem einzelnen Test ausgeführt und initialisiert das `databaseConnection` Objekt.
-     * Sie stellt sicher, dass eine neue Datenbankverbindung und eine leere Testdatenbank vor jedem Test vorhanden sind.
-     */
-    @BeforeAll
-    static void setUp() throws SQLException {
-        // Initialisiert die Datenquelle und DatabaseConnection vor jedem Test
-        databaseConnection = DatabaseConnection.getInstance();
-        databaseConnection.closeConnection();
-        databaseConnection.openConnection(new Properties());
-        databaseConnection.createAllTables();
-        databaseConnection.removeAllTables();
-    }
+class TestCreateAllTables extends BaseTest {
 
     @Test
     void testCreateAllTables() {
-        Connection connection = databaseConnection.getConnection();
+        Connection conn = connection.getConnection();
 
         try {
-            assertFalse(doesTableExist(connection, "heizung"));
-            assertFalse(doesTableExist(connection, "wasser"));
-            assertFalse(doesTableExist(connection, "strom"));
-            assertFalse(doesTableExist(connection, "kunde"));
+            assertFalse(doesTableExist(conn, "heizung"));
+            assertFalse(doesTableExist(conn, "wasser"));
+            assertFalse(doesTableExist(conn, "strom"));
+            assertFalse(doesTableExist(conn, "kunde"));
         } catch (SQLException e) {
             fail("SQLException occurred while checking if tables exist: " + e.getMessage());
         }
 
-        databaseConnection.createAllTables();
+        connection.createAllTables();
 
         try {
-            assertTrue(doesTableExist(connection, "heizung"));
-            assertTrue(doesTableExist(connection, "wasser"));
-            assertTrue(doesTableExist(connection, "strom"));
-            assertTrue(doesTableExist(connection, "kunde"));
+            assertTrue(doesTableExist(conn, "heizung"));
+            assertTrue(doesTableExist(conn, "wasser"));
+            assertTrue(doesTableExist(conn, "strom"));
+            assertTrue(doesTableExist(conn, "kunde"));
         } catch (SQLException e) {
             fail("SQLException occurred while checking if tables exist: " + e.getMessage());
         }
@@ -63,14 +44,14 @@ class TestCreateAllTables {
     /**
      * Checks if a table with the given name exists in the database.
      *
-     * @param connection the database connection to use for the query
+     * @param conn      the database conn to use for the query
      * @param tableName the name of the table to check for
      * @return true if the table exists, false otherwise
      * @throws SQLException if a database access error occurs
      */
-    private boolean doesTableExist(Connection connection, String tableName) throws SQLException {
+    private boolean doesTableExist(Connection conn, String tableName) throws SQLException {
         // Use DatabaseMetaData to fetch table metadata
-        try (var tables = connection.getMetaData().getTables(
+        try (var tables = conn.getMetaData().getTables(
                 null, // Catalog (null means any)
                 null, // Schema pattern (null means any)
                 tableName.toUpperCase(), // Table name (case-insensitive)
