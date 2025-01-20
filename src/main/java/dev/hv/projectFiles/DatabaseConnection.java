@@ -15,7 +15,6 @@ public class DatabaseConnection implements IDatebaseConnection {
     // singelton
     private static Connection connection = null;
     private static DatabaseConnection instance;
-    private static boolean isTestEnvironment = false;
 
     //TODO: setDatabaseConnection -> nur ausführbar wenn DatabaseConnection für Tests verwendet wird
 
@@ -30,6 +29,10 @@ public class DatabaseConnection implements IDatebaseConnection {
             instance = new DatabaseConnection();
         }
         return instance;
+    }
+
+    public static synchronized void resetInstance() {
+        instance = null;
     }
 
     // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die nicht mit der hv-Datenbank verbindet)
