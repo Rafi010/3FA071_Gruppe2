@@ -21,7 +21,7 @@ public class User implements ICustomer {
     @JsonProperty("last_name")
     String lastName;
 
-    @NotNull(message = "Birthdate cannot be empty")  // Hibernate-specific annotation
+    //@NotNull(message = "Birthdate cannot be empty")  // Hibernate-specific annotation
     @JsonProperty("birth_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate birthdate;
@@ -30,8 +30,8 @@ public class User implements ICustomer {
     @JsonProperty("gender")
     Gender gender;
 
-    @NotNull(message = "ID cannot be empty")  // Hibernate-specific annotation
-    @UUID(message = "ID must be a valid UUID")  // Hibernate-specific annotation
+    //@NotNull(message = "ID cannot be empty")  // Hibernate-specific annotation
+    //@UUID(message = "ID must be a valid UUID")  // Hibernate-specific annotation
     @JsonProperty("id")
     java.util.UUID id;
 
