@@ -1,4 +1,6 @@
 package dev.Test_DatabaseConnection;
 
-public class TestTruncateAllTables {
+import dev.BaseTest;
+
+public class TestTruncateAllTables extends BaseTest {
 }

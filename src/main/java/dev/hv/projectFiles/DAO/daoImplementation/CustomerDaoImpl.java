@@ -147,6 +147,8 @@ public class CustomerDaoImpl implements CustomerDao<User> {
      */
     @Override
     public void updateUser(User user) {
+        validateUser(user);
+
         // Konvertieren des Geburtsdatums in das SQL-Format
         LocalDate birthDate = user.getBirthDate();
         Date sqlDate = Date.valueOf(birthDate);
@@ -170,12 +172,17 @@ public class CustomerDaoImpl implements CustomerDao<User> {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder("Validation failed for User:\n");
+
+            // Add all validation failures to the error message
             for (ConstraintViolation<User> violation : violations) {
-                sb.append(violation.getPropertyPath())
-                        .append(": ")
-                        .append(violation.getMessage())
+                sb.append("Property: ")
+                        .append(violation.getPropertyPath())
+                        .append(" - ")
+                        .append(violation.getMessage()) // validation message
                         .append("\n");
             }
+
+            // Throw an exception with the validation error message
             throw new IllegalArgumentException(sb.toString());
         }
     }
