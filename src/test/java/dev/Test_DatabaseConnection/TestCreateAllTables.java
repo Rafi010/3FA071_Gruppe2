@@ -1,6 +1,7 @@
 package dev.Test_DatabaseConnection;
 
 import dev.BaseTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -13,6 +14,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * der Klasse `DatabaseConnection` durchführt.
  */
 class TestCreateAllTables extends BaseTest {
+
+    @BeforeEach
+    public void initiate(){
+        connection.removeAllTables();
+    }
 
     @Test
     void testCreateAllTables() {
