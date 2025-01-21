@@ -3,25 +3,25 @@ package dev.hv.projectFiles.DAO.entities;
 import dev.hv.model.ICustomer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.UUID;
 
 import java.time.LocalDate;
 
 public class User implements ICustomer {
 
-    @NotNull(message = "First name cannot be empty")  // Hibernate-specific annotation
+    @NotEmpty(message = "First name cannot be empty")  // Hibernate-specific annotation
     @Length(min = 1, max = 50, message = "First name must be between 1 and 50 characters")  // Hibernate-specific annotation
     @JsonProperty("first_name")
     String firstName;
 
-    @NotNull(message = "Last name cannot be empty")  // Hibernate-specific annotation
+    @NotEmpty(message = "Last name cannot be empty")  // Hibernate-specific annotation
     @Length(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")  // Hibernate-specific annotation
     @JsonProperty("last_name")
     String lastName;
 
-    //@NotNull(message = "Birthdate cannot be empty")  // Hibernate-specific annotation
+    @NotNull(message = "Birthdate cannot be empty")  // Hibernate-specific annotation
     @JsonProperty("birth_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate birthdate;
@@ -30,8 +30,7 @@ public class User implements ICustomer {
     @JsonProperty("gender")
     Gender gender;
 
-    //@NotNull(message = "ID cannot be empty")  // Hibernate-specific annotation
-    //@UUID(message = "ID must be a valid UUID")  // Hibernate-specific annotation
+    @NotNull(message = "ID cannot be empty")  // Hibernate-specific annotation
     @JsonProperty("id")
     java.util.UUID id;
 

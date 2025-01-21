@@ -1,4 +1,6 @@
 package dev.Test_DatabaseConnection;
 
-public class TestRemoveAllTables {
+import dev.BaseTest;
+
+public class TestRemoveAllTables extends BaseTest {
 }

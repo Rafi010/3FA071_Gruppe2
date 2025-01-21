@@ -4,6 +4,7 @@ import dev.BaseTest;
 import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,6 +35,8 @@ class TestCloseConnection extends BaseTest {
         } catch (SQLException e) {
             fail("SQLException occurred while checking if connection is closed: " + e.getMessage());
         }
+
+        connection.openConnection(new Properties());
     }
 }
 

@@ -1,6 +1,5 @@
 package dev;
 
-// BaseTest.java (Shared setup logic)
 import dev.hv.projectFiles.DatabaseConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,7 +15,7 @@ public class BaseTest {
     @BeforeAll
     public static void setUp() throws SQLException {
         Properties properties = new Properties();
-        DatabaseConnection connection = DatabaseConnection.getInstance();
+        connection = DatabaseConnection.getInstance();
         connection.openConnection(properties);
     }
 
@@ -32,4 +31,5 @@ public class BaseTest {
     public void prepare() {
         connection.removeAllTables();
     }
+
 }

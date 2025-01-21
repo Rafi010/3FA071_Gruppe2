@@ -1,11 +1,6 @@
 package dev.Test_DatabaseConnection;
 
-import dev.TestUtils;
-import dev.hv.projectFiles.DatabaseConnection;
-import org.junit.jupiter.api.BeforeAll;
+import dev.BaseTest;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-public class TestFillDatabase {
+public class TestFillDatabase extends BaseTest {
 }

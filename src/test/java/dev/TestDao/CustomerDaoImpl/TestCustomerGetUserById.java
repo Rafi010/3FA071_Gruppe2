@@ -1,12 +1,11 @@
 package dev.TestDao.CustomerDaoImpl;
 
-import dev.TestUtils;
+import dev.BaseTest;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
-import dev.hv.projectFiles.DatabaseConnection;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -18,18 +17,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCustomerGetUserById {
+public class TestCustomerGetUserById extends BaseTest {
 
-    private static DatabaseConnection databaseConnection;
-
-    @BeforeAll
-    static void setUp() throws SQLException {
-        // Initialisiert die Datenquelle und DatabaseConnection vor jedem Test
-        Connection connection = TestUtils.getTestDbConnection();
-        databaseConnection = new DatabaseConnection();
-        databaseConnection.setConnection(connection);
-        databaseConnection.createAllTables();
-
+    @BeforeEach
+    public void initiate(){
+        connection.createAllTables();
     }
 
     @Test
@@ -37,11 +29,11 @@ public class TestCustomerGetUserById {
         UUID randomUuid = UUID.randomUUID();
         Date date = Date.valueOf(LocalDate.now());
         try {
-            saveUserInDb(databaseConnection.getConnection(), randomUuid, date);
+            saveUserInDb(connection.getConnection(), randomUuid, date);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        CustomerDao<User> customerDao = new CustomerDaoImpl(databaseConnection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
         ICustomer user = customerDao.getUserById(randomUuid.toString());
 
         assertEquals(ICustomer.Gender.M, user.getGender());

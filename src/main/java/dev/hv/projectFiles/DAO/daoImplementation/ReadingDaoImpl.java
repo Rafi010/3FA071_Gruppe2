@@ -5,10 +5,15 @@ import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
 import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.User;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -18,6 +23,7 @@ import java.util.UUID;
 public class ReadingDaoImpl implements ReadingDao<Reading> {
     private final Connection connection; // Verbindung zur Datenbank
     private final CustomerDao<User> customerDao; // DAO für Kunden
+    private final Validator validator;
 
     /**
      * Konstruktor, der die Datenbankverbindung initialisiert.
@@ -26,6 +32,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     public ReadingDaoImpl(Connection connection) {
         this.connection = connection;
         this.customerDao = new CustomerDaoImpl(connection); // Initialisierung des CustomerDao
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            this.validator = factory.getValidator();
+        }
     }
 
     /**
@@ -34,6 +43,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
      */
     @Override
     public void addReading(Reading reading) {
+
+        validateReading(reading);
+
         try {
             String zaehlerstand = "";
             // Bestimmung der Spalte basierend auf der Zählerart
@@ -72,10 +84,11 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     @Override
     public Reading getReadingById(IReading.KindOfMeter kindOfMeter, String id) {
         if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) return null; // Kein Abruf für unbekannte Zählerart
+        String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
         try {
-            String query = "SELECT * FROM ? WHERE id = ?";
+            String query = "SELECT * FROM ? WHERE kundenid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, kindOfMeter.toString().toLowerCase());
+            stmt.setString(1, metre);
             stmt.setString(2, id);
             ResultSet rs = stmt.executeQuery();
 
@@ -105,10 +118,11 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     public List<Reading> getAllReadings(IReading.KindOfMeter kindOfMeter) {
         if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) return null; // Keine Abfrage für unbekannte Zählerart
         List<Reading> readings = new ArrayList<>();
+        String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
         try {
             String query = "SELECT * FROM ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, kindOfMeter.toString().toLowerCase());
+            stmt.setString(1, metre);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -134,6 +148,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
      */
     @Override
     public void updateReading(Reading reading) {
+
+        validateReading(reading);
+
         try {
             String zaehlerstand = "";
             switch (reading.getKindOfMeter()) {
@@ -169,14 +186,35 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
      */
     @Override
     public void deleteReading(IReading.KindOfMeter kindOfMeter, String id) {
+        String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
+        System.out.println(metre);
         try {
-            String query = "DELETE FROM ? WHERE id = ?";
+            String query = "DELETE FROM ? WHERE kundenid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, kindOfMeter.toString().toLowerCase());
+            stmt.setString(1, metre);
             stmt.setString(2, id);
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void validateReading(Reading reading) {
+        Set<ConstraintViolation<Reading>> violations = validator.validate(reading);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder("Validation failed for Reading:\n");
+
+            // Add all validation failures to the error message
+            for (ConstraintViolation<Reading> violation : violations) {
+                sb.append("Property: ")
+                        .append(violation.getPropertyPath())
+                        .append(" - ")
+                        .append(violation.getMessage()) // validation message
+                        .append("\n");
+            }
+
+            // Throw an exception with the validation error message
+            throw new IllegalArgumentException(sb.toString());
         }
     }
 }
