@@ -15,15 +15,7 @@ public class ReadingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response readingsPost(@Valid Reading readingData){
-        //TODO re-enable
-        /*
-        if (readingData.getDateOfReading() == null /*|| readingData.getComment() == null || readingData.getCustomer() == null /*|| readingData.getId() == null || readingData.getSubstitute() == null || readingData.getKindOfMeter() == null || readingData.getMeterCount() == null || readingData.getMeterId() == null){
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("incomplete data")
-                    .build();
-        }
-*/
-        // Simulierte Verarbeitung
+
         //TODO remove "!= null" statements after testing
         String responseMessage = String.format(
                 "{\"message\":\"Reading created - Date: %s, Comment: %s, Customer %s, Substitute: %s, " +

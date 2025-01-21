@@ -20,7 +20,6 @@ public class CustomerResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response customerPost(@Valid User user) {
 
-        // Simulierte Verarbeitung
         String responseMessage = String.format(
                 "{\"message\":\"Customer created: %s %s (%s) - Birthdate: %s, ID: %s\"}",
                 user.getFirstName(),
