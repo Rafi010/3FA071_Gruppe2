@@ -1,5 +1,6 @@
 package dev.hv.rest;
 
+import com.fasterxml.jackson.core.util.JacksonFeature;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -19,7 +20,9 @@ public class Server {
     public static void startServer(String url) {
         if (server == null) {
             // Konfiguration der verfügbaren Ressourcen-Endpunkte
-            ResourceConfig resourceConfig = new ResourceConfig().packages("dev.hv.rest.ResourceEndpoints");
+            ResourceConfig resourceConfig = new ResourceConfig()
+                    .packages("dev.hv.rest.ResourceEndpoints")
+                    .register(JacksonFeature.class);
 
             // Initialisiert und startet den Grizzly HTTP-Server
             server = GrizzlyHttpServerFactory.createHttpServer(URI.create(url), resourceConfig);
