@@ -45,7 +45,7 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(kundenid, zaehlernummer, @datum, zaehlerstand_in_m3, kommentar)
+(kundenid, zaehlernummer, @datum, zaehlerstand_in_m³, kommentar)
 --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
 SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
 ;
