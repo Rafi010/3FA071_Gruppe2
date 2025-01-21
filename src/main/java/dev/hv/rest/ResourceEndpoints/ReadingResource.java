@@ -2,6 +2,7 @@ package dev.hv.rest.ResourceEndpoints;
 
 
 import dev.hv.projectFiles.DAO.entities.Reading;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -13,14 +14,34 @@ public class ReadingResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response readingsPost(Reading readingData){
-        if (readingData.getDateOfReading() == null || readingData.getComment() == null /*|| readingData.getCustomer() == null*/ || readingData.getId() == null || readingData.getSubstitute() == null || readingData.getKindOfMeter() == null || readingData.getMeterCount() == null || readingData.getMeterId() == null){
+    public Response readingsPost(@Valid Reading readingData){
+        //TODO re-enable
+        /*
+        if (readingData.getDateOfReading() == null /*|| readingData.getComment() == null || readingData.getCustomer() == null /*|| readingData.getId() == null || readingData.getSubstitute() == null || readingData.getKindOfMeter() == null || readingData.getMeterCount() == null || readingData.getMeterId() == null){
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("incomplete data")
                     .build();
         }
+*/
+        // Simulierte Verarbeitung
+        //TODO remove "!= null" statements after testing
+        String responseMessage = String.format(
+                "{\"message\":\"Reading created - Date: %s, Comment: %s, Customer %s, Substitute: %s, " +
+                        "KindOfMeter %s, MeterCount: %s, MeterId: %s, ID: %s\"}",
+                readingData.getDateOfReading() != null ? readingData.getDateOfReading().toString() : "N/A",
+                readingData.getComment() != null ? readingData.getComment() : "N/A",
+                readingData.getCustomer() != null ? readingData.getCustomer().toString() : "N/A", //TODO process customer!!!
+                readingData.getSubstitute() != null ? readingData.getSubstitute().toString() : "N/A",
+                readingData.getKindOfMeter() != null ? readingData.getKindOfMeter().toString() : "N/A",
+                readingData.getMeterCount() != null ? readingData.getMeterCount().toString() : "N/A",
+                readingData.getMeterId() != null ? readingData.getMeterId() : "N/A",
+                readingData.getId() != null ? readingData.getId().toString() : "N/A"
+        );
+
+
         return Response.status(Response.Status.CREATED)
-                .entity(readingData.getDateOfReading() + " " + readingData.getComment() + " " +  readingData.getCustomer() + " " + readingData.getId() + " " + readingData.getSubstitute() + " " + readingData.getKindOfMeter() + " " + readingData.getMeterCount() + " " + readingData.getMeterId())
+                .entity(responseMessage)
                 .build();
+
     }
 }
