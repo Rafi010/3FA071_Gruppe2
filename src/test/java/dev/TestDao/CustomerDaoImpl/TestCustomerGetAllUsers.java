@@ -1,13 +1,10 @@
 package dev.TestDao.CustomerDaoImpl;
 
 import dev.BaseTest;
-import dev.TestUtils;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
-import dev.hv.projectFiles.DatabaseConnection;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestCustomerGetAllUsers extends BaseTest {
 
     @BeforeEach
-    public void initiate(){
+    public void initiate() {
         connection.createAllTables();
     }
 
@@ -52,8 +49,8 @@ public class TestCustomerGetAllUsers extends BaseTest {
         PreparedStatement pst = connection.prepareStatement(query);
         pst.setString(1, uuid.toString()); // UUID
         pst.setString(2, ICustomer.Gender.M.toString()); // Anrede
-        pst.setString(3, "Max"+i); // Vorname
-        pst.setString(4, "Mustermann"+i);
+        pst.setString(3, "Max" + i); // Vorname
+        pst.setString(4, "Mustermann" + i);
         pst.setDate(5, date);
         return pst.executeUpdate(); // gibt Anzahl der veränderten einträge zurück in diesem fall immer eins
     }

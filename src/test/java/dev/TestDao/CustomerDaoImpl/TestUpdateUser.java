@@ -4,6 +4,7 @@ import dev.BaseTest;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
+import dev.hv.projectFiles.DAO.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,7 @@ public class TestUpdateUser extends BaseTest {
     public void testUpdateDeletedUser() throws SQLException {
         UUID uuid = UUID.randomUUID();
         createUser(uuid); // Erstelle einen Benutzer mit der UUID
-        CustomerDao customerDao = new CustomerDaoImpl(connection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
         customerDao.deleteUser(uuid.toString()); // Lösche den Benutzer, um sicherzustellen, dass die UUID nicht existiert
 
         String query = "UPDATE kunde SET Vorname = ? WHERE uuid = ?";

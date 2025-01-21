@@ -1,13 +1,10 @@
 package dev.TestDao.CustomerDaoImpl;
 
 import dev.BaseTest;
-import dev.TestUtils;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.User;
-import dev.hv.projectFiles.DatabaseConnection;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,15 +1,13 @@
 package dev.TestDao.CustomerDaoImpl;
 
 import dev.BaseTest;
-import dev.TestUtils;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
-import dev.hv.projectFiles.DatabaseConnection;
-import org.junit.jupiter.api.BeforeAll;
+import dev.hv.projectFiles.DAO.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.sql.Connection;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -44,7 +42,7 @@ public void initiate(){
         } catch (SQLException e) {
             fail("SQLException occurred while creating User in DB: " + e.getMessage());
         }
-        CustomerDao customerDao = new CustomerDaoImpl(connection.getConnection());
+        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
         customerDao.deleteUser(uuid.toString());
 
         try {

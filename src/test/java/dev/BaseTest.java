@@ -4,7 +4,6 @@ import dev.hv.projectFiles.DatabaseConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.mariadb.jdbc.Connection;
 
 import java.sql.SQLException;
 import java.util.Properties;
