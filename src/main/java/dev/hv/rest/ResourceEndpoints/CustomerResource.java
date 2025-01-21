@@ -3,6 +3,7 @@ package dev.hv.rest.ResourceEndpoints;
 import dev.hv.projectFiles.DAO.entities.User;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -17,7 +18,7 @@ public class CustomerResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response customerPost(@Valid User user) {
 
         // Simulierte Verarbeitung

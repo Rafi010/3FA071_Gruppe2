@@ -13,23 +13,17 @@ public class User implements ICustomer {
 
     @NotEmpty(message = "First name cannot be empty")  // Hibernate-specific annotation
     @Length(min = 1, max = 50, message = "First name must be between 1 and 50 characters")  // Hibernate-specific annotation
-    @JsonProperty("first_name")
     String firstName;
 
     @NotEmpty(message = "Last name cannot be empty")  // Hibernate-specific annotation
     @Length(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")  // Hibernate-specific annotation
-    @JsonProperty("last_name")
     String lastName;
 
-    @JsonProperty("birth_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate birthdate;
 
     @NotNull(message = "Gender cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("gender")
     Gender gender;
 
-    @JsonProperty("id")
     java.util.UUID id;
 
     @Override

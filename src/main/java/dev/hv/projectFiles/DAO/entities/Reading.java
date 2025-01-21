@@ -14,35 +14,27 @@ import java.util.UUID;
 public class Reading implements IReading {
 
 
-    @JsonProperty("comment")
+
     String comment;
 
     @NotNull(message = "Customer cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("customer")
     ICustomer customer;
 
     @NotNull(message = "dateOfReading cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("dateOfReading")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate dateOfReading;
 
     @NotNull(message = "kindOfMeter cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("kindOfMeter")
     KindOfMeter kindOfMeter;
 
     @NotNull(message = "meterCount cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("meterCount")
     Double meterCount;
 
     @NotNull(message = "meterId cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("meterId")
     String meterId;
 
     @NotNull(message = "substitute cannot be empty")  // Hibernate-specific annotation
-    @JsonProperty("substitute")
     Boolean substitute;
 
-    @JsonProperty("id")
     UUID id;
 
 
