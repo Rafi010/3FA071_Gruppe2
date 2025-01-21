@@ -17,14 +17,8 @@ public class CustomerResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response customerPost(@Valid User user) {
-        // Zusätzliche Validierung, falls nötig
-        if (user.getFirstName() == null || user.getLastName() == null || user.getGender() == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("incomplete data")
-                    .build();
-        }
 
         // Simulierte Verarbeitung
         String responseMessage = String.format(
