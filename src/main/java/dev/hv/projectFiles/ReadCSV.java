@@ -30,7 +30,7 @@ public class ReadCSV {
         try {
             // CSVParser erstellen
             CSVParser parser = new CSVParserBuilder()
-                    .withSeparator(';')  // Setzt das Trennzeichen auf Semikolon
+                    .withSeparator(';')
                     .build();
 
             // Den Parser an den CSVReader übergeben
@@ -41,7 +41,7 @@ public class ReadCSV {
             String kunde;
             String zaehlernummer;
             try (CSVReader reader = new CSVReaderBuilder(new FileReader(csvFile))
-                    .withCSVParser(parser)  // Verwendet den benutzerdefinierten Parser
+                    .withCSVParser(parser)
                     .build()) {
 
                 String[] line;
@@ -63,11 +63,11 @@ public class ReadCSV {
                     // Überprüfen auf Metadaten: Kunde und Zählernummer
                     if (readingMeta) {
                         if (line[0].equalsIgnoreCase("Kunde")) {
-                            kunde = line[1];  // Speichert den Wert von Kunde
+                            kunde = line[1];
                         } else if (line[0].equalsIgnoreCase("Zählernummer")) {
-                            zaehlernummer = line[1];  // Speichert den Wert von Zählernummer
+                            zaehlernummer = line[1];
                         } else if (line[0].equalsIgnoreCase("Datum")) {
-                            readingMeta = false;  // Erreicht den tatsächlichen Datenabschnitt
+                            readingMeta = false;
                         }
                     }
 
@@ -81,24 +81,26 @@ public class ReadCSV {
             // SQL-fertige Ausgabe generieren
             for (String[] dataLine : dataList) {
                 if (bo) {
-                    toCommand = """                
-                            Kunde,Zaehlernummer,%s,%s,%s
-                            """.formatted(dataLine[0], dataLine[1], dataLine[2]);
+                    toCommand = "Kunde,Zaehlernummer,%s,%s,%s".formatted(dataLine[0], dataLine[1], dataLine[2]);
                     bo = false;
                 } else {
-                    toCommand = """                
-                            %s,%s,%s,%s,%s
-                            """.formatted(kunde, zaehlernummer,
-                            dataLine[0].trim(),  // Datum
-                            dataLine[1].replace(",", ".").trim(),  // Zählerstand
-                            dataLine.length > 2 && dataLine[2].trim().isEmpty() ? "null" : dataLine[2].trim()); // Kommentar
-
+                    String comment = dataLine.length > 2 ? dataLine[2].trim() : "";
+                    if (comment.startsWith("Zählertausch: neue Nummer")) {
+                        String[] parts = comment.split("Nummer");
+                        if (parts.length > 1) {
+                            zaehlernummer = parts[1].trim();
+                        }
+                    }
+                    toCommand = "%s,%s,%s,%s,%s".formatted(kunde, zaehlernummer,
+                            dataLine[0].trim(),
+                            dataLine[1].replace(",", ".").trim(),
+                            comment.isEmpty() ? "null" : comment);
                 }
-                // Leere Befehle überspringen
                 if (!toCommand.trim().isEmpty()) {
                     sqlList.add(toCommand);
                 }
             }
+
             switch (type) {
                 case 0:
                     writeCSV("src\\main\\resources\\heizung_sql.csv", sqlList);
@@ -117,6 +119,7 @@ public class ReadCSV {
             throw new RuntimeException(e);
         }
     }
+
 
     public static void writeCSV(String outputFile, List<String> sqlList) {
         try (CSVWriter writer = (CSVWriter) new CSVWriterBuilder(new FileWriter(outputFile))
