@@ -28,7 +28,6 @@ public class TestRemoveAllTables extends BaseTest {
             for (int i = 0; i < expectedTables.length; i++) {
                 String query = "SELECT * FROM " + expectedTables[i];
                 PreparedStatement stmt = conn.prepareStatement(query);
-                System.out.println(stmt);
                 ResultSet rs = stmt.executeQuery();
             }
         } catch(SQLException e){
