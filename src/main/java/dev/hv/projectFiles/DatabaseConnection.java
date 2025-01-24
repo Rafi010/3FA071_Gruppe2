@@ -93,14 +93,18 @@ public class DatabaseConnection implements IDatebaseConnection {
         Util.executeSQL(connection, "src/main/resources/sql/load_csv_file_in_table.sql");
     }
 
-    public Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            openConnection(new Properties());
+    public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                openConnection(new Properties());
+            }
+            return connection;
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL Exception at egtConnection: " + e);
         }
-        return connection;
     }
 
-    public void setConnection(Connection connection) {
+    public void setConnection (Connection connection){
         DatabaseConnection.connection = connection;
     }
 }
