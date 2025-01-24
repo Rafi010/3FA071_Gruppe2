@@ -11,17 +11,10 @@ import java.util.Properties;
 
 public class DatabaseConnection implements IDatebaseConnection {
     // Die Verbindung wird lokal gespeichert, sodass alle DB-Interaktionen nur innerhalb dieser Klasse stattfinden können
-    // singelton
+    // singleton
     private static Connection connection = null;
     private static DatabaseConnection instance;
 
-    //TODO: setDatabaseConnection -> nur ausführbar wenn DatabaseConnection für Tests verwendet wird
-
-    // TODO Privater Konstruktor, um Instanziierung zu verhindern
-    // TODO private DatabaseConnection() {}
-
-    // TODO Dilemma singelton/test -> Lehrer, ChatGPT, Eingenrecherche (kompliziert)
-    // TODO Idee: getInstance zur Benutzung im prod / Möglichkeit new Object aber nur in test
 
     public static synchronized DatabaseConnection getInstance() {
         if (instance == null) {
