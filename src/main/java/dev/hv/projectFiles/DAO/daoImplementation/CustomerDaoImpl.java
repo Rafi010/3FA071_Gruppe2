@@ -46,7 +46,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
         // Konvertieren des Geburtsdatums in das SQL-Format
         LocalDate birthDate = customer.getBirthDate();
-        Date sqlDate = Date.valueOf(birthDate);
+        Date sqlDate = (birthDate == null) ? null : Date.valueOf(birthDate);
 
         try {
             // SQL-Query zum Einfügen eines neuen Nutzers

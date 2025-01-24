@@ -21,6 +21,7 @@ public class Start {
       // Verbindung zu MySQL öffnen
       connection.openConnection(properties);
       // Tabellen erstellen und mit Daten füllen
+      connection.removeAllTables();
       connection.createAllTables();
       // daten in DB laden
       connection.fillDatabase();

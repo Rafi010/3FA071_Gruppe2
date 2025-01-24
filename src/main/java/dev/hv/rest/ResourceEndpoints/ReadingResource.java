@@ -38,8 +38,6 @@ public class ReadingResource {
         }
 
         Customer customer = (Customer)readingData.getCustomer();
-        System.out.println(customerDao.getCustomerById("e6124ae9-a0fb-4a3a-bfcb-e9e017c874f5"));
-        System.out.println(customerDao.getCustomerById(customer.getId().toString()));
 
         if (customerDao.getCustomerById(customer.getId().toString()) == null) {
             customerDao.addCustomer(customer);

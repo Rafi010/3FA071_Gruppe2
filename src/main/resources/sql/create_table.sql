@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS heizung (
     zaehlernummer VARCHAR(255) NOT NULL UNIQUE,
     datum DATE NOT NULL,
     zaehlerstand_in_mwh FLOAT NOT NULL,
-    kommentar VARCHAR(255) NOT NULL
+    kommentar VARCHAR(255)
 );
 --Erstellt die Tabelle Wasser mit den Spalten KundenID, Zaehlernummer, Datum, Zaehlernummer_in_m³ und Kommentar.
 CREATE TABLE IF NOT EXISTS wasser (
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS wasser (
     zaehlernummer VARCHAR(255) NOT NULL UNIQUE,
     datum DATE NOT NULL,
     zaehlerstand_in_m3 FLOAT NOT NULL,
-    kommentar VARCHAR(255) NOT NULL
+    kommentar VARCHAR(255)
 );
 --Erstellt die Tabelle Strom mit den Spalten KundenID, Zaehlernummer, Datum, Zaehlernummer_in_khw und Kommentar.
 CREATE TABLE IF NOT EXISTS strom (
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS strom (
     zaehlernummer VARCHAR(255) NOT NULL UNIQUE,
     datum DATE NOT NULL,
     zaehlerstand_in_kwh FLOAT NOT NULL,
-    kommentar VARCHAR(255) NOT NULL
+    kommentar VARCHAR(255)
 );
 --Erstellt die Tabelle Kunde mit den Spalten UUID, Anrede, Nachname, Vorname und Geburtsdatum.
 CREATE TABLE IF NOT EXISTS kunde (
@@ -28,5 +28,5 @@ CREATE TABLE IF NOT EXISTS kunde (
     anrede VARCHAR(1) NOT NULL,
     nachname VARCHAR(255) NOT NULL,
     vorname VARCHAR(255) NOT NULL,
-    geburtsdatum DATE NOT NULL
+    geburtsdatum DATE
 );
