@@ -1,15 +1,14 @@
 package dev.hv.projectFiles.DAO.entities;
 
 import dev.hv.model.ICustomer;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-public class User implements ICustomer {
+public class Customer implements ICustomer {
 
     @NotEmpty(message = "First name cannot be empty")  // Hibernate-specific annotation
     @Length(min = 1, max = 50, message = "First name must be between 1 and 50 characters")  // Hibernate-specific annotation
@@ -24,7 +23,7 @@ public class User implements ICustomer {
     @NotNull(message = "Gender cannot be empty")  // Hibernate-specific annotation
     Gender gender;
 
-    java.util.UUID id;
+    UUID id;
 
     @Override
     public LocalDate getBirthDate() {

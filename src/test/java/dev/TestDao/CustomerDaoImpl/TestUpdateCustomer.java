@@ -4,7 +4,7 @@ import dev.BaseTest;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestUpdateUser extends BaseTest {
+public class TestUpdateCustomer extends BaseTest {
 
     @BeforeEach
     public void initiate() {
@@ -39,8 +39,8 @@ public class TestUpdateUser extends BaseTest {
     public void testUpdateDeletedUser() throws SQLException {
         UUID uuid = UUID.randomUUID();
         createUser(uuid); // Erstelle einen Benutzer mit der UUID
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        customerDao.deleteUser(uuid.toString()); // Lösche den Benutzer, um sicherzustellen, dass die UUID nicht existiert
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        customerDao.deleteCustomer(uuid.toString()); // Lösche den Benutzer, um sicherzustellen, dass die UUID nicht existiert
 
         String query = "UPDATE kunde SET Vorname = ? WHERE uuid = ?";
         PreparedStatement statement = connection.getConnection().prepareStatement(query);

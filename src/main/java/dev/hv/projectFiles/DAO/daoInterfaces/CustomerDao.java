@@ -5,9 +5,9 @@ import dev.hv.model.ICustomer;
 import java.util.List;
 
 public interface CustomerDao<User> {
-    void addUser(User user);
-    ICustomer getUserById(String id);
-    List<User> getAllUsers();
-    void updateUser(User user);
-    void deleteUser(String id);
+    void addCustomer(User user);
+    ICustomer getCustomerById(String id);
+    List<User> getAllCustomers();
+    void updateCustomer(User user);
+    void deleteCustomer(String id);
 }

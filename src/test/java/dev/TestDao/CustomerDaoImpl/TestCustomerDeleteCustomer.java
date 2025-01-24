@@ -4,7 +4,7 @@ import dev.BaseTest;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCustomerDeleteUser extends BaseTest {
+public class TestCustomerDeleteCustomer extends BaseTest {
 
 @BeforeEach
 public void initiate(){
@@ -42,8 +42,8 @@ public void initiate(){
         } catch (SQLException e) {
             fail("SQLException occurred while creating User in DB: " + e.getMessage());
         }
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        customerDao.deleteUser(uuid.toString());
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        customerDao.deleteCustomer(uuid.toString());
 
         try {
             String query = "SELECT * FROM kunde WHERE uuid = ?";

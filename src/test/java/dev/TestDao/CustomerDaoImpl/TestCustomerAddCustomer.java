@@ -5,7 +5,7 @@ import dev.hv.exceptions.DuplicateUserException;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Diese Klasse enthält Tests zum Hinzufügen von Nutzern in die Datenbank mittels der CustomerDao-Klasse.
  */
-class TestCustomerAddUser extends BaseTest {
+class TestCustomerAddCustomer extends BaseTest {
 
     @BeforeEach
     public void initiate() {
@@ -35,12 +35,12 @@ class TestCustomerAddUser extends BaseTest {
      */
     @Test
     void testAddUserToDatabase() {
-        User testUser = getTestUser(UUID.randomUUID());
+        Customer testCustomer = getTestUser(UUID.randomUUID());
 
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        customerDao.addUser(testUser);
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        customerDao.addCustomer(testCustomer);
         try {
-            verifyUserInDatabase(connection.getConnection(), testUser);
+            verifyUserInDatabase(connection.getConnection(), testCustomer);
         } catch (SQLException e) {
             fail("SQLException occurred while checking if tables exist: " + e.getMessage());
         }
@@ -51,11 +51,11 @@ class TestCustomerAddUser extends BaseTest {
      */
     @Test
     void testAddUserWithMissingFirstName() {
-        User testUser = getTestUser(UUID.randomUUID());
-        testUser.setFirstName(""); // Setzt den Vornamen auf eine leere Zeichenkette
+        Customer testCustomer = getTestUser(UUID.randomUUID());
+        testCustomer.setFirstName(""); // Setzt den Vornamen auf eine leere Zeichenkette
 
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        assertThrows(IllegalArgumentException.class, () -> customerDao.addUser(testUser), "Es wurde erwartet, dass eine SQLException geworfen wird bei fehlendem Vornamen.");
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        assertThrows(IllegalArgumentException.class, () -> customerDao.addCustomer(testCustomer), "Es wurde erwartet, dass eine SQLException geworfen wird bei fehlendem Vornamen.");
     }
 
     /**
@@ -65,12 +65,12 @@ class TestCustomerAddUser extends BaseTest {
     //@Test
     void testAddDuplicateUser() {
         UUID duplicateId = UUID.randomUUID();
-        User user1 = getTestUser(duplicateId);
-        User user2 = getTestUser(duplicateId); // Gleiche UUID
+        Customer customer1 = getTestUser(duplicateId);
+        Customer customer2 = getTestUser(duplicateId); // Gleiche UUID
 
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        customerDao.addUser(user1);
-        assertThrows(DuplicateUserException.class, () -> customerDao.addUser(user2), "Es wurde erwartet, dass eine SQLException geworfen wird bei einer doppelten UUID.");
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        customerDao.addCustomer(customer1);
+        assertThrows(DuplicateUserException.class, () -> customerDao.addCustomer(customer2), "Es wurde erwartet, dass eine SQLException geworfen wird bei einer doppelten UUID.");
     }
 
     /**
@@ -79,11 +79,11 @@ class TestCustomerAddUser extends BaseTest {
      */
     @Test
     void testAddUserWithInvalidGender() {
-        User invalidUser = getTestUser(UUID.randomUUID());
-        invalidUser.setFirstName(null); // Setzt das Geschlecht auf null
+        Customer invalidCustomer = getTestUser(UUID.randomUUID());
+        invalidCustomer.setFirstName(null); // Setzt das Geschlecht auf null
 
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        assertThrows(IllegalArgumentException.class, () -> customerDao.addUser(invalidUser), "Es wurde erwartet, dass eine NullPointerException geworfen wird falls ein wert null ist.");
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        assertThrows(IllegalArgumentException.class, () -> customerDao.addCustomer(invalidCustomer), "Es wurde erwartet, dass eine NullPointerException geworfen wird falls ein wert null ist.");
     }
 
     /**
@@ -92,14 +92,14 @@ class TestCustomerAddUser extends BaseTest {
      * @param id die UUID, die man dem User geben möchte
      * @return das User-Objekt, das zum Testen verwendet wird
      */
-    private User getTestUser(UUID id) {
-        User user = new User();
-        user.setId(id);
-        user.setFirstName("Max");
-        user.setLastName("Mustermann");
-        user.setGender(ICustomer.Gender.M);
-        user.setBirthDate(LocalDate.of(2000, 1, 1));
-        return user;
+    private Customer getTestUser(UUID id) {
+        Customer customer = new Customer();
+        customer.setId(id);
+        customer.setFirstName("Max");
+        customer.setLastName("Mustermann");
+        customer.setGender(ICustomer.Gender.M);
+        customer.setBirthDate(LocalDate.of(2000, 1, 1));
+        return customer;
     }
 
     /**
@@ -107,19 +107,19 @@ class TestCustomerAddUser extends BaseTest {
      * Diese Methode prüft, ob der Nutzer in der Tabelle `users` korrekt gespeichert wurde.
      *
      * @param connection die Verbindung zur Datenbank
-     * @param user       das Nutzerobjekt, das in der Datenbank überprüft werden soll
+     * @param customer       das Nutzerobjekt, das in der Datenbank überprüft werden soll
      * @throws SQLException falls ein SQL Fehler auftritt, wird dieser an das JUnit Framework übergeben zur Behandlung
      */
-    private void verifyUserInDatabase(Connection connection, User user) throws SQLException {
+    private void verifyUserInDatabase(Connection connection, Customer customer) throws SQLException {
         String query = "SELECT * FROM kunde WHERE uuid = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, user.getId().toString());
+            stmt.setString(1, customer.getId().toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 assertTrue(rs.next(), "Der Nutzer wurde nicht in der Datenbank gefunden.");
-                assertEquals(user.getId().toString(), rs.getString("uuid"));
-                assertEquals(user.getFirstName(), rs.getString("vorname"));
-                assertEquals(user.getLastName(), rs.getString("nachname"));
-                assertEquals(user.getBirthDate(), rs.getDate("geburtsdatum").toLocalDate());
+                assertEquals(customer.getId().toString(), rs.getString("uuid"));
+                assertEquals(customer.getFirstName(), rs.getString("vorname"));
+                assertEquals(customer.getLastName(), rs.getString("nachname"));
+                assertEquals(customer.getBirthDate(), rs.getDate("geburtsdatum").toLocalDate());
             }
         }
     }

@@ -4,7 +4,7 @@ import dev.hv.model.IReading;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
 import dev.hv.projectFiles.DAO.entities.Reading;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -22,7 +22,7 @@ import java.util.UUID;
  */
 public class ReadingDaoImpl implements ReadingDao<Reading> {
     private final Connection connection; // Verbindung zur Datenbank
-    private final CustomerDao<User> customerDao; // DAO für Kunden
+    private final CustomerDao<Customer> customerDao; // DAO für Kunden
     private final Validator validator;
 
     /**
@@ -42,7 +42,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
      * @param reading das Messwert-Objekt, das hinzugefügt werden soll
      */
     @Override
-    public void addReading(Reading reading) {
+    public void addReading(IReading reading) {
 
         validateReading(reading);
 
@@ -96,7 +96,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 Reading reading = new Reading();
                 reading.setId(UUID.fromString(rs.getString("kundenid"))); // Kunden-ID
                 reading.setComment(rs.getString("kommentar")); // Kommentar
-                reading.setCustomer(customerDao.getUserById(rs.getString("kundenid"))); // Kundenobjekt abrufen
+                reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
                 reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
                 reading.setKindOfMeter(kindOfMeter); // Zählerart
                 reading.setMeterCount(rs.getDouble("zaehlerstand")); // Zählerstand
@@ -129,7 +129,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 Reading reading = new Reading();
                 reading.setId(UUID.fromString(rs.getString("kundenid"))); // Kunden-ID
                 reading.setComment(rs.getString("kommentar")); // Kommentar
-                reading.setCustomer(customerDao.getUserById(rs.getString("kundenid"))); // Kundenobjekt abrufen
+                reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
                 reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
                 reading.setKindOfMeter(kindOfMeter); // Zählerart
                 reading.setMeterCount(rs.getDouble("zaehlerstand")); // Zählerstand
@@ -147,7 +147,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
      * @param reading das Reading-Objekt mit aktualisierten Werten
      */
     @Override
-    public void updateReading(Reading reading) {
+    public void updateReading(IReading reading) {
 
         validateReading(reading);
 
@@ -199,13 +199,13 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         }
     }
 
-    private void validateReading(Reading reading) {
-        Set<ConstraintViolation<Reading>> violations = validator.validate(reading);
+    private void validateReading(IReading reading) {
+        Set<ConstraintViolation<IReading>> violations = validator.validate(reading);
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder("Validation failed for Reading:\n");
 
             // Add all validation failures to the error message
-            for (ConstraintViolation<Reading> violation : violations) {
+            for (ConstraintViolation<IReading> violation : violations) {
                 sb.append("Property: ")
                         .append(violation.getPropertyPath())
                         .append(" - ")

@@ -4,7 +4,7 @@ import dev.BaseTest;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,10 +38,10 @@ public class TestCustomerGetAllUsers extends BaseTest {
                 throw new RuntimeException(e);
             }
         }
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        List<User> allUsers = customerDao.getAllUsers();
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        List<Customer> allCustomers = customerDao.getAllCustomers();
         assertEquals(10, dbEntryCount); // Wurden alle Datenbankeinträge erstellt
-        assertEquals(10, allUsers.size()); // Wurde alle erstellten Datenbankeinträge durch DAO in die Liste aufgenommen
+        assertEquals(10, allCustomers.size()); // Wurde alle erstellten Datenbankeinträge durch DAO in die Liste aufgenommen
     }
 
     private int saveUserInDb(Connection connection, UUID uuid, Date date, int i) throws SQLException {

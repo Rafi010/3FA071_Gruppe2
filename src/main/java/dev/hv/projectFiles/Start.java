@@ -5,7 +5,7 @@ import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
 import dev.hv.projectFiles.DAO.entities.Reading;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import dev.hv.rest.Server;
 
 import java.sql.SQLException;
@@ -26,7 +26,7 @@ public class Start {
       connection.fillDatabase();
 
       // CustomerDao erstellen
-      CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
+      CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
       // ReadingDao erstellen
       ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
       // Verbindung schließen

@@ -2,7 +2,7 @@ package dev.hv.rest.ResourceEndpoints;
 
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -11,7 +11,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.sql.SQLException;
-import java.util.Properties;
 
 
 @Path("/customers")
@@ -31,16 +30,16 @@ public class CustomerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response customerPost(@Valid User user) {
+    public Response customerPost(@Valid Customer customer) {
 
         // Simulierte Verarbeitung
         String responseMessage = String.format(
                 "{\"message\":\"Customer created: %s %s (%s) - Birthdate: %s, ID: %s\"}",
-                user.getFirstName(),
-                user.getLastName(),
-                user.getGender(),
-                user.getBirthDate() != null ? user.getBirthDate().toString() : "N/A",
-                user.getId() != null ? user.getId().toString() : "N/A"
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getGender(),
+                customer.getBirthDate() != null ? customer.getBirthDate().toString() : "N/A",
+                customer.getId() != null ? customer.getId().toString() : "N/A"
         );
 
         return Response.status(Response.Status.CREATED)
@@ -52,10 +51,10 @@ public class CustomerResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response customerPut(@PathParam("id") String uuid, @Valid User user) {
+    public Response customerPut(@PathParam("id") String uuid, @Valid Customer user) {
         try {
             // Abrufen des existierenden Benutzers
-            User existingUser = findUserByUuid(uuid);
+            Customer existingUser = findCustomerByUuid(uuid);
 
             if (existingUser == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -70,7 +69,7 @@ public class CustomerResource {
             existingUser.setBirthDate(user.getBirthDate());
 
             // Aktualisieren des Benutzers in der Datenbank
-            updateUser(existingUser);
+            updateCustomer(existingUser);
 
             // Erfolgreiche Antwort
             String responseMessage = String.format("{\"message\": \"Kunde erfolgreich aktualisiert\", \"customer\": {\"id\": \"%s\", \"firstName\": \"%s\", \"lastName\": \"%s\"}}",
@@ -88,13 +87,13 @@ public class CustomerResource {
         }
     }
 
-    private User findUserByUuid(String uuid) {
+    private Customer findCustomerByUuid(String uuid) {
         try {
             DatabaseConnection connection = DatabaseConnection.getInstance();
             CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
-            ICustomer customer = customerDao.getUserById(uuid);
-            if (customer instanceof User) {
-                return (User) customer;
+            ICustomer customer = customerDao.getCustomerById(uuid);
+            if (customer instanceof Customer) {
+                return (Customer) customer;
             } else if (customer == null) {
                 return null;
             } else {
@@ -106,11 +105,11 @@ public class CustomerResource {
         }
     }
 
-    private void updateUser(User user) {
+    private void updateCustomer(Customer user) {
         try {
             DatabaseConnection connection = DatabaseConnection.getInstance();
             CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
-            customerDao.updateUser(user);
+            customerDao.updateCustomer(user);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error updating user", e);

@@ -4,7 +4,7 @@ import dev.BaseTest;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
-import dev.hv.projectFiles.DAO.entities.User;
+import dev.hv.projectFiles.DAO.entities.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCustomerGetUserById extends BaseTest {
+public class TestCustomerGetCustomerById extends BaseTest {
 
     @BeforeEach
     public void initiate(){
@@ -33,8 +33,8 @@ public class TestCustomerGetUserById extends BaseTest {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        CustomerDao<User> customerDao = new CustomerDaoImpl(connection.getConnection());
-        ICustomer user = customerDao.getUserById(randomUuid.toString());
+        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+        ICustomer user = customerDao.getCustomerById(randomUuid.toString());
 
         assertEquals(ICustomer.Gender.M, user.getGender());
         assertEquals("Max", user.getFirstName());
