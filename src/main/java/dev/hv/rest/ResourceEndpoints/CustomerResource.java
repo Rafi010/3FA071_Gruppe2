@@ -10,16 +10,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.sql.SQLException;
+import java.util.UUID;
 
 
 @Path("/customers")
 public class CustomerResource {
-
-    public CustomerResource() throws SQLException {
-        DatabaseConnection connection = DatabaseConnection.getInstance();
-    }
-
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -31,8 +26,14 @@ public class CustomerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response customerPost(@Valid Customer customer) {
+        DatabaseConnection connection = DatabaseConnection.getInstance();
+        CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
 
-        // Simulierte Verarbeitung
+        if (customer.getId() == null) {
+            customer.setId(UUID.randomUUID());
+        }
+        customerDao.addCustomer(customer);
+
         String responseMessage = String.format(
                 "{\"message\":\"Customer created: %s %s (%s) - Birthdate: %s, ID: %s\"}",
                 customer.getFirstName(),
@@ -50,7 +51,7 @@ public class CustomerResource {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON) //TODO: Anforderung Kommunikationsprotokoll TEXT_PLAIN
     public Response customerPut(@PathParam("id") String uuid, @Valid Customer user) {
         try {
             // Abrufen des existierenden Benutzers
