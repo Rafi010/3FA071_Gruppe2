@@ -10,16 +10,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.sql.SQLException;
+import java.util.UUID;
 
 
 @Path("/customers")
 public class CustomerResource {
-
-    public CustomerResource() throws SQLException {
-        DatabaseConnection connection = DatabaseConnection.getInstance();
-    }
-
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -31,8 +26,14 @@ public class CustomerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response customerPost(@Valid Customer customer) {
+        DatabaseConnection connection = DatabaseConnection.getInstance();
+        CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
 
-        // Simulierte Verarbeitung
+        if (customer.getId() == null) {
+            customer.setId(UUID.randomUUID());
+        }
+        customerDao.addCustomer(customer);
+
         String responseMessage = String.format(
                 "{\"message\":\"Customer created: %s %s (%s) - Birthdate: %s, ID: %s\"}",
                 customer.getFirstName(),
@@ -50,32 +51,32 @@ public class CustomerResource {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response customerPut(@PathParam("id") String uuid, @Valid Customer user) {
+    @Produces(MediaType.APPLICATION_JSON) //TODO: Anforderung Kommunikationsprotokoll TEXT_PLAIN
+    public Response customerPut(@PathParam("id") String uuid, @Valid Customer customer) {
         try {
             // Abrufen des existierenden Benutzers
-            Customer existingUser = findCustomerByUuid(uuid);
+            Customer existingCustomer = findCustomerByUuid(uuid);
 
-            if (existingUser == null) {
+            if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("{\"error\": \"Kunde nicht gefunden\"}")
                         .build();
             }
 
             // Überschreiben der Werte des existierenden Benutzers
-            existingUser.setFirstName(user.getFirstName());
-            existingUser.setLastName(user.getLastName());
-            existingUser.setGender(user.getGender());
-            existingUser.setBirthDate(user.getBirthDate());
+            existingCustomer.setFirstName(customer.getFirstName());
+            existingCustomer.setLastName(customer.getLastName());
+            existingCustomer.setGender(customer.getGender());
+            existingCustomer.setBirthDate(customer.getBirthDate());
 
             // Aktualisieren des Benutzers in der Datenbank
-            updateCustomer(existingUser);
+            updateCustomer(existingCustomer);
 
             // Erfolgreiche Antwort
             String responseMessage = String.format("{\"message\": \"Kunde erfolgreich aktualisiert\", \"customer\": {\"id\": \"%s\", \"firstName\": \"%s\", \"lastName\": \"%s\"}}",
-                    existingUser.getId(),
-                    existingUser.getFirstName(),
-                    existingUser.getLastName());
+                    existingCustomer.getId(),
+                    existingCustomer.getFirstName(),
+                    existingCustomer.getLastName());
             return Response.status(Response.Status.OK)
                     .entity(responseMessage)
                     .build();
@@ -101,18 +102,18 @@ public class CustomerResource {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error finding user", e);
+            throw new RuntimeException("Error finding customer", e);
         }
     }
 
-    private void updateCustomer(Customer user) {
+    private void updateCustomer(Customer customer) {
         try {
             DatabaseConnection connection = DatabaseConnection.getInstance();
             CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
-            customerDao.updateCustomer(user);
+            customerDao.updateCustomer(customer);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error updating user", e);
+            throw new RuntimeException("Error updating customer", e);
         }
     }
 
