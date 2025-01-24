@@ -2,6 +2,7 @@ package dev.hv.projectFiles.DAO.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.hv.model.ICustomer;
 import dev.hv.model.IReading;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ public class Reading implements IReading {
 
     String comment;
 
+    @JsonDeserialize(as = User.class)
     @NotNull(message = "Customer cannot be empty")  // Hibernate-specific annotation
     ICustomer customer;
 
