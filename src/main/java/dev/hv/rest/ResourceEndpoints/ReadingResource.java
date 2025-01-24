@@ -21,13 +21,12 @@ import java.util.UUID;
 
 @Path("/readings")
 public class ReadingResource {
+    DatabaseConnection connection = DatabaseConnection.getInstance();
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response readingsPost(@Valid Reading readingData){
-
-        DatabaseConnection connection = DatabaseConnection.getInstance();
 
         CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
 
