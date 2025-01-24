@@ -88,7 +88,11 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
                 customer.setGender(ICustomer.Gender.valueOf(rs.getString("anrede"))); // Anrede setzen
                 customer.setFirstName(rs.getString("vorname")); // Vorname setzen
                 customer.setLastName(rs.getString("nachname")); // Nachname setzen
-                customer.setBirthDate(rs.getDate("geburtsdatum").toLocalDate()); // Geburtsdatum setzen
+                if (rs.getDate("geburtsdatum") == null) {
+                    customer.setBirthDate(null);
+                } else {
+                    customer.setBirthDate(rs.getDate("geburtsdatum").toLocalDate()); // Geburtsdatum setzen
+                }
                 return customer;
             }
         } catch (SQLException e) {

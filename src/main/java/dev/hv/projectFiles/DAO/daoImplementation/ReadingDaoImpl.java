@@ -47,27 +47,26 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         validateReading(reading);
 
         try {
-            String zaehlerstand = "";
+            String zaehlerstandColumn = "";
             // Bestimmung der Spalte basierend auf der Zählerart
             switch (reading.getKindOfMeter()) {
-                case STROM -> zaehlerstand = "zaehlerstand_in_kwh";
-                case WASSER -> zaehlerstand = "zaehlerstand_in_m³";
-                case HEIZUNG -> zaehlerstand = "zaehlerstand_in_mwh";
+                case STROM -> zaehlerstandColumn = "zaehlerstand_in_kwh";
+                case WASSER -> zaehlerstandColumn = "zaehlerstand_in_m³";
+                case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
                 case UNBEKANNT -> {
                     return; // Falls die Art unbekannt ist, keine Aktion
                 }
             }
 
+            String metre = reading.getKindOfMeter().toString().toLowerCase();
             // SQL-Query für das Einfügen eines neuen Messwerts
-            String query = "INSERT INTO ? (kundenid, zaehlernummer, datum, ?, kommentar) VALUES (?, ?, ?, ?, ?)";
+            String query = "INSERT INTO " + metre + " (kundenid, zaehlernummer, datum, " + zaehlerstandColumn + ", kommentar) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, reading.getKindOfMeter().toString().toLowerCase()); // table to insert into depending on kind of meter
-            stmt.setString(2, zaehlerstand); // name of column to change the zählerstand depending on kind of meter
-            stmt.setString(3, reading.getCustomer().getId().toString()); // Kunden-ID
-            stmt.setString(4, reading.getMeterId()); // Zählernummer
-            stmt.setDate(5, Date.valueOf(reading.getDateOfReading())); // Datum
-            stmt.setDouble(6, reading.getMeterCount()); // Zählerstand
-            stmt.setString(7, reading.getComment()); // Kommentar
+            stmt.setString(1, reading.getCustomer().getId().toString()); // Kunden-ID
+            stmt.setString(2, reading.getMeterId()); // Zählernummer
+            stmt.setDate(3, Date.valueOf(reading.getDateOfReading())); // Datum
+            stmt.setDouble(4, reading.getMeterCount()); // Zählerstand
+            stmt.setString(5, reading.getComment()); // Kommentar
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             System.out.println("Es wurden nicht alle erforderlichen Werte des Objekts erfüllt.\nEs wurde nicht in die Datenbank gespeichert.");
@@ -86,10 +85,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) return null; // Kein Abruf für unbekannte Zählerart
         String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
         try {
-            String query = "SELECT * FROM ? WHERE kundenid = ?";
+            String query = "SELECT * FROM " + metre + " WHERE kundenid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, metre);
-            stmt.setString(2, id);
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -120,9 +118,8 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         List<Reading> readings = new ArrayList<>();
         String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
         try {
-            String query = "SELECT * FROM ?";
+            String query = "SELECT * FROM " + metre;
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, metre);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -162,17 +159,17 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 }
             }
 
+            String metre = reading.getKindOfMeter().toString().toLowerCase();
+
             // SQL-Query für das Aktualisieren eines Messwerts
-            String query = "UPDATE ? SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, ? = ? WHERE zaehlernummer = ?";
+            String query = "UPDATE " + metre + " SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, " + zaehlerstand + " = ? WHERE zaehlernummer = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, reading.getKindOfMeter().toString().toLowerCase()); //table to update in depending on kind of meter
-            stmt.setString(2, reading.getComment()); // Kommentar
-            stmt.setString(3, reading.getCustomer().getId().toString()); // Kunden-ID
-            stmt.setDate(4, Date.valueOf(reading.getDateOfReading())); // Datum
-            stmt.setString(5, reading.getMeterId()); // Zählernummer
-            stmt.setString(6, zaehlerstand); //kind of Zählerstand depending on kind of meter
-            stmt.setDouble(7, reading.getMeterCount()); // Zählerstand
-            stmt.setString(8, reading.getMeterId()); // Zählernummer für WHERE-Bedingung
+            stmt.setString(1, reading.getComment()); // Kommentar
+            stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
+            stmt.setDate(3, Date.valueOf(reading.getDateOfReading())); // Datum
+            stmt.setString(4, reading.getMeterId()); // Zählernummer
+            stmt.setDouble(5, reading.getMeterCount()); // Zählerstand
+            stmt.setString(6, reading.getMeterId()); // Zählernummer für WHERE-Bedingung
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
@@ -189,10 +186,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
         System.out.println(metre);
         try {
-            String query = "DELETE FROM ? WHERE kundenid = ?";
+            String query = "DELETE FROM " + metre + " WHERE kundenid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, metre);
-            stmt.setString(2, id);
+            stmt.setString(1, id);
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException e) {
             throw new RuntimeException(e);
