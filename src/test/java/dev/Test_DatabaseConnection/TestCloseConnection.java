@@ -17,7 +17,7 @@ class TestCloseConnection extends BaseTest {
      * Dieser Test überprüft, ob die closeConnection Methode ordnungsgemäß funktioniert.
      */
     @Test
-    void testCloseConnection() {
+    void testCloseConnection() throws SQLException {
         // Ensure the connection is not null and is open before closing
         assertNotNull(connection.getConnection(), "Connection should not be null before close");
         try {

@@ -8,10 +8,11 @@ import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.User;
 import dev.hv.rest.Server;
 
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class Start {
-   public static void main(String[] args) {
+   public static void main(String[] args) throws SQLException {
       // Properties-Objekt erstellen, das als Parameter verwendet wird
       Properties properties = new Properties();
       // Datenbankverbindung-Objekt erstellen, das für die Kommunikation mit der Datenbank genutzt wird

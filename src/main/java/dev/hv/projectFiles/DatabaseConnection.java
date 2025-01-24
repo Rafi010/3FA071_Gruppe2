@@ -29,15 +29,9 @@ public class DatabaseConnection implements IDatebaseConnection {
 
     // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die nicht mit der hv-Datenbank verbindet)
     @Override
-    public IDatebaseConnection openConnection(Properties properties) {
-        if (connection != null) {
-            try {
-                if (!connection.isClosed()) {
-                    throw new IllegalStateException("Connection already open");
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+    public IDatebaseConnection openConnection(Properties properties) throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            return this;
         }
 
         final String userName = System.getProperty("user.name");
@@ -99,7 +93,10 @@ public class DatabaseConnection implements IDatebaseConnection {
         Util.executeSQL(connection, "src/main/resources/sql/load_csv_file_in_table.sql");
     }
 
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            openConnection(new Properties());
+        }
         return connection;
     }
 
