@@ -123,8 +123,8 @@ public class CustomerResource {
 
         customerDao.deleteCustomer(uuid);
 
-        return Response.status(Response.Status.CREATED)
-                .entity("HI")
+        return Response.status(Response.Status.OK)
+                .entity("Customer deleted.")
                 .build();
     } //TODO NOT FOUND & SET TO NULL
 
