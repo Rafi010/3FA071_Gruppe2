@@ -9,36 +9,30 @@ import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.Customer;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 @Path("/readings")
 public class ReadingResource {
+
     DatabaseConnection connection = DatabaseConnection.getInstance();
+    CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
+    ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response readingsPost(@Valid Reading readingData){
-
-        CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
-
-        ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
-
+    public Response readingsPost(@Valid Reading reading){
 
         //add UUID if not existent
-        if (readingData.getId() == null) {
-            readingData.setId(UUID.randomUUID());
+        if (reading.getId() == null) {
+            reading.setId(UUID.randomUUID());
         }
 
-        Customer customer = (Customer)readingData.getCustomer();
+        Customer customer = (Customer)reading.getCustomer();
 
         //TODO shorten functionality by only calling the add function and not checking first
         //add customer of reading to DB if not already present
@@ -46,14 +40,25 @@ public class ReadingResource {
             customerDao.addCustomer(customer);
         }
 
-        readingDao.addReading(readingData);
-
-
-
+        readingDao.addReading(reading);
 
         return Response.status(Response.Status.CREATED)
-                .entity(readingData)
+                .entity(reading)
                 .build();
 
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response readingPut(@Valid Reading reading){
+
+        try {
+            readingDao.updateReading(reading);
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.CREATED)
+                .entity(reading)
+                .build();
     }
 }

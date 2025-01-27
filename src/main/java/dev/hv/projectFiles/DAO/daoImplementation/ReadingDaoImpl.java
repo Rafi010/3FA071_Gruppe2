@@ -195,6 +195,10 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         }
     }
 
+    /**
+     * Validiert ein Reading auf seine richtigkeit.
+     * @param reading das Reading welches validiert wird
+     */
     private void validateReading(IReading reading) {
         Set<ConstraintViolation<IReading>> violations = validator.validate(reading);
         if (!violations.isEmpty()) {
