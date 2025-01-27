@@ -8,18 +8,16 @@ import jakarta.ws.rs.core.Response;
 @Path("/setupDB")
 public class SetupResource {
 
+    DatabaseConnection connection = DatabaseConnection.getInstance();
+
     @DELETE
     public Response setupDB(){
-
-        DatabaseConnection connection = DatabaseConnection.getInstance();
-
+        connection.getConnection();
         // Tabellen erstellen und mit Daten füllen
         connection.removeAllTables();
         connection.createAllTables();
         // daten in DB laden
         connection.fillDatabase();
-
-
 
         return Response.status(Response.Status.CREATED)
                 .entity("Database setup complete.")
