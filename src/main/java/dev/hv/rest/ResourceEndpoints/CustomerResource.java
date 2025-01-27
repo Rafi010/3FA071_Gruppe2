@@ -16,6 +16,9 @@ import java.util.UUID;
 @Path("/customers")
 public class CustomerResource {
 
+    DatabaseConnection connection = DatabaseConnection.getInstance();
+    CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
@@ -26,8 +29,7 @@ public class CustomerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response customerPost(@Valid Customer customer) {
-        DatabaseConnection connection = DatabaseConnection.getInstance();
-        CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
+
 
         if (customer.getId() == null) {
             customer.setId(UUID.randomUUID());
@@ -90,8 +92,6 @@ public class CustomerResource {
 
     private Customer findCustomerByUuid(String uuid) {
         try {
-            DatabaseConnection connection = DatabaseConnection.getInstance();
-            CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
             ICustomer customer = customerDao.getCustomerById(uuid);
             if (customer instanceof Customer) {
                 return (Customer) customer;
@@ -108,13 +108,25 @@ public class CustomerResource {
 
     private void updateCustomer(Customer customer) {
         try {
-            DatabaseConnection connection = DatabaseConnection.getInstance();
-            CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
             customerDao.updateCustomer(customer);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error updating customer", e);
         }
     }
+
+
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response customerDelete(@PathParam("id") String uuid){
+
+        customerDao.deleteCustomer(uuid);
+
+        return Response.status(Response.Status.CREATED)
+                .entity("HI")
+                .build();
+    } //TODO NOT FOUND & SET TO NULL
+
 
 }
