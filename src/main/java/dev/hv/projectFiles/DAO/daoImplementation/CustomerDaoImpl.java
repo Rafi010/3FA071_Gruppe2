@@ -4,7 +4,6 @@ import dev.hv.exceptions.DuplicateUserException;
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.Customer;
-import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -37,7 +36,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
     }
 
     /**
-     * Funktion, um einen Nutzer in der Datenbank zu erstellen.
+     * Methode, um einen Nutzer in der Datenbank zu erstellen.
      * @param customer das Nutzer-Objekt, das in die Datenbank eingefügt wird.
      */
     @Override
@@ -67,7 +66,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
     }
 
     /**
-     * Funktion, um einen Benutzer aus der Datenbank anhand der ID zu bekommen.
+     * Methode, um einen Benutzer aus der Datenbank anhand der ID zu bekommen.
      * @param id die ID, anhand der der Nutzer gesucht wird.
      * @return gibt den anhand der Datenbankdaten erstellten Nutzer zurück.
      */
@@ -102,7 +101,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
     }
 
     /**
-     * Funktion, um alle Nutzer aus der Datenbank als Liste auszugeben.
+     * Methode, um alle Nutzer aus der Datenbank als Liste auszugeben.
      * @return Liste mit den Nutzer-Objekten, die zuvor für jeden Eintrag erstellt wurden.
      */
     @Override
@@ -131,7 +130,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
     }
 
     /**
-     * Funktion, um einen Nutzer aus der Datenbank zu entfernen.
+     * Methode, um einen Nutzer aus der Datenbank zu entfernen.
      * @param id die ID des Nutzers, der aus der Datenbank entfernt wird.
      */
     @Override
@@ -148,7 +147,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
     }
 
     /**
-     * Funktion, um einen Nutzer innerhalb der Datenbank zu aktualisieren.
+     * Methode, um einen Nutzer innerhalb der Datenbank zu aktualisieren.
      * @param customer das Nutzer-Objekt, das aktualisiert werden soll.
      */
     @Override
@@ -174,6 +173,10 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
         }
     }
 
+    /**
+     * Validiert einen Customer auf seine richtigkeit.
+     * @param customer der Customer welches validiert wird
+     */
     private void validateCustomer(Customer customer) {
         Set<ConstraintViolation<Customer>> violations = validator.validate(customer);
         if (!violations.isEmpty()) {

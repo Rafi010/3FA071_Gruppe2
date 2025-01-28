@@ -35,7 +35,7 @@ public class Server {
     }
 
     /**
-     * Stoppt den laufenden HTTP-Server.
+     * Stoppt den laufenden Server.
      */
     public static void stopServer() {
         if (server != null) {
