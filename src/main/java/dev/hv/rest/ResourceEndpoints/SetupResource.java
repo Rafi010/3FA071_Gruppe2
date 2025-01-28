@@ -12,7 +12,6 @@ public class SetupResource {
 
     @DELETE
     public Response setupDB(){
-        connection.getConnection();
         // Tabellen erstellen und mit Daten füllen
         connection.removeAllTables();
         connection.createAllTables();

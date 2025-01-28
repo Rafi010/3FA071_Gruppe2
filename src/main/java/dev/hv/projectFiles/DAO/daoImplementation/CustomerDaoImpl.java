@@ -72,7 +72,6 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
      */
     @Override
     public ICustomer getCustomerById(String id) {
-        System.out.println(connection);
         try {
             // SQL-Query zum Abrufen eines Nutzers anhand der UUID
             String query = "SELECT * FROM kunde WHERE uuid = ?";
