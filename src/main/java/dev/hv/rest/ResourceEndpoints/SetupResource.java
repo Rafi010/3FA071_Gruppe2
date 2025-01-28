@@ -19,7 +19,7 @@ public class SetupResource {
         // daten in DB laden
         connection.fillDatabase();
 
-        return Response.status(Response.Status.CREATED)
+        return Response.status(Response.Status.OK)
                 .entity("Database setup complete.")
                 .build();
     }
