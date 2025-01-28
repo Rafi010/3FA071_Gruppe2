@@ -9,25 +9,32 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Diese Klasse bietet Methoden zum Öffnen, Schließen und Getten der Connection.
+ * Außerdem noch zum Erstellen, Löschen und Füllen der Tabellen in der DB.
+ */
 public class DatabaseConnection implements IDatebaseConnection {
     // Die Verbindung wird lokal gespeichert, sodass alle DB-Interaktionen nur innerhalb dieser Klasse stattfinden können
     // singleton
     private static Connection connection = null;
     private static DatabaseConnection instance;
 
-
+    /**
+     * Konstruktor für CustomerDaoImpl.
+     */
     public static synchronized DatabaseConnection getInstance() {
-        if (instance == null) {
-            instance = new DatabaseConnection();
-        }
+            if (instance == null) {
+                instance = new DatabaseConnection();
+            }
         return instance;
     }
 
-    public static synchronized void resetInstance() {
-        instance = null;
-    }
 
-    // Öffnet eine Verbindung zu MySQL (verwendet die URL in der Properties-Datei, die nicht mit der hv-Datenbank verbindet)
+    /**
+     * Öffnet eine Verbindung zu MySQL
+     *
+     * @param properties die URL aus der Properties-Datei welche mit der DB verbindet
+     */
     @Override
     public IDatebaseConnection openConnection(Properties properties) throws SQLException {
         if (connection != null && !connection.isClosed()) {
@@ -52,6 +59,9 @@ public class DatabaseConnection implements IDatebaseConnection {
         return this;
     }
 
+    /**
+     * Erstellt alle vier Tabellen in der DB wenn noch nicht existent.
+     */
     @Override
     public void createAllTables() {
         if (connection == null) {
@@ -60,6 +70,9 @@ public class DatabaseConnection implements IDatebaseConnection {
         Util.executeSQL(connection, "src/main/resources/sql/create_table.sql");
     }
 
+    /**
+     * Löscht alle daten aus den vier Tabellen.
+     */
     @Override
     public void truncateAllTables() {
         if (connection == null) {
@@ -68,6 +81,9 @@ public class DatabaseConnection implements IDatebaseConnection {
         Util.executeSQL(connection, "src/main/resources/sql/truncate_table.sql");
     }
 
+    /**
+     * Löscht alle vier Tabellen.
+     */
     @Override
     public void removeAllTables() {
         if (connection == null) {
@@ -76,6 +92,9 @@ public class DatabaseConnection implements IDatebaseConnection {
         Util.executeSQL(connection, "src/main/resources/sql/remove_table.sql");
     }
 
+    /**
+     * Schließt die Verbindung zur DB.
+     */
     @Override
     public void closeConnection() {
         try {
@@ -86,6 +105,12 @@ public class DatabaseConnection implements IDatebaseConnection {
         }
     }
 
+    /**
+     * Füllt alle vier Tabellen mit Daten.
+     * Es sollten alle Tabellen bereits vorhanden sein.
+     *
+     * @throws IllegalStateException falls noch keine DB Verbindung existiert.
+     */
     public void fillDatabase() {
         if (connection == null) {
             throw new IllegalStateException("Keine offene Datenbankverbindung");
@@ -93,18 +118,19 @@ public class DatabaseConnection implements IDatebaseConnection {
         Util.executeSQL(connection, "src/main/resources/sql/load_csv_file_in_table.sql");
     }
 
+    /**
+     * gibt die datenbank verbindung zurück
+     *
+     * @return db connection
+     */
     public Connection getConnection() {
-        try {
+        try{
             if (connection == null || connection.isClosed()) {
-                openConnection(new Properties());
-            }
+                instance.openConnection(new Properties());
+               }
             return connection;
         } catch (SQLException e) {
-            throw new RuntimeException("SQL Exception at egtConnection: " + e);
+            throw new RuntimeException("Fehler bei getConnection: " + e);
         }
-    }
-
-    public void setConnection (Connection connection){
-        DatabaseConnection.connection = connection;
     }
 }
