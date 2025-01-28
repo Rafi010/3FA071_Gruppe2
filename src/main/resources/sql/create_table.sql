@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS heizung (
     id INT AUTO_INCREMENT PRIMARY KEY,
     kundenid VARCHAR(255),
-    zaehlernummer VARCHAR(255) NOT NULL UNIQUE,
+    zaehlernummer VARCHAR(255) NOT NULL,
     datum DATE NOT NULL,
     zaehlerstand_in_mwh FLOAT NOT NULL,
     kommentar VARCHAR(255)
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS heizung (
 CREATE TABLE IF NOT EXISTS wasser (
     id INT AUTO_INCREMENT PRIMARY KEY,
     kundenid VARCHAR(255),
-    zaehlernummer VARCHAR(255) NOT NULL UNIQUE,
+    zaehlernummer VARCHAR(255) NOT NULL,
     datum DATE NOT NULL,
     zaehlerstand_in_m3 FLOAT NOT NULL,
     kommentar VARCHAR(255)
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS wasser (
 CREATE TABLE IF NOT EXISTS strom (
     id INT AUTO_INCREMENT PRIMARY KEY,
     kundenid VARCHAR(255),
-    zaehlernummer VARCHAR(255) NOT NULL UNIQUE,
+    zaehlernummer VARCHAR(255) NOT NULL,
     datum DATE NOT NULL,
     zaehlerstand_in_kwh FLOAT NOT NULL,
     kommentar VARCHAR(255)
