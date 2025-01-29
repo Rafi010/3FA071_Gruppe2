@@ -72,7 +72,6 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
      */
     @Override
     public ICustomer getCustomerById(String id) {
-        System.out.println(connection);
         try {
             // SQL-Query zum Abrufen eines Nutzers anhand der UUID
             String query = "SELECT * FROM kunde WHERE uuid = ?";
@@ -131,20 +130,61 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Nutzer aus der Datenbank zu entfernen.
+     * Diese Methode löscht den Nutzer mit der angegebenen ID aus der
+     * Kundentabelle und setzt gleichzeitig den Attributwert
+     * 'kundenid' in den Ablesungstabellen (heizung, strom, wasser)
+     * auf NULL, um die Ablesungen des gelöschten Nutzers zu
+     * erhalten. Alle Operationen werden in einer Transaktion
+     * durchgeführt, um die Datenintegrität sicherzustellen.
+     * Im Falle eines Fehlers wird ein Rollback durchgeführt.
+     *
      * @param id die ID des Nutzers, der aus der Datenbank entfernt wird.
+     * @throws RuntimeException wenn ein Fehler beim Löschen des Nutzers
+     *         oder beim Aktualisieren der Ablesungen auftritt.
      */
     @Override
     public void deleteCustomer(String id) {
         try {
+            // Beginne eine Transaktion
+            connection.setAutoCommit(false);
+
             // SQL-Query zum Löschen eines Nutzers anhand der UUID
-            String query = "DELETE FROM kunde WHERE uuid = ?";
-            PreparedStatement stmt = connection.prepareStatement(query); // PreparedStatement erstellen
-            stmt.setString(1, id); // ID in die Query einfügen
-            stmt.executeUpdate(); // Query ausführen
+            String deleteQuery = "DELETE FROM kunde WHERE uuid = ?";
+            PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery);
+            deleteStmt.setString(1, id);
+            deleteStmt.executeUpdate();
+
+            // Liste der Ablesungstabellen
+            String[] tables = {"heizung", "strom", "wasser"};
+
+            // Update-Abfragen für jede Tabelle
+            for (String table : tables) {
+                String updateQuery = "UPDATE " + table + " SET kundenid = NULL WHERE kundenid = ?";
+                PreparedStatement updateStmt = connection.prepareStatement(updateQuery);
+                updateStmt.setString(1, id);
+                updateStmt.executeUpdate();
+            }
+
+            // Transaktion erfolgreich abschließen
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e); // Fehlerausgabe im Fehlerfall
+            // Im Fehlerfall zurückrollen
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                throw new RuntimeException("Rollback failed", rollbackEx);
+            }
+            throw new RuntimeException("Error deleting customer", e);
+        } finally {
+            // Auto-Commit wieder aktivieren
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error resetting auto-commit", e);
+            }
         }
     }
+
 
     /**
      * Methode, um einen Nutzer innerhalb der Datenbank zu aktualisieren.

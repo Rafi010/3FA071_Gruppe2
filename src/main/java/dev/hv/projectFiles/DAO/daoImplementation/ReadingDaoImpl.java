@@ -184,7 +184,6 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     @Override
     public void deleteReading(IReading.KindOfMeter kindOfMeter, String id) {
         String metre = kindOfMeter.toString().toLowerCase().replace("'", "");
-        System.out.println(metre);
         try {
             String query = "DELETE FROM " + metre + " WHERE kundenid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);

@@ -17,16 +17,12 @@ public class Start {
       Properties properties = new Properties();
       // Datenbankverbindung-Objekt erstellen, das für die Kommunikation mit der Datenbank genutzt wird
       DatabaseConnection connection = DatabaseConnection.getInstance();
-
       // Verbindung zu MySQL öffnen
       connection.openConnection(properties);
-
       // CustomerDao erstellen
       CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
       // ReadingDao erstellen
       ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
-      // Verbindung schließen
-      connection.closeConnection();
       // server starten
       Server.startServer("http://localhost:8080/");
 

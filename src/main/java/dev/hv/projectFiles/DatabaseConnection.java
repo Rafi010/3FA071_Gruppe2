@@ -124,13 +124,6 @@ public class DatabaseConnection implements IDatebaseConnection {
      * @return db connection
      */
     public Connection getConnection() {
-        try{
-            if (connection == null || connection.isClosed()) {
-                instance.openConnection(new Properties());
-               }
             return connection;
-        } catch (SQLException e) {
-            throw new RuntimeException("Fehler bei getConnection: " + e);
-        }
     }
 }
