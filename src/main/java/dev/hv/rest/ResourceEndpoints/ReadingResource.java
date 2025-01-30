@@ -34,7 +34,6 @@ public class ReadingResource {
 
         Customer customer = (Customer)reading.getCustomer();
 
-        //TODO shorten functionality by only calling the add function and not checking first
         //add customer of reading to DB if not already present
         if (customerDao.getCustomerById(customer.getId().toString()) == null) {
             customerDao.addCustomer(customer);

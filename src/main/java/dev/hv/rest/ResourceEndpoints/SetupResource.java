@@ -5,6 +5,8 @@ import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 
+import java.sql.SQLException;
+
 @Path("/setupDB")
 public class SetupResource {
 
@@ -17,6 +19,11 @@ public class SetupResource {
         connection.createAllTables();
         // daten in DB laden
         connection.fillDatabase();
+        try {
+            connection.getConnection().setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         return Response.status(Response.Status.OK)
                 .entity("Database setup complete.")
