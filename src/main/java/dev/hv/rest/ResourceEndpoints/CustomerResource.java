@@ -53,7 +53,7 @@ public class CustomerResource {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON) //TODO: Anforderung Kommunikationsprotokoll TEXT_PLAIN
+    @Produces(MediaType.TEXT_PLAIN)
     public Response customerPut(@PathParam("id") String uuid, @Valid Customer customer) {
         try {
             // Abrufen des existierenden Benutzers
@@ -61,7 +61,7 @@ public class CustomerResource {
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"error\": \"Kunde nicht gefunden\"}")
+                        .entity("Fehler: Kunde nicht gefunden")
                         .build();
             }
 
@@ -69,13 +69,13 @@ public class CustomerResource {
             existingCustomer.setFirstName(customer.getFirstName());
             existingCustomer.setLastName(customer.getLastName());
             existingCustomer.setGender(customer.getGender());
-            existingCustomer.setBirthDate(customer.getBirthDate());
+            existingCustomer.setBirthDate(customer.getBirthDate()); //TODO kann in db auch null sein und führt dann zu e
 
             // Aktualisieren des Benutzers in der Datenbank
             updateCustomer(existingCustomer);
 
-            // Erfolgreiche Antwort
-            String responseMessage = String.format("{\"message\": \"Kunde erfolgreich aktualisiert\", \"customer\": {\"id\": \"%s\", \"firstName\": \"%s\", \"lastName\": \"%s\"}}",
+            // Erfolgreiche Antwort als Plain Text
+            String responseMessage = String.format("Kunde erfolgreich aktualisiert - ID: %s, Name: %s %s",
                     existingCustomer.getId(),
                     existingCustomer.getFirstName(),
                     existingCustomer.getLastName());
@@ -85,7 +85,7 @@ public class CustomerResource {
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Fehler beim Aktualisieren des Kunden\"}")
+                    .entity("Fehler beim Aktualisieren des Kunden")
                     .build();
         }
     }
