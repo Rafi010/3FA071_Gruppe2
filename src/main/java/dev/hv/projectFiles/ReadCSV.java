@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ReadCSV {
 
@@ -81,10 +82,9 @@ public class ReadCSV {
             }
 
             // SQL-fertige Ausgabe generieren
-            int idCounter = 1; // ID-Zähler
             for (String[] dataLine : dataList) {
                 if (bo) {
-                    toCommand = "id,Kunde,Zaehlernummer,Datum,%s,Kommentar".formatted(zaehlerstandTitle);
+                    toCommand = "uuid,Kunde,Zaehlernummer,Datum,%s,Kommentar".formatted(zaehlerstandTitle);
                     bo = false;
                 } else {
                     String comment = dataLine.length > 2 ? dataLine[2].trim() : "";
@@ -94,8 +94,12 @@ public class ReadCSV {
                             zaehlernummer = parts[1].trim();
                         }
                     }
-                    toCommand = "%d,%s,%s,%s,%s,%s".formatted(
-                            idCounter++, // ID hinzufügen
+
+                    // Generiere eine neue UUID für jede Zeile
+                    String uuid = UUID.randomUUID().toString();
+
+                    toCommand = "%s,%s,%s,%s,%s,%s".formatted(
+                            uuid, // UUID hinzufügen
                             kunde,
                             zaehlernummer,
                             dataLine[0].trim(),
