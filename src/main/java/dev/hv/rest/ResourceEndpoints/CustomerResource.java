@@ -10,6 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -20,9 +21,12 @@ public class CustomerResource {
     CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Customer Page";
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response customerGetAll() {
+        List<Customer> customers = customerDao.getAllCustomers();
+        return Response.status(Response.Status.OK)
+                .entity(customers)
+                .build();
     }
 
     @POST
