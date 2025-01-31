@@ -168,7 +168,7 @@ public class CustomerResource {
                     .entity("{\"status\":\"error\",\"message\":\"Fehler beim Entfernen des Kunden\"}")
                     .build();
         }
-    } //TODO SET TO NULL??
+    }
 
 
 }
