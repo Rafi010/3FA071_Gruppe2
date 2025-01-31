@@ -38,7 +38,7 @@ public class CustomerResource {
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Fehler: Kunde nicht gefunden")
+                        .entity("{\"status\":\"error\",\"message\":\"Fehler: Kunde nicht gefunden\"}")
                         .build();
             }
 
@@ -49,7 +49,7 @@ public class CustomerResource {
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Fehler beim Abrufen des Kunden")
+                    .entity("{\"status\":\"error\",\"message\":\"Fehler beim Abrufen des Kunden\"}")
                     .build();
         }
     }
@@ -97,7 +97,7 @@ public class CustomerResource {
             existingCustomer.setFirstName(customer.getFirstName());
             existingCustomer.setLastName(customer.getLastName());
             existingCustomer.setGender(customer.getGender());
-            existingCustomer.setBirthDate(customer.getBirthDate()); //TODO kann in db auch null sein und führt dann zu e
+            existingCustomer.setBirthDate(customer.getBirthDate());
 
             // Aktualisieren des Benutzers in der Datenbank
             updateCustomer(existingCustomer);
@@ -148,13 +148,27 @@ public class CustomerResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response customerDelete(@PathParam("id") String uuid) {
+        try {
+            // Abrufen des existierenden Benutzers
+            Customer existingCustomer = findCustomerByUuid(uuid);
 
-        customerDao.deleteCustomer(uuid);
+            if (existingCustomer == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"status\":\"error\",\"message\":\"Fehler: Kunde nicht gefunden\"}")
+                        .build();
+            }
+            customerDao.deleteCustomer(uuid);
 
-        return Response.status(Response.Status.OK)
-                .entity("Customer deleted.")
-                .build();
-    } //TODO NOT FOUND & SET TO NULL
+            return Response.status(Response.Status.OK)
+                    .entity("{\"message\":\"Kunde entfernt.\"}")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"status\":\"error\",\"message\":\"Fehler beim Entfernen des Kunden\"}")
+                    .build();
+        }
+    } //TODO SET TO NULL??
 
 
 }
