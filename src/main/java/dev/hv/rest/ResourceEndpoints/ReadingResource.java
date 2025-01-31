@@ -34,7 +34,6 @@ public class ReadingResource {
 
         Customer customer = (Customer)reading.getCustomer();
 
-        //TODO shorten functionality by only calling the add function and not checking first
         //add customer of reading to DB if not already present
         if (customerDao.getCustomerById(customer.getId().toString()) == null) {
             customerDao.addCustomer(customer);
@@ -51,14 +50,16 @@ public class ReadingResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response readingPut(@Valid Reading reading){
-
-        try {
-            readingDao.updateReading(reading);
-        } catch (RuntimeException e) {
+        if (reading.getId() == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.CREATED)
-                .entity(reading)
-                .build();
+        if (readingDao.getReadingById(reading.getKindOfMeter(), reading.getId().toString()) == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            readingDao.updateReading(reading);
+            return Response.status(Response.Status.CREATED)
+                    .entity(reading)
+                    .build();
+        }
     }
 }

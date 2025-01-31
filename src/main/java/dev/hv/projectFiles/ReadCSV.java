@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ReadCSV {
 
@@ -33,13 +34,14 @@ public class ReadCSV {
                     .withSeparator(';')
                     .build();
 
-            // Den Parser an den CSVReader übergeben
             List<String[]> dataList;
             List<String> sqlList;
             boolean bo;
             String toCommand;
             String kunde;
             String zaehlernummer;
+            String zaehlerstandTitle = null; // Dynamischer Titel für Zählerstand
+
             try (CSVReader reader = new CSVReaderBuilder(new FileReader(csvFile))
                     .withCSVParser(parser)
                     .build()) {
@@ -68,6 +70,7 @@ public class ReadCSV {
                             zaehlernummer = line[1];
                         } else if (line[0].equalsIgnoreCase("Datum")) {
                             readingMeta = false;
+                            zaehlerstandTitle = line[2]; // Dynamischer Titel für Zählerstand
                         }
                     }
 
@@ -81,7 +84,7 @@ public class ReadCSV {
             // SQL-fertige Ausgabe generieren
             for (String[] dataLine : dataList) {
                 if (bo) {
-                    toCommand = "Kunde,Zaehlernummer,%s,%s,%s".formatted(dataLine[0], dataLine[1], dataLine[2]);
+                    toCommand = "uuid,Kunde,Zaehlernummer,Datum,%s,Kommentar".formatted(zaehlerstandTitle);
                     bo = false;
                 } else {
                     String comment = dataLine.length > 2 ? dataLine[2].trim() : "";
@@ -91,10 +94,18 @@ public class ReadCSV {
                             zaehlernummer = parts[1].trim();
                         }
                     }
-                    toCommand = "%s,%s,%s,%s,%s".formatted(kunde, zaehlernummer,
+
+                    // Generiere eine neue UUID für jede Zeile
+                    String uuid = UUID.randomUUID().toString();
+
+                    toCommand = "%s,%s,%s,%s,%s,%s".formatted(
+                            uuid, // UUID hinzufügen
+                            kunde,
+                            zaehlernummer,
                             dataLine[0].trim(),
                             dataLine[1].replace(",", ".").trim(),
-                            comment.isEmpty() ? "null" : comment);
+                            comment.isEmpty() ? "\\N" : comment
+                    );
                 }
                 if (!toCommand.trim().isEmpty()) {
                     sqlList.add(toCommand);

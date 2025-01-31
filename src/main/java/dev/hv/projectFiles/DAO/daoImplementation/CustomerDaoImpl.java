@@ -24,8 +24,10 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     private final Connection connection; // Datenbankverbindung
     private final Validator validator;
+
     /**
      * Konstruktor für CustomerDaoImpl.
+     *
      * @param connection die Datenbankverbindung, die von dieser DAO genutzt wird.
      */
     public CustomerDaoImpl(Connection connection) {
@@ -37,10 +39,11 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Nutzer in der Datenbank zu erstellen.
+     *
      * @param customer das Nutzer-Objekt, das in die Datenbank eingefügt wird.
      */
     @Override
-    public void addCustomer(Customer customer) throws NullPointerException{
+    public void addCustomer(Customer customer) throws NullPointerException {
         validateCustomer(customer);
 
         // Konvertieren des Geburtsdatums in das SQL-Format
@@ -67,12 +70,12 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Benutzer aus der Datenbank anhand der ID zu bekommen.
+     *
      * @param id die ID, anhand der der Nutzer gesucht wird.
      * @return gibt den anhand der Datenbankdaten erstellten Nutzer zurück.
      */
     @Override
     public ICustomer getCustomerById(String id) {
-        System.out.println(connection);
         try {
             // SQL-Query zum Abrufen eines Nutzers anhand der UUID
             String query = "SELECT * FROM kunde WHERE uuid = ?";
@@ -102,6 +105,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um alle Nutzer aus der Datenbank als Liste auszugeben.
+     *
      * @return Liste mit den Nutzer-Objekten, die zuvor für jeden Eintrag erstellt wurden.
      */
     @Override
@@ -120,7 +124,13 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
                 customer.setGender(ICustomer.Gender.valueOf(rs.getString("anrede"))); // Anrede setzen
                 customer.setFirstName(rs.getString("vorname")); // Vorname setzen
                 customer.setLastName(rs.getString("nachname")); // Nachname setzen
-                customer.setBirthDate(rs.getDate("geburtsdatum").toLocalDate()); // Geburtsdatum setzen
+
+                // Geburtsdatum prüfen und setzen
+                Date birthDate = rs.getDate("geburtsdatum");
+                if (birthDate != null) {
+                    customer.setBirthDate(birthDate.toLocalDate()); //TODO JSON-Schema verlangt String, überprüfen
+                }
+
                 customers.add(customer); // Nutzer zur Liste hinzufügen
             }
         } catch (SQLException e) {
@@ -131,23 +141,65 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Nutzer aus der Datenbank zu entfernen.
+     * Diese Methode löscht den Nutzer mit der angegebenen ID aus der
+     * Kundentabelle und setzt gleichzeitig den Attributwert
+     * 'kundenid' in den Ablesungstabellen (heizung, strom, wasser)
+     * auf NULL, um die Ablesungen des gelöschten Nutzers zu
+     * erhalten. Alle Operationen werden in einer Transaktion
+     * durchgeführt, um die Datenintegrität sicherzustellen.
+     * Im Falle eines Fehlers wird ein Rollback durchgeführt.
+     *
      * @param id die ID des Nutzers, der aus der Datenbank entfernt wird.
+     * @throws RuntimeException wenn ein Fehler beim Löschen des Nutzers
+     *                          oder beim Aktualisieren der Ablesungen auftritt.
      */
     @Override
     public void deleteCustomer(String id) {
         try {
+            // Beginne eine Transaktion
+            connection.setAutoCommit(false);
+
             // SQL-Query zum Löschen eines Nutzers anhand der UUID
-            String query = "DELETE FROM kunde WHERE uuid = ?";
-            PreparedStatement stmt = connection.prepareStatement(query); // PreparedStatement erstellen
-            stmt.setString(1, id); // ID in die Query einfügen
-            stmt.executeUpdate(); // Query ausführen
+            String deleteQuery = "DELETE FROM kunde WHERE uuid = ?";
+            PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery);
+            deleteStmt.setString(1, id);
+            deleteStmt.executeUpdate();
+
+            // Liste der Ablesungstabellen
+            String[] tables = {"heizung", "strom", "wasser"};
+
+            // Update-Abfragen für jede Tabelle
+            for (String table : tables) {
+                String updateQuery = "UPDATE " + table + " SET kundenid = NULL WHERE kundenid = ?";
+                PreparedStatement updateStmt = connection.prepareStatement(updateQuery);
+                updateStmt.setString(1, id);
+                updateStmt.executeUpdate();
+            }
+
+            // Transaktion erfolgreich abschließen
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e); // Fehlerausgabe im Fehlerfall
+            // Im Fehlerfall zurückrollen
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                throw new RuntimeException("Rollback failed", rollbackEx);
+            }
+            throw new RuntimeException("Error deleting customer", e);
+        } finally {
+            // Auto-Commit wieder aktivieren
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error resetting auto-commit", e);
+            }
         }
     }
 
+
     /**
      * Methode, um einen Nutzer innerhalb der Datenbank zu aktualisieren.
+     *
      * @param customer das Nutzer-Objekt, das aktualisiert werden soll.
      */
     @Override
@@ -175,6 +227,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Validiert einen Customer auf seine richtigkeit.
+     *
      * @param customer der Customer welches validiert wird
      */
     private void validateCustomer(Customer customer) {
