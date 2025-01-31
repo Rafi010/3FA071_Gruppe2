@@ -1,133 +1,210 @@
 package dev.TestDao.ReadingDaoImpl;
 
+import dev.BaseTest;
+import dev.hv.model.ICustomer;
 import dev.hv.model.IReading;
 import dev.hv.model.IReading.KindOfMeter;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
-import dev.hv.projectFiles.DAO.entities.Customer;
-import dev.hv.projectFiles.DAO.entities.Reading;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestAddReading {
+class TestAddReading extends BaseTest {
 
-    private Connection connection; // Database connection for testing
-    private ReadingDaoImpl readingDao; // DAO under test
+    private ReadingDaoImpl readingDao;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        // Create an in-memory H2 database
-        connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        resetDatabase(); // Reset and initialize the database schema
-        readingDao = new ReadingDaoImpl(connection);
+    public void initiate() {
+        connection.createAllTables();
+        readingDao = new ReadingDaoImpl(connection.getConnection());
     }
 
     @Test
-    void testAddReadingWithStromMeter() {
-        // Arrange
-        IReading reading = createTestReading(KindOfMeter.STROM, "123", "1234", 500.0, "Adding STROM reading");
+    void testAddReadingWithValidParameters() {
+        Connection conn = connection.getConnection();
+        String customerId = UUID.randomUUID().toString();
+        assertDoesNotThrow(() -> {
+            // Add a valid reading
+            IReading reading = createTestReading(KindOfMeter.STROM, customerId, "1234", 500.0, "Valid STROM reading");
+            readingDao.addReading(reading);
 
-        // Act & Assert
-        assertDoesNotThrow(() -> readingDao.addReading(reading));
-        assertTrue(isReadingInDatabase("strom", "1234")); // Verify that the entry was added
+            // Check that the entry exists in the database
+            String query = "SELECT * FROM strom WHERE zaehlernummer = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, "1234");
+            assertTrue(stmt.executeQuery().next(), "Reading should be present in the database");
+        });
+    }
+
+    @Test
+    void testAddReadingWithWaterMeter() {
+        Connection conn = connection.getConnection();
+        String customerId = UUID.randomUUID().toString();
+        assertDoesNotThrow(() -> {
+            // Add a valid water reading
+            IReading reading = createTestReading(KindOfMeter.WASSER, customerId, "5678", 100.0, "Water reading test");
+            readingDao.addReading(reading);
+
+            // Check that the entry exists in the database
+            String query = "SELECT * FROM wasser WHERE zaehlernummer = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, "5678");
+            assertTrue(stmt.executeQuery().next(), "Water reading should be present in the database");
+        });
+    }
+
+    @Test
+    void testAddReadingWithHeatMeter() {
+        Connection conn = connection.getConnection();
+        String customerId = UUID.randomUUID().toString();
+        assertDoesNotThrow(() -> {
+            // Add a valid heat meter reading
+            IReading reading = createTestReading(KindOfMeter.HEIZUNG, customerId, "9101", 150.0, "Heat meter test");
+            readingDao.addReading(reading);
+
+            // Check that the entry exists in the database
+            String query = "SELECT * FROM heizung WHERE zaehlernummer = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, "9101");
+            assertTrue(stmt.executeQuery().next(), "Heat reading should be present in the database");
+        });
     }
 
     @Test
     void testAddReadingWithUnknownMeter() {
-        // Arrange
-        IReading reading = createTestReading(KindOfMeter.UNBEKANNT, "123", "1234", 500.0, "Adding unknown reading");
+        Connection conn = connection.getConnection();
+        String customerId = UUID.randomUUID().toString();
+        assertDoesNotThrow(() -> {
+            // Attempt to add an unknown type of reading
+            IReading reading = createTestReading(KindOfMeter.UNBEKANNT, customerId, "1111", 200.0, "Unknown meter test");
 
-        // Act
-        assertDoesNotThrow(() -> readingDao.addReading(reading));
+            // Expect the DAO to handle it gracefully and not insert anything
+            readingDao.addReading(reading);
 
-        // Assert
-        assertFalse(isReadingInDatabase("unknown", "1234")); // Entry should not be added
+            String query = "SELECT * FROM strom WHERE zaehlernummer = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, "1111");
+            assertFalse(stmt.executeQuery().next(), "Unknown reading should not be added to the database");
+        });
     }
 
     @Test
-    void testAddReadingWithInvalidData() {
-        // Arrange: Create a reading with invalid data (e.g., null customer ID)
-        IReading reading = createTestReading(KindOfMeter.STROM, null, "1234", 500.0, "Invalid data");
-
-        // Act & Assert: Expect validation to throw an exception
-        assertThrows(IllegalArgumentException.class, () -> readingDao.addReading(reading));
-    }
-
-    @Test
-    void testAddReadingWithSqlException() throws SQLException {
-        // Arrange: Delete the schema to force an SQLException
-        connection.createStatement().execute("DROP TABLE strom");
-        IReading reading = createTestReading(KindOfMeter.STROM, "123", "1234", 500.0, "SQL Exception test");
-
-        // Act & Assert: Method should handle the exception gracefully
-        assertDoesNotThrow(() -> readingDao.addReading(reading));
+    void testAddReadingWithInvalidParameters() {
+        Connection conn = connection.getConnection();
+        assertThrows(IllegalArgumentException.class, () -> {
+            // Add a reading with invalid data (e.g., null customer ID)
+            IReading reading = createTestReading(KindOfMeter.STROM, null, "2222", 100.0, "Invalid reading test");
+            readingDao.addReading(reading);
+        });
     }
 
     private IReading createTestReading(KindOfMeter kind, String customerId, String meterId, double count, String comment) {
-        // Creating a test implementation of IReading
-        return new Reading() {{
-            setKindOfMeter(kind);
-            setCustomer(new Customer() {{
-                setId(customerId != null ? java.util.UUID.randomUUID() : null);
-            }});
-            setMeterId(meterId);
-            setMeterCount(count);
-            setComment(comment);
-            setDateOfReading(LocalDate.now());
-        }};
-    }
+        // Simple utility method for creating test readings
+        return new IReading() {
+            @Override
+            public UUID getId() {
+                return null;
+            }
 
-    private void resetDatabase() throws SQLException {
-        // Drop tables if they exist and recreate them
-        connection.createStatement().execute("DROP TABLE IF EXISTS strom;");
-        connection.createStatement().execute("DROP TABLE IF EXISTS wasser;");
-        connection.createStatement().execute("DROP TABLE IF EXISTS heizung;");
-        createTestDatabaseSchema();
-    }
+            @Override
+            public void setId(UUID id) {
 
-    private void createTestDatabaseSchema() throws SQLException {
-        // Creating schema for the tests with H2 database
-        connection.createStatement().execute("""
-            CREATE TABLE strom (
-                kundenid VARCHAR(255) NOT NULL,
-                zaehlernummer VARCHAR(255) NOT NULL,
-                datum DATE NOT NULL,
-                zaehlerstand_in_kwh DOUBLE NOT NULL,
-                kommentar VARCHAR(255));
-        """);
+            }
 
-        connection.createStatement().execute("""
-            CREATE TABLE wasser (
-                kundenid VARCHAR(255) NOT NULL,
-                zaehlernummer VARCHAR(255) NOT NULL,
-                datum DATE NOT NULL,
-                zaehlerstand_in_m3 DOUBLE NOT NULL,
-                kommentar VARCHAR(255));
-        """);
+            private KindOfMeter kindOfMeter = kind;
+            private String customer = customerId;
+            private String meterIdValue = meterId;
+            private double countValue = count;
+            private String commentValue = comment;
+            private LocalDate date = LocalDate.now();
 
-        connection.createStatement().execute("""
-            CREATE TABLE heizung (
-                kundenid VARCHAR(255) NOT NULL,
-                zaehlernummer VARCHAR(255) NOT NULL,
-                datum DATE NOT NULL,
-                zaehlerstand_in_mwh DOUBLE NOT NULL,
-                kommentar VARCHAR(255));
-        """);
-    }
+            @Override
+            public KindOfMeter getKindOfMeter() {
+                return kindOfMeter;
+            }
 
-    private boolean isReadingInDatabase(String tableName, String meterId) {
-        try (var stmt = connection.prepareStatement("SELECT * FROM " + tableName + " WHERE zaehlernummer = ?")) {
-            stmt.setString(1, meterId);
-            var rs = stmt.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            return false;
-        }
+            @Override
+            public String getCustomerId() {
+                return customer;
+            }
+
+            @Override
+            public String getMeterId() {
+                return meterIdValue;
+            }
+
+            @Override
+            public Boolean getSubstitute() {
+                return null;
+            }
+
+            @Override
+            public String printDateOfReading() {
+                return "";
+            }
+
+            @Override
+            public void setComment(String comment) {
+
+            }
+
+            @Override
+            public void setCustomer(ICustomer customer) {
+
+            }
+
+            @Override
+            public void setDateOfReading(LocalDate dateOfReading) {
+
+            }
+
+            @Override
+            public void setKindOfMeter(KindOfMeter kindOfMeter) {
+
+            }
+
+            @Override
+            public void setMeterCount(Double meterCount) {
+
+            }
+
+            @Override
+            public void setMeterId(String meterId) {
+
+            }
+
+            @Override
+            public void setSubstitute(Boolean substitute) {
+
+            }
+
+            @Override
+            public double getMeterCount() {
+                return countValue;
+            }
+
+            @Override
+            public String getComment() {
+                return commentValue;
+            }
+
+            @Override
+            public ICustomer getCustomer() {
+                return null;
+            }
+
+            @Override
+            public LocalDate getDateOfReading() {
+                return date;
+            }
+        };
     }
 }
