@@ -6,10 +6,10 @@ import dev.hv.projectFiles.DAO.entities.Customer;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -20,16 +20,44 @@ public class CustomerResource {
     CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Customer Page";
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response customerGetAll() {
+        List<Customer> customers = customerDao.getAllCustomers();
+        return Response.status(Response.Status.OK)
+                .entity(customers)
+                .build();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response customerGetById(@PathParam("id") String uuid) {
+        try {
+            // Abrufen des existierenden Benutzers
+            Customer existingCustomer = findCustomerByUuid(uuid);
+
+            if (existingCustomer == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Fehler: Kunde nicht gefunden")
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity(existingCustomer)
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Fehler beim Abrufen des Kunden")
+                    .build();
+        }
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response customerPost(@Valid Customer customer) {
-
 
         if (customer.getId() == null) {
             customer.setId(UUID.randomUUID());
@@ -119,7 +147,7 @@ public class CustomerResource {
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response customerDelete(@PathParam("id") String uuid){
+    public Response customerDelete(@PathParam("id") String uuid) {
 
         customerDao.deleteCustomer(uuid);
 

@@ -24,8 +24,10 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     private final Connection connection; // Datenbankverbindung
     private final Validator validator;
+
     /**
      * Konstruktor für CustomerDaoImpl.
+     *
      * @param connection die Datenbankverbindung, die von dieser DAO genutzt wird.
      */
     public CustomerDaoImpl(Connection connection) {
@@ -37,10 +39,11 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Nutzer in der Datenbank zu erstellen.
+     *
      * @param customer das Nutzer-Objekt, das in die Datenbank eingefügt wird.
      */
     @Override
-    public void addCustomer(Customer customer) throws NullPointerException{
+    public void addCustomer(Customer customer) throws NullPointerException {
         validateCustomer(customer);
 
         // Konvertieren des Geburtsdatums in das SQL-Format
@@ -67,6 +70,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Benutzer aus der Datenbank anhand der ID zu bekommen.
+     *
      * @param id die ID, anhand der der Nutzer gesucht wird.
      * @return gibt den anhand der Datenbankdaten erstellten Nutzer zurück.
      */
@@ -101,6 +105,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um alle Nutzer aus der Datenbank als Liste auszugeben.
+     *
      * @return Liste mit den Nutzer-Objekten, die zuvor für jeden Eintrag erstellt wurden.
      */
     @Override
@@ -119,7 +124,13 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
                 customer.setGender(ICustomer.Gender.valueOf(rs.getString("anrede"))); // Anrede setzen
                 customer.setFirstName(rs.getString("vorname")); // Vorname setzen
                 customer.setLastName(rs.getString("nachname")); // Nachname setzen
-                customer.setBirthDate(rs.getDate("geburtsdatum").toLocalDate()); // Geburtsdatum setzen
+
+                // Geburtsdatum prüfen und setzen
+                Date birthDate = rs.getDate("geburtsdatum");
+                if (birthDate != null) {
+                    customer.setBirthDate(birthDate.toLocalDate()); //TODO JSON-Schema verlangt String, überprüfen
+                }
+
                 customers.add(customer); // Nutzer zur Liste hinzufügen
             }
         } catch (SQLException e) {
@@ -140,7 +151,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
      *
      * @param id die ID des Nutzers, der aus der Datenbank entfernt wird.
      * @throws RuntimeException wenn ein Fehler beim Löschen des Nutzers
-     *         oder beim Aktualisieren der Ablesungen auftritt.
+     *                          oder beim Aktualisieren der Ablesungen auftritt.
      */
     @Override
     public void deleteCustomer(String id) {
@@ -188,6 +199,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Methode, um einen Nutzer innerhalb der Datenbank zu aktualisieren.
+     *
      * @param customer das Nutzer-Objekt, das aktualisiert werden soll.
      */
     @Override
@@ -215,6 +227,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
 
     /**
      * Validiert einen Customer auf seine richtigkeit.
+     *
      * @param customer der Customer welches validiert wird
      */
     private void validateCustomer(Customer customer) {
