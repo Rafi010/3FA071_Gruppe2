@@ -72,10 +72,10 @@ public class ReadingResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response specificReadingGet(
-            @QueryParam("uuid") String uuid,
+            @QueryParam("customer") String customer,
             @QueryParam("start") String date1Str,
             @QueryParam("end") String date2Str,
-            @QueryParam("kindOfMeter") IReading.KindOfMeter metre
+            @QueryParam("kindOfMeter") IReading.KindOfMeter meter
     ) {
 
         LocalDate date1 = parseLocalDate(date1Str);
@@ -86,14 +86,14 @@ public class ReadingResource {
                     .entity(new Reading())
                     .build();
         }
-        if (metre == null) {
-            metre = IReading.KindOfMeter.UNBEKANNT;
+        if (meter == null) {
+            meter = IReading.KindOfMeter.UNBEKANNT;
         }
-        List<Reading> readings = readingDao.getAllReadings(metre);
+        List<Reading> readings = readingDao.getAllReadings(meter);
         List<Reading> finalReadings = new ArrayList<>();
         for (int i = 0; i < readings.size(); i++) {
             Reading reading = readings.get(i);
-            if (!Objects.equals(reading.getCustomer().getId().toString(), uuid)) {
+            if (!Objects.equals(reading.getCustomer().getId().toString(), customer)) {
                 continue;
             }
             if (validDate(date1, date2, reading.getDateOfReading())) {
