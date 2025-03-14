@@ -1,14 +1,16 @@
 package dev.hv.projectFiles.DAO.daoInterfaces;
 
 import dev.hv.model.IReading;
-import dev.hv.projectFiles.DAO.entities.Reading;
 
 import java.util.List;
 
+/**
+ * Interface welches die Funktionen für die ReadingDao beschreibt.
+ */
 public interface ReadingDao<Reading> {
-    void addReading(Reading reading);
+    void addReading(IReading reading);
     Reading getReadingById(IReading.KindOfMeter kindOfMeter, String id);
     List<Reading> getAllReadings(IReading.KindOfMeter kindOfMeter);
-    void updateReading(Reading reading);
+    void updateReading(IReading reading);
     void deleteReading(IReading.KindOfMeter kindOfMeter, String id);
 }

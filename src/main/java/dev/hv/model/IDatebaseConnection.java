@@ -1,5 +1,6 @@
 package dev.hv.model;
 
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Properties;
  */
 public interface IDatebaseConnection {
 
-    public IDatebaseConnection openConnection(Properties properties);
+    public IDatebaseConnection openConnection(Properties properties) throws SQLException;
     public void createAllTables();
     public void truncateAllTables();
     public void removeAllTables();

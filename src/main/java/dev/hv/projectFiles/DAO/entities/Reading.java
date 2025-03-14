@@ -1,7 +1,9 @@
 package dev.hv.projectFiles.DAO.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.hv.model.ICustomer;
 import dev.hv.model.IReading;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,13 +11,29 @@ import java.util.UUID;
 
 public class Reading implements IReading {
 
+
+
     String comment;
+
+    @JsonDeserialize(as = Customer.class)
+    @NotNull(message = "Customer cannot be empty")  // Hibernate-specific annotation
     ICustomer customer;
+
+    @NotNull(message = "dateOfReading cannot be empty")  // Hibernate-specific annotation
     LocalDate dateOfReading;
+
+    @NotNull(message = "kindOfMeter cannot be empty")  // Hibernate-specific annotation
     KindOfMeter kindOfMeter;
+
+    @NotNull(message = "meterCount cannot be empty")  // Hibernate-specific annotation
     Double meterCount;
+
+    @NotNull(message = "meterId cannot be empty")  // Hibernate-specific annotation
     String meterId;
+
+    @NotNull(message = "substitute cannot be empty")  // Hibernate-specific annotation
     Boolean substitute;
+
     UUID id;
 
 
