@@ -23,8 +23,8 @@ public class CustomerResource {
      *
      * @return Eine HTTP-Antwort mit der Liste aller Kunden im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *         200 (OK) - Wenn die Abfrage erfolgreich war.
-     *         500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn die Abfrage erfolgreich war.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -41,9 +41,9 @@ public class CustomerResource {
      * @param uuid Die eindeutige Identifikationsnummer des Kunden.
      * @return Eine HTTP-Antwort mit den Kundendetails im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *         200 (OK) - Wenn der Kunde gefunden wurde.
-     *         404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
-     *         500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn der Kunde gefunden wurde.
+     *                                 404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @GET
     @Path("/{id}")
@@ -55,7 +55,7 @@ public class CustomerResource {
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"status\":\"error\",\"message\":\"Fehler: Kunde nicht gefunden\"}")
+                        .entity("{\"status\":\"error\",\"message\":\"Kunde nicht gefunden\"}")
                         .build();
             }
 
@@ -209,9 +209,9 @@ public class CustomerResource {
      * @param uuid Die eindeutige Identifikationsnummer des zu löschenden Kunden.
      * @return Eine HTTP-Antwort mit einer Bestätigungsnachricht im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *         200 (OK) - Wenn der Kunde erfolgreich gelöscht wurde.
-     *         404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
-     *         500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn der Kunde erfolgreich gelöscht wurde.
+     *                                 404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @DELETE
     @Path("/{id}")
@@ -223,7 +223,7 @@ public class CustomerResource {
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"status\":\"error\",\"message\":\"Fehler: Kunde nicht gefunden\"}")
+                        .entity("{\"status\":\"error\",\"message\":\"Kunde nicht gefunden\"}")
                         .build();
             }
             customerDao.deleteCustomer(uuid);
