@@ -63,7 +63,7 @@ public class ReadingResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
             readingDao.updateReading(reading);
-            return Response.status(Response.Status.CREATED)
+            return Response.status(Response.Status.OK)
                     .entity(reading)
                     .build();
         }
@@ -82,9 +82,7 @@ public class ReadingResource {
         LocalDate date2 = parseLocalDate(date2Str);
 
         if (date1 == null && date2 == null){
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new Reading())
-                    .build();
+            date2 = LocalDate.now();
         }
         if (meter == null) {
             meter = IReading.KindOfMeter.UNBEKANNT;
