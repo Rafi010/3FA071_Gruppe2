@@ -6,8 +6,8 @@ import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
-import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.Customer;
+import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -31,14 +31,14 @@ public class ReadingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response readingsPost(@Valid Reading reading){
+    public Response readingsPost(@Valid Reading reading) {
 
         //add UUID if not existent
         if (reading.getId() == null) {
             reading.setId(UUID.randomUUID());
         }
 
-        Customer customer = (Customer)reading.getCustomer();
+        Customer customer = (Customer) reading.getCustomer();
 
         //add customer of reading to DB if not already present
         if (customerDao.getCustomerById(customer.getId().toString()) == null) {
@@ -55,7 +55,7 @@ public class ReadingResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response readingPut(@Valid Reading reading){
+    public Response readingPut(@Valid Reading reading) {
         if (reading.getId() == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -77,11 +77,19 @@ public class ReadingResource {
             @QueryParam("end") String date2Str,
             @QueryParam("kindOfMeter") IReading.KindOfMeter meter
     ) {
-
         LocalDate date1 = parseLocalDate(date1Str);
         LocalDate date2 = parseLocalDate(date2Str);
-
-        if (date1 == null && date2 == null){
+        if (date1Str != null && date1 == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"status\":\"error\",\"message\":\"Start date format has to be YYYY-MM-DD!\"}")
+                    .build();
+        }
+        if (date2Str != null && date2 == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"status\":\"error\",\"message\":\"End date format has to be YYYY-MM-DD!\"}")
+                    .build();
+        }
+        if (date1 == null && date2 == null) {
             date2 = LocalDate.now();
         }
         if (meter == null) {
@@ -91,7 +99,7 @@ public class ReadingResource {
         List<Reading> finalReadings = new ArrayList<>();
         for (int i = 0; i < readings.size(); i++) {
             Reading reading = readings.get(i);
-            if (!Objects.equals(reading.getCustomer().getId().toString(), customer)) {
+            if (!Objects.equals(reading.getCustomer().getId().toString(), customer) && customer != null) {
                 continue;
             }
             if (validDate(date1, date2, reading.getDateOfReading())) {
