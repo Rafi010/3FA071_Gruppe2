@@ -57,9 +57,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 }
             }
 
-            String metre = reading.getKindOfMeter().toString().toLowerCase();
+            String meter = reading.getKindOfMeter().toString().toLowerCase();
             // SQL-Query für das Einfügen eines neuen Messwerts
-            String query = "INSERT INTO " + metre + " (uuid, kundenid, zaehlernummer, datum, " + zaehlerstandColumn + ", kommentar) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO " + meter + " (uuid, kundenid, zaehlernummer, datum, " + zaehlerstandColumn + ", kommentar) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getId().toString());
             stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
@@ -92,9 +92,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
         }
 
-        String metre = kindOfMeter.toString().toLowerCase();
+        String meter = kindOfMeter.toString().toLowerCase();
         try {
-            String query = "SELECT * FROM " + metre + " WHERE uuid = ?";
+            String query = "SELECT * FROM " + meter + " WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -126,20 +126,20 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         List<Reading> readings = new ArrayList<>();
 
         if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) {
-            List<IReading.KindOfMeter> metreList = Arrays.asList(IReading.KindOfMeter.STROM, IReading.KindOfMeter.WASSER, IReading.KindOfMeter.HEIZUNG);
-            for (int i = 0; i < metreList.size(); i++) {
-                IReading.KindOfMeter currentMeter = metreList.get(i);
+            List<IReading.KindOfMeter> meterList = Arrays.asList(IReading.KindOfMeter.STROM, IReading.KindOfMeter.WASSER, IReading.KindOfMeter.HEIZUNG);
+            for (int i = 0; i < meterList.size(); i++) {
+                IReading.KindOfMeter currentMeter = meterList.get(i);
 
                 String zaehlerstandColumn = "";
 
-                switch (kindOfMeter) {
+                switch (currentMeter) {
                     case STROM -> zaehlerstandColumn = "zaehlerstand_in_kwh";
                     case WASSER -> zaehlerstandColumn = "zaehlerstand_in_m3";
                     case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
                 }
-                String metre = currentMeter.toString().toLowerCase();
+                String meter = currentMeter.toString().toLowerCase();
                 try {
-                    String query = "SELECT * FROM " + metre;
+                    String query = "SELECT * FROM " + meter;
                     PreparedStatement stmt = connection.prepareStatement(query);
                     ResultSet rs = stmt.executeQuery();
 
@@ -149,7 +149,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                         reading.setComment(rs.getString("kommentar")); // Kommentar
                         reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
                         reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
-                        reading.setKindOfMeter(kindOfMeter); // Zählerart
+                        reading.setKindOfMeter(currentMeter); // Zählerart
                         reading.setMeterCount(rs.getDouble(zaehlerstandColumn)); // Zählerstand
                         reading.setMeterId(rs.getString("zaehlernummer")); // Zählernummer
                         readings.add(reading); // Messwert zur Liste hinzufügen
@@ -171,9 +171,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             }
 
 
-            String metre = kindOfMeter.toString().toLowerCase();
+            String meter = kindOfMeter.toString().toLowerCase();
             try {
-                String query = "SELECT * FROM " + metre;
+                String query = "SELECT * FROM " + meter;
                 PreparedStatement stmt = connection.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery();
 
@@ -215,10 +215,10 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 }
             }
 
-            String metre = reading.getKindOfMeter().toString().toLowerCase();
+            String meter = reading.getKindOfMeter().toString().toLowerCase();
 
             // SQL-Query für das Aktualisieren eines Messwerts
-            String query = "UPDATE " + metre + " SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, " + zaehlerstand + " = ? WHERE uuid = ?";
+            String query = "UPDATE " + meter + " SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, " + zaehlerstand + " = ? WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getComment()); // Kommentar
             stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
@@ -239,9 +239,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
      */
     @Override
     public void deleteReading(IReading.KindOfMeter kindOfMeter, String id) {
-        String metre = kindOfMeter.toString().toLowerCase();
+        String meter = kindOfMeter.toString().toLowerCase();
         try {
-            String query = "DELETE FROM " + metre + " WHERE uuid = ?";
+            String query = "DELETE FROM " + meter + " WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, id);
             stmt.executeUpdate(); // SQL ausführen
