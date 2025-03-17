@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import MyComponent from './components/CustomerGrid';
+import Visualization, { DataType } from './components/Visualization';
+import DataSelection from './components/DataSelection';
 
 function App() {
+
+  const [alignment, setAlignment] = useState("customers");
   return (
     <div className="App">
       <header className="App-header">
         <h1>People List</h1>
-        <MyComponent /> {/* Use MyComponent to display the list */}
+        <DataSelection alignment={alignment} setAlignment={setAlignment}/>
+        <Visualization dataType={alignment as DataType}/>
       </header>
     </div>
   );

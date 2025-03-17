@@ -13,13 +13,17 @@ interface Person {
   birthDate: number[] | null;
 }
 
+interface VisualizationProps {
+  dataType: DataType;
+}
+
 export enum DataType {
   Customers = 'customers',
   Readings = 'readings',
 }
 
-const MyComponent = () => {
-  const { data, loading } = useGetData(DataType.Customers);
+const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
+  const { data, loading } = useGetData(dataType);
   const [filter, setFilter] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,8 +40,24 @@ const MyComponent = () => {
   });
 
   // Define the columns for the DataGrid
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 100 },
+  const customersColumns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 200 },
+    { field: "firstName", headerName: "First Name", width: 150 },
+    { field: "lastName", headerName: "Last Name", width: 150 },
+    { field: "gender", headerName: "Gender", width: 120 },
+    {
+      field: "birthDate",
+      headerName: "Birth Date",
+      width: 150,
+      valueGetter: (value, row) => {
+        const birthDate = row.birthDate;
+        return birthDate ? birthDate.join("-") : "N/A";
+      },
+    },
+  ];
+
+  const readingsColumns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 200 },
     { field: "firstName", headerName: "First Name", width: 150 },
     { field: "lastName", headerName: "Last Name", width: 150 },
     { field: "gender", headerName: "Gender", width: 120 },
@@ -81,7 +101,7 @@ const MyComponent = () => {
       {/* DataGrid */}
       <DataGrid
         rows={filteredData}
-        columns={columns}
+        columns={customersColumns}
         slots={{ toolbar: CustomToolbar }}
         checkboxSelection
         disableRowSelectionOnClick
@@ -94,4 +114,4 @@ const MyComponent = () => {
   );
 };
 
-export default MyComponent;
+export default Visualization;

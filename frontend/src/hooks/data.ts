@@ -19,6 +19,7 @@ export const useGetData = (dataType: DataType) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch(`http://localhost:8080/${dataType}`)
       .then((response) => response.json())
       .then((json) => {
@@ -30,7 +31,7 @@ export const useGetData = (dataType: DataType) => {
         setLoading(false);
       });
   }, 
-  []);
+  [dataType]);
 
   return { data, loading };
 };
