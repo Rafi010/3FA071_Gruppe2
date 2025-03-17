@@ -75,8 +75,9 @@ public class ReadingResource {
             @QueryParam("customer") String customer,
             @QueryParam("start") String date1Str,
             @QueryParam("end") String date2Str,
-            @QueryParam("kindOfMeter") IReading.KindOfMeter meter
+            @QueryParam("kindOfMeter") String meterStr
     ) {
+        IReading.KindOfMeter meter;
         LocalDate date1 = parseLocalDate(date1Str);
         LocalDate date2 = parseLocalDate(date2Str);
         if (date1Str != null && date1 == null) {
@@ -92,9 +93,20 @@ public class ReadingResource {
         if (date1 == null && date2 == null) {
             date2 = LocalDate.now();
         }
-        if (meter == null) {
-            meter = IReading.KindOfMeter.UNBEKANNT;
+
+        try {
+            if (meterStr == null) {
+                meter = IReading.KindOfMeter.UNBEKANNT;
+            } else {
+                meter = IReading.KindOfMeter.valueOf(meterStr.toUpperCase());
+            }
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"status\":\"error\",\"message\":\"Invalid kindOfMeter parameter. " +
+                            "Allowed values are: HEIZUNG, STROM, UNBEKANNT and WASSER\"}")
+                    .build();
         }
+
         List<Reading> readings = readingDao.getAllReadings(meter);
         List<Reading> finalReadings = new ArrayList<>();
         for (int i = 0; i < readings.size(); i++) {
@@ -106,7 +118,6 @@ public class ReadingResource {
                 finalReadings.add(reading);
             }
         }
-
 
         return Response.status(Response.Status.OK)
                 .entity(finalReadings)
