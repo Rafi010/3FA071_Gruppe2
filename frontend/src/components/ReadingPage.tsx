@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { useGetData } from "../hooks/data";
-import { Box, CircularProgress, MenuItem, Skeleton } from "@mui/material";
+import { Box, CircularProgress, MenuItem, radioClasses, Skeleton } from "@mui/material";
 import { DataGrid, GridColDef, GridCsvExportMenuItem, GridExportMenuItemProps, gridFilteredSortedRowIdsSelector, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, gridVisibleColumnFieldsSelector, useGridApiContext } from "@mui/x-data-grid";
 import { red } from "@mui/material/colors";
 import { CustomToolbar } from "./CustomToolbar";
+import { read } from "node:fs";
 
-interface Person {
-  firstName: string;
-  lastName: string;
-  gender: string;
+interface Reading {
+  customerID: string;
   id: string;
-  birthDate: number[] | null;
-}
-
-interface VisualizationProps {
-  dataType: DataType;
+  kindOfMeter: string;
+  dateOfReading: number[]; 
+  meterCount: number;      
+  comment: string;
 }
 
 export enum DataType {
@@ -22,39 +20,28 @@ export enum DataType {
   Readings = 'readings',
 }
 
-const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
-  const { data, loading } = useGetData(dataType);
+const ReadingPage = () => {
+  const { readingsData, loading } = useGetData();
   const [filter, setFilter] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(event.target.value);
   };
 
-  // Filter the data based on the filter input
-  const filteredData = data.filter((person: Person) => {
-    const name = `${person.firstName} ${person.lastName}`;
+  const filteredData = readingsData.filter((reading) => {
+
+    const formattedDate = reading.dateOfReading
+    ? `${reading.dateOfReading[0]}-${String(reading.dateOfReading[1]).padStart(2, '0')}-${String(reading.dateOfReading[2]).padStart(2, '0')}`
+    : "";
+
     return (
-      name.toLowerCase().includes(filter.toLowerCase()) ||
-      person.gender.toLowerCase().includes(filter.toLowerCase())
+      (reading.comment && reading.comment.toLowerCase().includes(filter.toLowerCase())) ||
+      (reading.kindOfMeter && reading.kindOfMeter.toLowerCase().includes(filter.toLowerCase())) ||
+      (reading.id && reading.id.toLowerCase().includes(filter.toLowerCase())) ||
+      (reading.meterCount !== null && reading.meterCount !== undefined && reading.meterCount.toString().toLowerCase().includes(filter.toLowerCase())) ||
+      formattedDate.includes(filter)
     );
   });
-
-  // Define the columns for the DataGrid
-  const customersColumns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 300 },
-    { field: "firstName", headerName: "First Name", width: 150 },
-    { field: "lastName", headerName: "Last Name", width: 150 },
-    { field: "gender", headerName: "Gender", width: 120 },
-    {
-      field: "birthDate",
-      headerName: "Birth Date",
-      width: 150,
-      valueGetter: (value, row) => {
-        const birthDate = row.birthDate;
-        return birthDate ? birthDate.join("-") : "N/A";
-      },
-    },
-  ];
 
   const readingsColumns: GridColDef[] = [
     { field: "customer.id", headerName: "Customer ID", width: 300, valueGetter: (value, row) => {
@@ -65,10 +52,17 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
     { field: "id", headerName: "ID", width: 300 },
     { field: "kindOfMeter", headerName: "Kind of Meter", width: 150 },
     { field: "dateOfReading", headerName: "Date", width: 150,
-       valueGetter: (value, row) => {
-      const readingDate = row.dateOfReading;
-      return readingDate ? readingDate.join("-") : "N/A";
-    }, },
+        valueGetter: (value, row) => {
+            const readingDate = row.dateOfReading;
+            if (readingDate) {
+              const year = readingDate[0];
+              const month = String(readingDate[1]).padStart(2, '0');
+              const day = String(readingDate[2]).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            }
+            return "N/A";
+          },
+        },
     { field: "meterCount", headerName: "Meter Count", width: 150 },
     { field: "comment", headerName: "Comment", width: 150 },
     
@@ -80,7 +74,7 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
     <Skeleton animation="wave" variant="rectangular" height={600} sx={{bgcolor: 'grey.900' }}/>
   </Box>);
 
-  if (data.length === 0) return <p>No data available.</p>;
+  if (readingsData.length === 0) return <p>No data available.</p>;
 
   return (
     <Box sx={{ height: 600, width: "90%", marginBottom: 10}}>
@@ -103,7 +97,7 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
       {/* DataGrid */}
       <DataGrid
         rows={filteredData}
-        columns={dataType === DataType.Customers ? customersColumns : readingsColumns}
+        columns={readingsColumns}
         slots={{ toolbar: CustomToolbar }}
         checkboxSelection
         disableRowSelectionOnClick
@@ -116,4 +110,4 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
   );
 };
 
-export default Visualization;
+export default ReadingPage;

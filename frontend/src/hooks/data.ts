@@ -1,6 +1,11 @@
 // hooks/useGetData.ts
 import { useState, useEffect } from 'react';
 
+export enum DataType {
+  Customers = 'customers',
+  Readings = 'readings',
+}
+
 interface Person {
   firstName: string;
   lastName: string;
@@ -9,29 +14,38 @@ interface Person {
   birthDate: number[] | null;
 }
 
-export enum DataType {
-  Customers = 'customers',
-  Readings = 'readings',
+interface Reading {
+  customerID: string;
+  id: string;
+  kindOfMeter: string;
+  dateOfReading: number[]; 
+  meterCount: number;      
+  comment: string;
 }
 
-export const useGetData = (dataType: DataType) => {
-  const [data, setData] = useState<Person[]>([]);
+export const useGetData = () => {
+  const [customerData, setCustomers] = useState<Person[]>([]);
+  const [readingsData, setReadings] = useState<Reading[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:8080/${dataType}`)
-      .then((response) => response.json())
-      .then((json) => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
-  }, 
-  [dataType]);
+    
+    // Fetch both customer and reading data in parallel
+    Promise.all([
+      fetch('http://localhost:8080/customers').then((response) => response.json()),
+      fetch('http://localhost:8080/readings').then((response) => response.json()),
+    ])
+    .then(([customersData, readingsData]) => {
+      setCustomers(customersData); // Set customers data
+      setReadings(readingsData); // Set readings data
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    });
+  }, []);
 
-  return { data, loading };
+  return { customerData, readingsData, loading };
 };
