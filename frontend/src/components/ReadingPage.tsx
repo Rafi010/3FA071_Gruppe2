@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useGetData } from "../hooks/data";
-import { Box, CircularProgress, MenuItem, radioClasses, Skeleton } from "@mui/material";
+import { Box, CircularProgress, MenuItem, radioClasses, Skeleton, TextField } from "@mui/material";
 import { DataGrid, GridColDef, GridCsvExportMenuItem, GridExportMenuItemProps, gridFilteredSortedRowIdsSelector, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, gridVisibleColumnFieldsSelector, useGridApiContext } from "@mui/x-data-grid";
 import { red } from "@mui/material/colors";
 import { CustomToolbar } from "./CustomToolbar";
@@ -70,8 +70,8 @@ const ReadingPage = () => {
 
   if (loading) return (
   <Box sx={{ width: "90%", marginBottom: 10 }}>
-    <Skeleton animation="wave" variant="rectangular" height={50} sx={{ marginBottom: 2, bgcolor: 'grey.900' }} />
-    <Skeleton animation="wave" variant="rectangular" height={600} sx={{bgcolor: 'grey.900' }}/>
+    <Skeleton animation="wave" variant="rectangular" height={50} sx={{ marginBottom: 2, bgcolor: '#1f1f1f' }} />
+    <Skeleton animation="wave" variant="rectangular" height={600} sx={{bgcolor: '#1f1f1f' }}/>
   </Box>);
 
   if (readingsData.length === 0) return <p>No data available.</p>;
@@ -80,16 +80,29 @@ const ReadingPage = () => {
     <Box sx={{ height: 600, width: "90%"}}>
       {/* Filter Input */}
       <Box sx={{ marginBottom: 2 }}>
-        <input
-          type="text"
-          placeholder="Filter"
+      <TextField
+          label="Filter"
+          variant="outlined"
           value={filter}
           onChange={handleFilterChange}
-          style={{
-            width: "98%",
-            padding: "10px",
-            fontSize: "16px",
-            marginBottom: "10px",
+          fullWidth
+          sx={{
+            input: {
+              color: 'white',  // Ensure text is white
+            },
+            '& .MuiInputBase-root': {
+              backgroundColor: 'background.paper', // Match dark theme background
+              borderRadius: '4px',
+            },
+            '& .MuiOutlinedInput-root': {
+              borderColor: 'rgba(255, 255, 255, 0.23)',  // Light border for dark mode
+            },
+            '& .MuiInputLabel-root': {
+              color: 'white',  // White label color
+            },
+            '& .MuiFormLabel-root.Mui-focused': {
+              color: 'white',  // Keep label white when focused
+            },
           }}
         />
       </Box>

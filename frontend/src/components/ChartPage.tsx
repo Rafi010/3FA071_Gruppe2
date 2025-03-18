@@ -42,10 +42,6 @@ const ChartComponent: React.FC = () => {
   // Get the data from the custom hook
   const { readingsDataStrom, loading } = useGetData();
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   // Process the data to extract monthly averages
   const { dates, meterCounts } = processData(readingsDataStrom);
 
