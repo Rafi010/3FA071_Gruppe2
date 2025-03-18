@@ -64,7 +64,7 @@ const CustomerPage = () => {
   if (customerData.length === 0) return <p>No data available.</p>;
 
   return (
-    <Box sx={{ height: 600, width: "90%", marginBottom: 10}}>
+    <Box sx={{ height: 600, width: "90%"}}>
       {/* Filter Input */}
       <Box sx={{ marginBottom: 2 }}>
         <input

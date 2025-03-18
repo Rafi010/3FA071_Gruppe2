@@ -26,6 +26,7 @@ interface Reading {
 export const useGetData = () => {
   const [customerData, setCustomers] = useState<Person[]>([]);
   const [readingsData, setReadings] = useState<Reading[]>([]);
+  const [readingsDataStrom, setReadingsStrom] = useState<Reading[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -35,10 +36,12 @@ export const useGetData = () => {
     Promise.all([
       fetch('http://localhost:8080/customers').then((response) => response.json()),
       fetch('http://localhost:8080/readings').then((response) => response.json()),
+      fetch('http://localhost:8080/readings?kindOfMeter=STROM').then((response) => response.json()),
     ])
-    .then(([customersData, readingsData]) => {
+    .then(([customersData, readingsData, readingsDataStrom]) => {
       setCustomers(customersData); // Set customers data
       setReadings(readingsData); // Set readings data
+      setReadingsStrom(readingsDataStrom)
       setLoading(false);
     })
     .catch((error) => {
@@ -47,5 +50,5 @@ export const useGetData = () => {
     });
   }, []);
 
-  return { customerData, readingsData, loading };
+  return { customerData, readingsData, readingsDataStrom, loading };
 };
