@@ -41,7 +41,7 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
 
   // Define the columns for the DataGrid
   const customersColumns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 200 },
+    { field: "id", headerName: "ID", width: 300 },
     { field: "firstName", headerName: "First Name", width: 150 },
     { field: "lastName", headerName: "Last Name", width: 150 },
     { field: "gender", headerName: "Gender", width: 120 },
@@ -57,19 +57,21 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
   ];
 
   const readingsColumns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 200 },
-    { field: "firstName", headerName: "First Name", width: 150 },
-    { field: "lastName", headerName: "Last Name", width: 150 },
-    { field: "gender", headerName: "Gender", width: 120 },
-    {
-      field: "birthDate",
-      headerName: "Birth Date",
-      width: 150,
-      valueGetter: (value, row) => {
-        const birthDate = row.birthDate;
-        return birthDate ? birthDate.join("-") : "N/A";
-      },
+    { field: "customer.id", headerName: "Customer ID", width: 300, valueGetter: (value, row) => {
+      const customerID = row.customer.id;
+      return customerID
+      }, 
     },
+    { field: "id", headerName: "ID", width: 300 },
+    { field: "kindOfMeter", headerName: "Kind of Meter", width: 150 },
+    { field: "dateOfReading", headerName: "Date", width: 150,
+       valueGetter: (value, row) => {
+      const readingDate = row.dateOfReading;
+      return readingDate ? readingDate.join("-") : "N/A";
+    }, },
+    { field: "meterCount", headerName: "Meter Count", width: 150 },
+    { field: "comment", headerName: "Comment", width: 150 },
+    
   ];
 
   if (loading) return (
@@ -101,7 +103,7 @@ const Visualization: React.FC<VisualizationProps> = ({dataType}) => {
       {/* DataGrid */}
       <DataGrid
         rows={filteredData}
-        columns={customersColumns}
+        columns={dataType === DataType.Customers ? customersColumns : readingsColumns}
         slots={{ toolbar: CustomToolbar }}
         checkboxSelection
         disableRowSelectionOnClick
