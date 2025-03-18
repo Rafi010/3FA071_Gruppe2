@@ -124,8 +124,7 @@ public class CustomerResource {
     /**
      * Aktualisiert die Informationen eines bestehenden Kunden.
      *
-     * @param uuid     Die eindeutige Identifikationsnummer des zu aktualisierenden Kunden.
-     * @param customer Das Kundenobjekt mit den aktualisierten Informationen.
+     * @param customer Das Kundenobjekt mit der ID und den aktualisierten Informationen.
      * @return Eine HTTP-Antwort mit einer Bestätigungsnachricht als Plain Text.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
      *                                 200 (OK) - Kunde erfolgreich aktualisiert
@@ -134,18 +133,18 @@ public class CustomerResource {
      *                                 500 (Internal Server Error) - Fehler bei der Aktualisierung
      */
     @PUT
-    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response customerPut(@PathParam("id") String uuid, @Valid Customer customer) {
+    public Response customerPut(@Valid Customer customer) {
         try {
-            if (customer == null) {
+            if (customer == null || customer.getId() == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Fehler Kundenobjekt fehlt oder ist ungültig.")
+                        .entity("Fehler: Kundenobjekt fehlt oder ID ist ungültig.")
                         .build();
             }
-            // Abrufen des existierenden Benutzers
-            Customer existingCustomer = findCustomerByUuid(uuid);
+
+            // Abrufen des existierenden Benutzers anhand der ID aus dem JSON-Body
+            Customer existingCustomer = findCustomerByUuid(customer.getId().toString());
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -157,7 +156,9 @@ public class CustomerResource {
             existingCustomer.setFirstName(customer.getFirstName());
             existingCustomer.setLastName(customer.getLastName());
             existingCustomer.setGender(customer.getGender());
-            existingCustomer.setBirthDate(customer.getBirthDate());
+            if (customer.getBirthDate() != null){
+                existingCustomer.setBirthDate(customer.getBirthDate());
+            }
 
             // Aktualisieren des Benutzers in der Datenbank
             updateCustomer(existingCustomer);
