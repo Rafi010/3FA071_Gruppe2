@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import './App.css';
 import DataSelection from './components/DataSelection';
-import CustomerPage from './components/CustomerPage';
-import ReadingPage from './components/ReadingPage';
+import CustomerPage from './pages/CustomerPage';
+import ReadingPage from './pages/ReadingPage';
 import { Box, Tabs, Tab, createTheme, ThemeProvider } from '@mui/material';
-import ChartComponent from './components/ChartPage';
+import ChartComponent from './pages/ChartPage';
 
 const darkTheme = createTheme({
   palette: {
