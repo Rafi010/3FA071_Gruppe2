@@ -9,8 +9,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Path("/customers")
 public class CustomerResource {
@@ -28,11 +27,21 @@ public class CustomerResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response customerGetAll() {
-        List<Customer> customers = customerDao.getAllCustomers();
-        return Response.status(Response.Status.OK)
-                .entity(customers)
-                .build();
+    public Response getAllCustomers() {
+        try {
+            List<Customer> customers = customerDao.getAllCustomers();
+
+            // Einbetten der Kundenliste in ein JSON-Objekt mit dem Schlüssel "customers"
+            Map<String, Object> response = new HashMap<>();
+            response.put("customers", customers);
+
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Ein interner Serverfehler ist aufgetreten\"}")
+                    .build();
+        }
     }
 
     /**
@@ -156,7 +165,7 @@ public class CustomerResource {
             existingCustomer.setFirstName(customer.getFirstName());
             existingCustomer.setLastName(customer.getLastName());
             existingCustomer.setGender(customer.getGender());
-            if (customer.getBirthDate() != null){
+            if (customer.getBirthDate() != null) {
                 existingCustomer.setBirthDate(customer.getBirthDate());
             }
 
