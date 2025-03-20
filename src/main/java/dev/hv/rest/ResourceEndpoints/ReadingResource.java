@@ -6,8 +6,8 @@ import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
 import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.daoInterfaces.ReadingDao;
-import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DAO.entities.Customer;
+import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -16,10 +16,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Path("/readings")
 public class ReadingResource {
@@ -31,14 +28,14 @@ public class ReadingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response readingsPost(@Valid Reading reading){
+    public Response readingsPost(@Valid Reading reading) {
 
         //add UUID if not existent
         if (reading.getId() == null) {
             reading.setId(UUID.randomUUID());
         }
 
-        Customer customer = (Customer)reading.getCustomer();
+        Customer customer = (Customer) reading.getCustomer();
 
         //add customer of reading to DB if not already present
         if (customerDao.getCustomerById(customer.getId().toString()) == null) {
@@ -55,7 +52,7 @@ public class ReadingResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response readingPut(@Valid Reading reading){
+    public Response readingPut(@Valid Reading reading) {
         if (reading.getId() == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -63,7 +60,7 @@ public class ReadingResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
             readingDao.updateReading(reading);
-            return Response.status(Response.Status.CREATED)
+            return Response.status(Response.Status.OK)
                     .entity(reading)
                     .build();
         }
@@ -75,25 +72,43 @@ public class ReadingResource {
             @QueryParam("customer") String customer,
             @QueryParam("start") String date1Str,
             @QueryParam("end") String date2Str,
-            @QueryParam("kindOfMeter") IReading.KindOfMeter meter
+            @QueryParam("kindOfMeter") String meterStr
     ) {
-
+        IReading.KindOfMeter meter;
         LocalDate date1 = parseLocalDate(date1Str);
         LocalDate date2 = parseLocalDate(date2Str);
-
-        if (date1 == null && date2 == null){
+        if (date1Str != null && date1 == null) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new Reading())
+                    .entity("{\"status\":\"error\",\"message\":\"Start date format has to be YYYY-MM-DD!\"}")
                     .build();
         }
-        if (meter == null) {
-            meter = IReading.KindOfMeter.UNBEKANNT;
+        if (date2Str != null && date2 == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"status\":\"error\",\"message\":\"End date format has to be YYYY-MM-DD!\"}")
+                    .build();
         }
+        if (date1 == null && date2 == null) {
+            date2 = LocalDate.now();
+        }
+
+        try {
+            if (meterStr == null) {
+                meter = IReading.KindOfMeter.UNBEKANNT;
+            } else {
+                meter = IReading.KindOfMeter.valueOf(meterStr.toUpperCase());
+            }
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"status\":\"error\",\"message\":\"Invalid kindOfMeter parameter. " +
+                            "Allowed values are: HEIZUNG, STROM, UNBEKANNT and WASSER\"}")
+                    .build();
+        }
+
         List<Reading> readings = readingDao.getAllReadings(meter);
         List<Reading> finalReadings = new ArrayList<>();
         for (int i = 0; i < readings.size(); i++) {
             Reading reading = readings.get(i);
-            if (!Objects.equals(reading.getCustomer().getId().toString(), customer)) {
+            if (!Objects.equals(reading.getCustomer().getId().toString(), customer) && customer != null) {
                 continue;
             }
             if (validDate(date1, date2, reading.getDateOfReading())) {
@@ -101,10 +116,20 @@ public class ReadingResource {
             }
         }
 
+        try {
+            List<Customer> customers = customerDao.getAllCustomers();
 
-        return Response.status(Response.Status.OK)
-                .entity(finalReadings)
-                .build();
+            // Einbetten der Kundenliste in ein JSON-Objekt mit dem Schlüssel "readings"
+            Map<String, Object> response = new HashMap<>();
+            response.put("readings", finalReadings);
+
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Ein interner Serverfehler ist aufgetreten\"}")
+                    .build();
+        }
     }
 
     private boolean validDate(LocalDate date1, LocalDate date2, LocalDate dateToCheck) {

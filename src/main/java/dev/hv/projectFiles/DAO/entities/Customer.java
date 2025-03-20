@@ -1,5 +1,7 @@
 package dev.hv.projectFiles.DAO.entities;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import dev.hv.model.ICustomer;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +10,8 @@ import org.hibernate.validator.constraints.Length;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonTypeName(value = "customer")
 public class Customer implements ICustomer {
 
     @NotEmpty(message = "First name cannot be empty")  // Hibernate-specific annotation

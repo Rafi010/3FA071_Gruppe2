@@ -1,5 +1,7 @@
 package dev.hv.projectFiles.DAO.entities;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.hv.model.ICustomer;
 import dev.hv.model.IReading;
@@ -9,9 +11,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonTypeName(value = "reading")
 public class Reading implements IReading {
-
-
 
     String comment;
 
