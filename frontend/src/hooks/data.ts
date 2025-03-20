@@ -39,8 +39,8 @@ export const useGetData = () => {
       fetch('http://localhost:8080/readings?kindOfMeter=STROM').then((response) => response.json()),
     ])
     .then(([customersData, readingsData, readingsDataStrom]) => {
-      setCustomers(customersData); // Set customers data
-      setReadings(readingsData); // Set readings data
+      setCustomers(customersData.customers); // Set customers data
+      setReadings(readingsData.readings); // Set readings data
       setReadingsStrom(readingsDataStrom)
       setLoading(false);
     })
