@@ -1,6 +1,5 @@
 package dev.hv.rest.ResourceEndpoints;
 
-
 import dev.hv.model.IReading;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
@@ -18,6 +17,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+/**
+ *  Resource-Klasse, die REST-Endpunkte für die Verwaltung von Zählerständen bereitstellt.
+ *  Ermöglicht das Hinzufügen, Aktualisieren und Abrufen von Zählerständen.
+ */
 @Path("/readings")
 public class ReadingResource {
 
@@ -25,6 +28,16 @@ public class ReadingResource {
     CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
     ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
 
+    /**
+     *  Erstellt einen neuen Zählerstand.
+     *
+     *  @param reading Das zu erstellende Reading-Objekt. Muss gültig sein (siehe Bean Validation).
+     *  @return Eine HTTP-Antwort mit dem erstellten Zählerstand im JSON-Format.
+     *  @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                  201 (Created) - Wenn der Zählerstand erfolgreich erstellt wurde.
+     *                                  400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
+     *                                  500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,6 +63,17 @@ public class ReadingResource {
 
     }
 
+    /**
+     * Aktualisiert einen bestehenden Zählerstand.
+     *
+     * @param reading Das zu aktualisierende Reading-Objekt. Muss gültig sein (siehe Bean Validation) und eine ID enthalten.
+     * @return Eine HTTP-Antwort mit dem aktualisierten Zählerstand im JSON-Format.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                  200 (OK) - Wenn der Zählerstand erfolgreich aktualisiert wurde.
+     *                                  400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
+     *                                  404 (Not Found) - Wenn kein Zählerstand mit der angegebenen ID existiert.
+     *                                  500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response readingPut(@Valid Reading reading) {
@@ -102,7 +126,20 @@ public class ReadingResource {
         }
     }
 
-
+    /**
+     * Ruft spezifische Zählerstände basierend auf verschiedenen Suchparametern ab.
+     *
+     * @param customer    (Optional) Die ID des Kunden, dessen Zählerstände abgerufen werden sollen.
+     * @param start       (Optional) Das Startdatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
+     * @param end         (Optional) Das Enddatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
+     * @param kindOfMeter (Optional) Der Zählertyp, dessen Zählerstände abgerufen werden sollen (HEIZUNG, STROM, UNBEKANNT, WASSER).
+     * @return Eine HTTP-Antwort mit einer Liste von Zählerständen im JSON-Format, die den Suchkriterien entsprechen.
+     *  Die Antwort enthält ein JSON-Objekt mit dem Schlüssel "readings", dessen Wert die Liste der Zählerstände ist.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                  200 (OK) - Wenn die Zählerstände erfolgreich abgerufen wurden.
+     *                                  400 (Bad Request) - Wenn das Datumsformat ungültig ist oder ein ungültiger Zählertyp angegeben wurde.
+     *                                  500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response specificReadingGet(
@@ -169,6 +206,14 @@ public class ReadingResource {
         }
     }
 
+    /**
+     * Hilfsmethode, um zu überprüfen, ob ein Datum in einen bestimmten Zeitraum fällt.
+     *
+     * @param date1       Das Startdatum des Zeitraums (kann null sein).
+     * @param date2       Das Enddatum des Zeitraums (kann null sein).
+     * @param dateToCheck Das zu überprüfende Datum.
+     * @return true, wenn das Datum im Zeitraum liegt oder wenn Start- oder Enddatum null sind und die Prüfung entsprechend angepasst wird.
+     */
     private boolean validDate(LocalDate date1, LocalDate date2, LocalDate dateToCheck) {
         if (date1 == null) {
             return !dateToCheck.isAfter(date2);
@@ -180,6 +225,12 @@ public class ReadingResource {
                 (dateToCheck.isEqual(date2) || dateToCheck.isBefore(date2));
     }
 
+    /**
+     * Hilfsmethode zum Parsen eines LocalDate aus einem String.
+     *
+     * @param dateStr Der zu parsende String im Format YYYY-MM-DD.
+     * @return Das geparste LocalDate-Objekt oder null, wenn der String null oder ungültig ist.
+     */
     private LocalDate parseLocalDate(String dateStr) {
         try {
             return (dateStr != null) ? LocalDate.parse(dateStr) : null;
@@ -188,6 +239,12 @@ public class ReadingResource {
         }
     }
 
+    /**
+     * Sucht eine Ablesung anhand ihrer UUID in allen Zählertypen.
+     *
+     * @param uuid Die UUID der Ablesung.
+     * @return Die gefundene Ablesung oder null, wenn keine Ablesung mit der UUID gefunden wurde.
+     */
     private Reading findReadingByUuid(String uuid) {
         // Durchlaufe alle vorhandenen Zählertypen
         for (IReading.KindOfMeter kind : IReading.KindOfMeter.values()) {
