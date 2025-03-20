@@ -16,10 +16,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Path("/readings")
 public class ReadingResource {
@@ -119,9 +116,20 @@ public class ReadingResource {
             }
         }
 
-        return Response.status(Response.Status.OK)
-                .entity(finalReadings)
-                .build();
+        try {
+            List<Customer> customers = customerDao.getAllCustomers();
+
+            // Einbetten der Kundenliste in ein JSON-Objekt mit dem Schlüssel "readings"
+            Map<String, Object> response = new HashMap<>();
+            response.put("readings", finalReadings);
+
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Ein interner Serverfehler ist aufgetreten\"}")
+                    .build();
+        }
     }
 
     private boolean validDate(LocalDate date1, LocalDate date2, LocalDate dateToCheck) {
