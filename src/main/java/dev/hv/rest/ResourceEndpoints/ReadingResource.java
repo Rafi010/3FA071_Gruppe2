@@ -66,6 +66,43 @@ public class ReadingResource {
         }
     }
 
+    /**
+     * Sucht eine Ablesung anhand ihrer eindeutigen UUID.
+     *
+     * @param uuid Die eindeutige Identifikationsnummer der Ablesung.
+     * @return Eine HTTP-Antwort mit den Ablesungsdetails im JSON-Format.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 200 (OK) - Wenn die Ablesung gefunden wurde.
+     *                                 404 (Not Found) - Wenn keine Ablesung mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response readingGetById(@PathParam("id") String uuid) {
+        try {
+            // Abrufen des existierenden Benutzers
+            Reading existingReading = findReadingByUuid(uuid);
+
+            if (existingReading == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"status\":\"error\",\"message\":\"Ablesung nicht gefunden\"}")
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity(existingReading)
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"status\":\"error\",\"message\":\"Fehler beim Abrufen der Ablesung\"}")
+                    .build();
+        }
+    }
+
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response specificReadingGet(
@@ -149,5 +186,25 @@ public class ReadingResource {
         } catch (DateTimeParseException e) {
             return null; // Falls das Datum ungültig ist, wird null zurückgegeben
         }
+    }
+
+    private Reading findReadingByUuid(String uuid) {
+        // Durchlaufe alle vorhandenen Zählertypen
+        for (IReading.KindOfMeter kind : IReading.KindOfMeter.values()) {
+            // Überspringe 'UNBEKANNT' falls gewünscht
+            if (kind == IReading.KindOfMeter.UNBEKANNT) continue;
+
+            try {
+                IReading reading = readingDao.getReadingById(kind, uuid);
+
+                if (reading instanceof Reading) {
+                    return (Reading) reading;
+                }
+            } catch (Exception e) {
+                // Logge Fehler, aber versuche nächsten Zählertyp
+                System.err.println("Fehler bei Suche in " + kind + ": " + e.getMessage());
+            }
+        }
+        return null; // Kein Treffer in allen Kategorien
     }
 }
