@@ -150,14 +150,12 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
 
     /**
      * Löscht einen Messwert aus der Datenbank basierend auf Zählerart und ID.
-     * @param kindOfMeter die Art des Zählers
      * @param id die ID des Messwerts
      */
     @Override
-    public void deleteReading(IReading.KindOfMeter kindOfMeter, String id) {
-        String meter = kindOfMeter.toString().toLowerCase();
+    public void deleteReading(String id) {
         try {
-            String query = "DELETE FROM " + meter + " WHERE uuid = ?";
+            String query = "DELETE FROM ablesung WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, id);
             stmt.executeUpdate(); // SQL ausführen
