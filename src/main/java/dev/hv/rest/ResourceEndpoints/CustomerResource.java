@@ -2,6 +2,7 @@ package dev.hv.rest.ResourceEndpoints;
 
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
+import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.Customer;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import java.util.*;
 public class CustomerResource {
 
     DatabaseConnection connection = DatabaseConnection.getInstance();
-    CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
+    CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
 
     /**
      * Ruft alle Kunden aus der Datenbank ab.

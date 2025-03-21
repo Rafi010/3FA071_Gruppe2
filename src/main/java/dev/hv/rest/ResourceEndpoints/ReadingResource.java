@@ -1,6 +1,5 @@
 package dev.hv.rest.ResourceEndpoints;
 
-
 import dev.hv.model.IReading;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
 import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
@@ -18,6 +17,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+/**
+ * Resource-Klasse, die REST-Endpunkte für die Verwaltung von Zählerständen bereitstellt.
+ * Ermöglicht das Hinzufügen, Aktualisieren, Abrufen und Löschen von Zählerständen.
+ */
 @Path("/readings")
 public class ReadingResource {
 
@@ -25,6 +28,16 @@ public class ReadingResource {
     CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
     ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
 
+    /**
+     * Erstellt einen neuen Zählerstand.
+     *
+     * @param reading Das zu erstellende Reading-Objekt. Muss gültig sein (siehe Bean Validation).
+     * @return Eine HTTP-Antwort mit dem erstellten Zählerstand im JSON-Format.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 201 (Created) - Wenn der Zählerstand erfolgreich erstellt wurde.
+     *                                 400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,22 +63,98 @@ public class ReadingResource {
 
     }
 
+    /**
+     * Aktualisiert einen bestehenden Zählerstand.
+     *
+     * @param reading Das zu aktualisierende Reading-Objekt. Muss gültig sein (siehe Bean Validation) und eine ID enthalten.
+     * @return Eine HTTP-Antwort mit dem aktualisierten Zählerstand im JSON-Format.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 200 (OK) - Wenn der Zählerstand erfolgreich aktualisiert wurde.
+     *                                 400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
+     *                                 404 (Not Found) - Wenn kein Zählerstand mit der angegebenen ID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response readingPut(@Valid Reading reading) {
         if (reading.getId() == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if (readingDao.getReadingById(reading.getKindOfMeter(), reading.getId().toString()) == null) {
+        Reading existingReading = findReadingByUuid(reading.getId().toString());
+        if (existingReading == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
             readingDao.updateReading(reading);
+            String responseMessage = String.format("Ablesung erfolgreich aktualisiert - ID der Ablesung: %s, " +
+                            "Datum der Ablesung: %s,\n      Art der Ablesung: %s, Zählerstand: %s, Zählernummer: %s, " +
+                            "Ersatzzähler: %s, Kommentar: %s,\n      Kunde: %s %s mit ID: %s",
+                    existingReading.getId(),
+                    existingReading.getDateOfReading(),
+                    existingReading.getKindOfMeter(),
+                    existingReading.getMeterCount(),
+                    existingReading.getMeterId(),
+                    existingReading.getSubstitute(),
+                    existingReading.getComment(),
+                    existingReading.getCustomer().getFirstName(),
+                    existingReading.getCustomer().getLastName(),
+                    existingReading.getCustomer().getId());
             return Response.status(Response.Status.OK)
-                    .entity(reading)
+                    .entity(responseMessage)
                     .build();
         }
     }
 
+    /**
+     * Sucht eine Ablesung anhand ihrer eindeutigen UUID.
+     *
+     * @param uuid Die eindeutige Identifikationsnummer der Ablesung.
+     * @return Eine HTTP-Antwort mit den Ablesungsdetails im JSON-Format.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 200 (OK) - Wenn die Ablesung gefunden wurde.
+     *                                 404 (Not Found) - Wenn keine Ablesung mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response readingGetById(@PathParam("id") String uuid) {
+        try {
+            // Abrufen des existierenden Benutzers
+            Reading existingReading = findReadingByUuid(uuid);
+
+            if (existingReading == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"status\":\"error\",\"message\":\"Ablesung nicht gefunden\"}")
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity(existingReading)
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"status\":\"error\",\"message\":\"Fehler beim Abrufen der Ablesung\"}")
+                    .build();
+        }
+    }
+
+    /**
+     * Ruft spezifische Zählerstände basierend auf verschiedenen Suchparametern ab.
+     *
+     * @param customer (Optional) Die ID des Kunden, dessen Zählerstände abgerufen werden sollen.
+     * @param date1Str (Optional) Das Startdatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
+     * @param date2Str (Optional) Das Enddatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
+     * @param meterStr (Optional) Der Zählertyp, dessen Zählerstände abgerufen werden sollen (HEIZUNG, STROM, UNBEKANNT, WASSER).
+     * @return Eine HTTP-Antwort mit einer Liste von Zählerständen im JSON-Format, die den Suchkriterien entsprechen.
+     * Die Antwort enthält ein JSON-Objekt mit dem Schlüssel "readings", dessen Wert die Liste der Zählerstände ist.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 200 (OK) - Wenn die Zählerstände erfolgreich abgerufen wurden.
+     *                                 400 (Bad Request) - Wenn das Datumsformat ungültig ist oder ein ungültiger Zählertyp angegeben wurde.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response specificReadingGet(
@@ -132,6 +221,40 @@ public class ReadingResource {
         }
     }
 
+    /**
+     * Löscht eine Ablesung anhand ihrer eindeutigen UUID.
+     *
+     * @param uuid Die UUID der zu löschenden Ablesung.
+     * @return Eine HTTP-Antwort, die den Erfolg oder Misserfolg der Löschung angibt.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 200 (OK) - Wenn die Ablesung erfolgreich gelöscht wurde.
+     *                                 404 (Not Found) - Wenn keine Ablesung mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     */
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response readingDelete(@PathParam("id") String uuid) {
+        try {
+            Reading existingReading = findReadingByUuid(uuid);
+
+            if (existingReading == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"status\":\"error\",\"message\":\"Ablesung nicht gefunden\"}")
+                        .build();
+            }
+
+            readingDao.deleteReading(existingReading.getKindOfMeter(), uuid);
+            return Response.status(Response.Status.OK).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"status\":\"error\",\"message\":\"Fehler beim Löschen der Ablesung\"}")
+                    .build();
+        }
+    }
+
     private boolean validDate(LocalDate date1, LocalDate date2, LocalDate dateToCheck) {
         if (date1 == null) {
             return !dateToCheck.isAfter(date2);
@@ -143,11 +266,43 @@ public class ReadingResource {
                 (dateToCheck.isEqual(date2) || dateToCheck.isBefore(date2));
     }
 
+    /**
+     * Hilfsmethode zum Parsen eines LocalDate aus einem String.
+     *
+     * @param dateStr Der zu parsende String im Format YYYY-MM-DD.
+     * @return Das geparste LocalDate-Objekt oder null, wenn der String null oder ungültig ist.
+     */
     private LocalDate parseLocalDate(String dateStr) {
         try {
             return (dateStr != null) ? LocalDate.parse(dateStr) : null;
         } catch (DateTimeParseException e) {
             return null; // Falls das Datum ungültig ist, wird null zurückgegeben
         }
+    }
+
+    /**
+     * Sucht eine Ablesung anhand ihrer UUID in allen Zählertypen.
+     *
+     * @param uuid Die UUID der Ablesung.
+     * @return Die gefundene Ablesung oder null, wenn keine Ablesung mit der UUID gefunden wurde.
+     */
+    private Reading findReadingByUuid(String uuid) {
+        // Durchlaufe alle vorhandenen Zählertypen
+        for (IReading.KindOfMeter kind : IReading.KindOfMeter.values()) {
+            // Überspringe 'UNBEKANNT' falls gewünscht
+            if (kind == IReading.KindOfMeter.UNBEKANNT) continue;
+
+            try {
+                IReading reading = readingDao.getReadingById(kind, uuid);
+
+                if (reading instanceof Reading) {
+                    return (Reading) reading;
+                }
+            } catch (Exception e) {
+                // Logge Fehler, aber versuche nächsten Zählertyp
+                System.err.println("Fehler bei Suche in " + kind + ": " + e.getMessage());
+            }
+        }
+        return null; // Kein Treffer in allen Kategorien
     }
 }

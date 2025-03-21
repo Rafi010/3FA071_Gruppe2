@@ -5,6 +5,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+/**
+ * Das ist ein Test
+ * Bei Aufrufen von "Localhost:8080 wird im optimalfall "Server is running!" ausgegeben
+ */
 @Path("")
 public class RootResource {
     @GET
