@@ -76,16 +76,31 @@ public class ReadingResource {
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response readingPut(@Valid Reading reading) {
         if (reading.getId() == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if (readingDao.getReadingById(reading.getKindOfMeter(), reading.getId().toString()) == null) {
+        Reading existingReading = findReadingByUuid(reading.getId().toString());
+        if (existingReading == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
             readingDao.updateReading(reading);
+            String responseMessage = String.format("Ablesung erfolgreich aktualisiert - ID der Ablesung: %s, " +
+                            "Datum der Ablesung: %s,\n      Art der Ablesung: %s, Zählerstand: %s, Zählernummer: %s, " +
+                            "Ersatzzähler: %s, Kommentar: %s,\n      Kunde: %s %s mit ID: %s",
+                    existingReading.getId(),
+                    existingReading.getDateOfReading(),
+                    existingReading.getKindOfMeter(),
+                    existingReading.getMeterCount(),
+                    existingReading.getMeterId(),
+                    existingReading.getSubstitute(),
+                    existingReading.getComment(),
+                    existingReading.getCustomer().getFirstName(),
+                    existingReading.getCustomer().getLastName(),
+                    existingReading.getCustomer().getId());
             return Response.status(Response.Status.OK)
-                    .entity(reading)
+                    .entity(responseMessage)
                     .build();
         }
     }
