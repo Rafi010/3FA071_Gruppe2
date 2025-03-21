@@ -26,7 +26,6 @@ const processData = (readingsData: Reading[]) => {
     if (!monthlyData[monthKey]) {
       monthlyData[monthKey] = { sum: 0, count: 0 };
     }
-
     monthlyData[monthKey].sum += item.meterCount;
     monthlyData[monthKey].count += 1;
   });
@@ -40,9 +39,9 @@ const processData = (readingsData: Reading[]) => {
   return { dates, meterCounts };
 };
 
-// ChartComponent that fetches data from useGetData hook
+// ChartComponent
 const ChartPage: React.FC = () => {
-  // Get the data from the custom hook
+
   const [filters, setFilters] = useState({
     kindOfMeter: 'STROM',
     start: '',
