@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarExportContainer, GridCsvExportMenuItem, GridExportMenuItemProps, useGridApiContext } from "@mui/x-data-grid";
-import { MenuItem } from "@mui/material";
-import { getJson, getXml, exportBlob } from '../utils/CustomExport';
+import { Button, MenuItem } from "@mui/material";
+import { getJson, getXml, exportBlob } from '../utils/customExport';
+import ImportButton from './CustomImportButton';
 
 function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
   const apiRef = useGridApiContext();
@@ -62,6 +63,7 @@ export function CustomToolbar() {
       <GridToolbarFilterButton />
       <GridToolbarDensitySelector />
       <CustomExportButton />
+      <ImportButton/>
     </GridToolbarContainer>
   );
 }

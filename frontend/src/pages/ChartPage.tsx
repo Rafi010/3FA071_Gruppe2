@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useGetData } from "../hooks/data"; // Import the custom hook
+import { useGetReadings } from "../hooks/useGetReadings";
+import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { WidthNormal } from "@mui/icons-material";
 
 // Define the type for each reading item
 interface Reading {
@@ -38,21 +41,58 @@ const processData = (readingsData: Reading[]) => {
 };
 
 // ChartComponent that fetches data from useGetData hook
-const ChartComponent: React.FC = () => {
+const ChartPage: React.FC = () => {
   // Get the data from the custom hook
-  const { readingsDataStrom, loading } = useGetData();
+  const [filters, setFilters] = useState({
+    kindOfMeter: 'STROM',
+    start: '',
+    end: '',
+    customer: '',
+  });
 
-  // Process the data to extract monthly averages
-  const { dates, meterCounts } = processData(readingsDataStrom);
+  const updateFilter = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value, // Nur das angegebene Feld ändern
+    }));
+  };
+
+  const { readingsData, loading } = useGetReadings(filters);
+  const { dates, meterCounts } = processData(readingsData);
+
+  const [meter, setMeter
+  ] = React.useState('STROM');
+
+  const handleChange = (event: SelectChangeEvent) => {
+    const newMeter = event.target.value as string;
+    setMeter(newMeter);
+    updateFilter("kindOfMeter", newMeter)
+  };
 
   return (
+    <Box p={1}>
+    <FormControl sx={{ width: '120px' }}>
+      <InputLabel id="demo-simple-select-label">Meter</InputLabel>
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        value={meter}
+        label="Meter"
+        onChange={handleChange}
+      >
+        <MenuItem value={"STROM"}>Strom</MenuItem>
+        <MenuItem value={"HEIZUNG"}>Heizung</MenuItem>
+        <MenuItem value={"WASSER"}>Wasser</MenuItem>
+      </Select>
+    </FormControl>
     <LineChart
       xAxis={[{ data: dates, scaleType: "point" }]} // X-axis labels (months)
       series={[{ data: meterCounts, area: true }]} // Y-axis values (average meter counts)
       width={1000}
       height={600}
     />
+    </Box>
   );
 };
 
-export default ChartComponent;
+export default ChartPage;

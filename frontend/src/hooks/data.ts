@@ -41,7 +41,7 @@ export const useGetData = () => {
     .then(([customersData, readingsData, readingsDataStrom]) => {
       setCustomers(customersData.customers); // Set customers data
       setReadings(readingsData.readings); // Set readings data
-      setReadingsStrom(readingsDataStrom)
+      setReadingsStrom(readingsDataStrom.readings)
       setLoading(false);
     })
     .catch((error) => {

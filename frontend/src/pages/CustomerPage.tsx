@@ -5,6 +5,7 @@ import { DataGrid, GridColDef, GridCsvExportMenuItem, GridExportMenuItemProps, g
 import { red } from "@mui/material/colors";
 import { CustomToolbar } from "../components/CustomToolbar";
 import { read } from "node:fs";
+import { useGetCustomers } from "../hooks/useGetCustomers";
 
 interface Person {
   firstName: string;
@@ -20,7 +21,7 @@ export enum DataType {
 }
 
 const CustomerPage = () => {
-  const { customerData, loading } = useGetData();
+  const { customerData, loading } = useGetCustomers();
   const [filter, setFilter] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {

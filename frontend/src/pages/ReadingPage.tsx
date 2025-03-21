@@ -5,6 +5,7 @@ import { DataGrid, GridColDef, GridCsvExportMenuItem, GridExportMenuItemProps, g
 import { red } from "@mui/material/colors";
 import { CustomToolbar } from "../components/CustomToolbar";
 import { read } from "node:fs";
+import { useGetReadings } from "../hooks/useGetReadings";
 
 interface Reading {
   customerID: string;
@@ -21,14 +22,20 @@ export enum DataType {
 }
 
 const ReadingPage = () => {
-  const { readingsData, loading } = useGetData();
+  const [filters, setFilters] = useState({
+    kindOfMeter: '',
+    start: '',
+    end: '',
+    customer: '',
+  });
+  const { readingsData, loading } = useGetReadings(filters);
   const [filter, setFilter] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(event.target.value);
   };
 
-  const filteredData = readingsData.filter((reading) => {
+  const filteredData = readingsData.filter((reading: Reading) => {
 
     const formattedDate = reading.dateOfReading
     ? `${reading.dateOfReading[0]}-${String(reading.dateOfReading[1]).padStart(2, '0')}-${String(reading.dateOfReading[2]).padStart(2, '0')}`
