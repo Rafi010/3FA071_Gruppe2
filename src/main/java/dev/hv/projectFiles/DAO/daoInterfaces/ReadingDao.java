@@ -9,8 +9,8 @@ import java.util.List;
  */
 public interface ReadingDao<Reading> {
     void addReading(IReading reading);
-    Reading getReadingById(IReading.KindOfMeter kindOfMeter, String id);
-    List<Reading> getAllReadings(IReading.KindOfMeter kindOfMeter);
+    Reading getReadingById(String id);
+    List<Reading> getAllReadings();
     void updateReading(IReading reading);
-    void deleteReading(IReading.KindOfMeter kindOfMeter, String id);
+    void deleteReading(String id);
 }
