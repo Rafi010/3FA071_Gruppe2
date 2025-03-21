@@ -190,9 +190,9 @@ public class ReadingResource {
             @QueryParam("end") String date2Str,
             @QueryParam("kindOfMeter") String meterStr
     ) {
-        IReading.KindOfMeter meter;
         LocalDate date1 = parseLocalDate(date1Str);
         LocalDate date2 = parseLocalDate(date2Str);
+
         if (date1Str != null && date1 == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("{\"status\":\"error\",\"message\":\"Start date format has to be YYYY-MM-DD!\"}")
@@ -207,11 +207,25 @@ public class ReadingResource {
             date2 = LocalDate.now();
         }
 
+        IReading.KindOfMeter meter = null;
+        if (meterStr != null) {
+            try {
+                meter = IReading.KindOfMeter.valueOf(meterStr.toUpperCase()); // Convert to Enum
+            } catch (IllegalArgumentException e) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"status\":\"error\",\"message\":\"Invalid meter type!\"}")
+                        .build();
+            }
+        }
+
         List<Reading> readings = readingDao.getAllReadings();
         List<Reading> finalReadings = new ArrayList<>();
-        for (int i = 0; i < readings.size(); i++) {
-            Reading reading = readings.get(i);
-            if (!Objects.equals(reading.getCustomer().getId().toString(), customer) && customer != null) {
+
+        for (Reading reading : readings) {
+            if (customer != null && !Objects.equals(reading.getCustomer().getId().toString(), customer)) {
+                continue;
+            }
+            if (meter != null && reading.getKindOfMeter() != meter) { // Filter by kindOfMeter
                 continue;
             }
             if (validDate(date1, date2, reading.getDateOfReading())) {
@@ -220,12 +234,8 @@ public class ReadingResource {
         }
 
         try {
-            List<Customer> customers = customerDao.getAllCustomers();
-
-            // Einbetten der Kundenliste in ein JSON-Objekt mit dem Schlüssel "readings"
             Map<String, Object> response = new HashMap<>();
             response.put("readings", finalReadings);
-
             return Response.ok(response).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,6 +244,7 @@ public class ReadingResource {
                     .build();
         }
     }
+
 
     /**
      * Löscht eine Ablesung anhand ihrer eindeutigen UUID.
