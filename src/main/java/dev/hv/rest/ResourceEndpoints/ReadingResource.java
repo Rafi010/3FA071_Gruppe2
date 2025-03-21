@@ -207,13 +207,39 @@ public class ReadingResource {
     }
 
     /**
-     * Hilfsmethode, um zu überprüfen, ob ein Datum in einen bestimmten Zeitraum fällt.
+     * Löscht eine Ablesung anhand ihrer eindeutigen UUID.
      *
-     * @param date1       Das Startdatum des Zeitraums (kann null sein).
-     * @param date2       Das Enddatum des Zeitraums (kann null sein).
-     * @param dateToCheck Das zu überprüfende Datum.
-     * @return true, wenn das Datum im Zeitraum liegt oder wenn Start- oder Enddatum null sind und die Prüfung entsprechend angepasst wird.
+     * @param uuid Die UUID der zu löschenden Ablesung.
+     * @return Eine HTTP-Antwort, die den Erfolg oder Misserfolg der Löschung angibt.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 200 (OK) - Wenn die Ablesung erfolgreich gelöscht wurde.
+     *                                 404 (Not Found) - Wenn keine Ablesung mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response readingDelete(@PathParam("id") String uuid) {
+        try {
+            Reading existingReading = findReadingByUuid(uuid);
+
+            if (existingReading == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"status\":\"error\",\"message\":\"Ablesung nicht gefunden\"}")
+                        .build();
+            }
+
+            readingDao.deleteReading(existingReading.getKindOfMeter(), uuid);
+            return Response.status(Response.Status.OK).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"status\":\"error\",\"message\":\"Fehler beim Löschen der Ablesung\"}")
+                    .build();
+        }
+    }
+
     private boolean validDate(LocalDate date1, LocalDate date2, LocalDate dateToCheck) {
         if (date1 == null) {
             return !dateToCheck.isAfter(date2);
