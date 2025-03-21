@@ -46,20 +46,8 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         validateReading(reading);
 
         try {
-            String zaehlerstandColumn = "";
-            // Bestimmung der Spalte basierend auf der Zählerart
-            switch (reading.getKindOfMeter()) {
-                case STROM -> zaehlerstandColumn = "zaehlerstand_in_kwh";
-                case WASSER -> zaehlerstandColumn = "zaehlerstand_in_m3";
-                case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
-                case UNBEKANNT -> {
-                    return; // Falls die Art unbekannt ist, keine Aktion
-                }
-            }
-
-            String meter = reading.getKindOfMeter().toString().toLowerCase();
             // SQL-Query für das Einfügen eines neuen Messwerts
-            String query = "INSERT INTO " + meter + " (uuid, kundenid, zaehlernummer, datum, " + zaehlerstandColumn + ", kommentar) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO ablesung (uuid, kundenid, zaehlernummer, datum, zaehlerstand, kommentar) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getId().toString());
             stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
