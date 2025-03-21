@@ -132,22 +132,9 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
     public void updateReading(IReading reading) {
 
         validateReading(reading);
-
-        try {
-            String zaehlerstand = "";
-            switch (reading.getKindOfMeter()) {
-                case STROM -> zaehlerstand = "zaehlerstand_in_kwh";
-                case WASSER -> zaehlerstand = "zaehlerstand_in_m3";
-                case HEIZUNG -> zaehlerstand = "zaehlerstand_in_mwh";
-                case UNBEKANNT -> {
-                    return; // Keine Aktualisierung für unbekannte Zählerart
-                }
-            }
-
-            String meter = reading.getKindOfMeter().toString().toLowerCase();
-
+        try{
             // SQL-Query für das Aktualisieren eines Messwerts
-            String query = "UPDATE " + meter + " SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, " + zaehlerstand + " = ? WHERE uuid = ?";
+            String query = "UPDATE ablesung SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, zaehlerstand = ? WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getComment()); // Kommentar
             stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
