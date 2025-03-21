@@ -116,13 +116,13 @@ public class ReadingResource {
             String responseMessage = String.format("Ablesung erfolgreich aktualisiert - ID der Ablesung: %s, " +
                             "Datum der Ablesung: %s,\n      Art der Ablesung: %s, Zählerstand: %s, Zählernummer: %s, " +
                             "Ersatzzähler: %s, Kommentar: %s,\n      Kunde: %s %s mit ID: %s",
-                    existingReading.getId(),
-                    existingReading.getDateOfReading(),
-                    existingReading.getKindOfMeter(),
-                    existingReading.getMeterCount(),
-                    existingReading.getMeterId(),
-                    existingReading.getSubstitute() != null ? existingReading.getSubstitute() : "N/A",
-                    existingReading.getComment() != null ? existingReading.getComment() : "N/A",
+                    reading.getId(),
+                    reading.getDateOfReading(),
+                    reading.getKindOfMeter(),
+                    reading.getMeterCount(),
+                    reading.getMeterId(),
+                    reading.getSubstitute() != null ? reading.getSubstitute() : "N/A",
+                    reading.getComment() != null ? reading.getComment() : "N/A",
                     customer.getFirstName() != null ? customer.getFirstName() : "N/A",
                     customer.getLastName() != null ? customer.getLastName() : "N/A",
                     customer.getId() != null ? customer.getId().toString() : "N/A");
