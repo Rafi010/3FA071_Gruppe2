@@ -85,6 +85,33 @@ public class ReadingResource {
         if (existingReading == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
+            Customer customer = (Customer) reading.getCustomer();
+            if (customer.getId() == null){ // Sollte Kunden ID nicht gegeben sein, wird Kunde aus der Ablesung genommen
+                customer = (Customer) existingReading.getCustomer();
+            }
+            //Kunde zur DB hinzufügen, wenn nicht vorhanden, sonst wird der Kunde der Ablesung geändert
+            //es werden aber keine Kundenänderungen übernommen, falls andere Namen oder Gender eingegeben werden!
+            if (customerDao.getCustomerById(customer.getId().toString()) == null && (customer.getFirstName() == null
+                    || customer.getLastName() == null || customer.getGender() == null)) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Kunde zu gegebener ID existiert nicht!\nID korrigieren oder zusätzlich 'firstName', " +
+                                "'lastName' und 'gender' des Kunden angeben, um einen neuen Kundeneintrag anzulegen.")
+                        .build();
+            } else if (customerDao.getCustomerById(customer.getId().toString()) == null
+                    && customer.getFirstName() != null
+                    && customer.getLastName() != null
+                    && customer.getGender() != null) {
+                customerDao.addCustomer(customer);
+            } else {
+                try {
+                    customer = (Customer) customerDao.getCustomerById(customer.getId().toString());
+                } catch (Exception e) {
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .entity("Kunde wurde anhand der ID nicht gefunden!")
+                            .build();
+                }
+            }
+            reading.setCustomer(customer);
             readingDao.updateReading(reading);
             String responseMessage = String.format("Ablesung erfolgreich aktualisiert - ID der Ablesung: %s, " +
                             "Datum der Ablesung: %s,\n      Art der Ablesung: %s, Zählerstand: %s, Zählernummer: %s, " +
@@ -94,11 +121,11 @@ public class ReadingResource {
                     existingReading.getKindOfMeter(),
                     existingReading.getMeterCount(),
                     existingReading.getMeterId(),
-                    existingReading.getSubstitute(),
-                    existingReading.getComment(),
-                    existingReading.getCustomer().getFirstName(),
-                    existingReading.getCustomer().getLastName(),
-                    existingReading.getCustomer().getId());
+                    existingReading.getSubstitute() != null ? existingReading.getSubstitute() : "N/A",
+                    existingReading.getComment() != null ? existingReading.getComment() : "N/A",
+                    customer.getFirstName() != null ? customer.getFirstName() : "N/A",
+                    customer.getLastName() != null ? customer.getLastName() : "N/A",
+                    customer.getId() != null ? customer.getId().toString() : "N/A");
             return Response.status(Response.Status.OK)
                     .entity(responseMessage)
                     .build();
