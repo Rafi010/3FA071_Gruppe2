@@ -18,8 +18,8 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- *  Resource-Klasse, die REST-Endpunkte für die Verwaltung von Zählerständen bereitstellt.
- *  Ermöglicht das Hinzufügen, Aktualisieren und Abrufen von Zählerständen.
+ * Resource-Klasse, die REST-Endpunkte für die Verwaltung von Zählerständen bereitstellt.
+ * Ermöglicht das Hinzufügen, Aktualisieren, Abrufen und Löschen von Zählerständen.
  */
 @Path("/readings")
 public class ReadingResource {
@@ -29,14 +29,14 @@ public class ReadingResource {
     ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
 
     /**
-     *  Erstellt einen neuen Zählerstand.
+     * Erstellt einen neuen Zählerstand.
      *
-     *  @param reading Das zu erstellende Reading-Objekt. Muss gültig sein (siehe Bean Validation).
-     *  @return Eine HTTP-Antwort mit dem erstellten Zählerstand im JSON-Format.
-     *  @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *                                  201 (Created) - Wenn der Zählerstand erfolgreich erstellt wurde.
-     *                                  400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
-     *                                  500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     * @param reading Das zu erstellende Reading-Objekt. Muss gültig sein (siehe Bean Validation).
+     * @return Eine HTTP-Antwort mit dem erstellten Zählerstand im JSON-Format.
+     * @throws WebApplicationException mit folgenden möglichen Status-Codes:
+     *                                 201 (Created) - Wenn der Zählerstand erfolgreich erstellt wurde.
+     *                                 400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -69,10 +69,10 @@ public class ReadingResource {
      * @param reading Das zu aktualisierende Reading-Objekt. Muss gültig sein (siehe Bean Validation) und eine ID enthalten.
      * @return Eine HTTP-Antwort mit dem aktualisierten Zählerstand im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *                                  200 (OK) - Wenn der Zählerstand erfolgreich aktualisiert wurde.
-     *                                  400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
-     *                                  404 (Not Found) - Wenn kein Zählerstand mit der angegebenen ID existiert.
-     *                                  500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn der Zählerstand erfolgreich aktualisiert wurde.
+     *                                 400 (Bad Request) - Wenn die übergebenen Daten ungültig sind.
+     *                                 404 (Not Found) - Wenn kein Zählerstand mit der angegebenen ID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
@@ -129,16 +129,16 @@ public class ReadingResource {
     /**
      * Ruft spezifische Zählerstände basierend auf verschiedenen Suchparametern ab.
      *
-     * @param customer    (Optional) Die ID des Kunden, dessen Zählerstände abgerufen werden sollen.
-     * @param start       (Optional) Das Startdatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
-     * @param end         (Optional) Das Enddatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
-     * @param kindOfMeter (Optional) Der Zählertyp, dessen Zählerstände abgerufen werden sollen (HEIZUNG, STROM, UNBEKANNT, WASSER).
+     * @param customer (Optional) Die ID des Kunden, dessen Zählerstände abgerufen werden sollen.
+     * @param date1Str (Optional) Das Startdatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
+     * @param date2Str (Optional) Das Enddatum für den Zeitraum, in dem die Zählerstände liegen müssen (Format: YYYY-MM-DD).
+     * @param meterStr (Optional) Der Zählertyp, dessen Zählerstände abgerufen werden sollen (HEIZUNG, STROM, UNBEKANNT, WASSER).
      * @return Eine HTTP-Antwort mit einer Liste von Zählerständen im JSON-Format, die den Suchkriterien entsprechen.
-     *  Die Antwort enthält ein JSON-Objekt mit dem Schlüssel "readings", dessen Wert die Liste der Zählerstände ist.
+     * Die Antwort enthält ein JSON-Objekt mit dem Schlüssel "readings", dessen Wert die Liste der Zählerstände ist.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *                                  200 (OK) - Wenn die Zählerstände erfolgreich abgerufen wurden.
-     *                                  400 (Bad Request) - Wenn das Datumsformat ungültig ist oder ein ungültiger Zählertyp angegeben wurde.
-     *                                  500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn die Zählerstände erfolgreich abgerufen wurden.
+     *                                 400 (Bad Request) - Wenn das Datumsformat ungültig ist oder ein ungültiger Zählertyp angegeben wurde.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
