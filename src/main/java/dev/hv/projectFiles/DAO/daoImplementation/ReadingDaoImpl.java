@@ -64,25 +64,14 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
 
     /**
      * Holt einen Messwert aus der Datenbank basierend auf der Zählerart und ID.
-     * @param kindOfMeter die Art des Zählers
      * @param id die ID des Messwerts
      * @return das gefundene Reading-Objekt oder null, falls nicht gefunden
      */
     @Override
-    public Reading getReadingById(IReading.KindOfMeter kindOfMeter, String id) {
-        if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) return null; // Kein Abruf für unbekannte Zählerart
+    public Reading getReadingById(String id) {
 
-        String zaehlerstandColumn = "";
-        // Bestimmung der Spalte basierend auf der Zählerart
-        switch (kindOfMeter) {
-            case STROM -> zaehlerstandColumn = "zaehlerstand_in_kwh";
-            case WASSER -> zaehlerstandColumn = "zaehlerstand_in_m3";
-            case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
-        }
-
-        String meter = kindOfMeter.toString().toLowerCase();
         try {
-            String query = "SELECT * FROM " + meter + " WHERE uuid = ?";
+            String query = "SELECT * FROM ablesung WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -93,8 +82,8 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
                 reading.setComment(rs.getString("kommentar")); // Kommentar
                 reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
                 reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
-                reading.setKindOfMeter(kindOfMeter); // Zählerart
-                reading.setMeterCount(rs.getDouble(zaehlerstandColumn)); // Zählerstand
+                reading.setKindOfMeter(IReading.KindOfMeter.valueOf(rs.getString("kindOfMeter"))); // Zählerart
+                reading.setMeterCount(rs.getDouble("zaehlerstand")); // Zählerstand
                 reading.setMeterId(rs.getString("zaehlernummer")); // Zählernummer
                 return reading;
             }
