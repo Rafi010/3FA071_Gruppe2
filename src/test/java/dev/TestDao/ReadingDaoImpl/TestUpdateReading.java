@@ -53,7 +53,7 @@ public class testUpdateReading extends BaseTest {
         Reading reading1 = new Reading();
         dao.addReading(reading1);
 
-        dao.getReadingById()
+        dao.getReadingById();
 
         String updateQuery = "UPDATE " + tableName +
                 " SET kunde = ?, zaehlernummer = ?, datum = ?, " + zaehlerstandColumn + " = ?, kommentar = ? " +
