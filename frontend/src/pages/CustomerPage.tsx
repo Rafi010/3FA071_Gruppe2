@@ -22,23 +22,8 @@ export enum DataType {
 
 const CustomerPage = () => {
   const { customerData, loading } = useGetCustomers();
-  const [filter, setFilter] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter(event.target.value);
-  };
 
-  // Filter the data based on the filter input
-  const filteredData = customerData.filter((person) => {
-    const name = `${person.firstName} ${person.lastName}`;
-    return (
-      name.toLowerCase().includes(filter.toLowerCase()) ||
-      person.gender.toLowerCase().includes(filter.toLowerCase())
-    );
-  }
-  );
-
-  // Define the columns for the DataGrid
   const customersColumns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 300 },
     { field: "firstName", headerName: "First Name", width: 150 },
@@ -66,38 +51,8 @@ const CustomerPage = () => {
 
   return (
     <Box sx={{ height: 600, width: "90%"}}>
-      {/* Filter Input */}
-      <Box sx={{ marginBottom: 2 }}>
-      <TextField
-          label="Filter"
-          variant="outlined"
-          value={filter}
-          onChange={handleFilterChange}
-          fullWidth
-          sx={{
-            input: {
-              color: 'white',  // Ensure text is white
-            },
-            '& .MuiInputBase-root': {
-              backgroundColor: 'background.paper', // Match dark theme background
-              borderRadius: '4px',
-            },
-            '& .MuiOutlinedInput-root': {
-              borderColor: 'rgba(255, 255, 255, 0.23)',  // Light border for dark mode
-            },
-            '& .MuiInputLabel-root': {
-              color: 'white',  // White label color
-            },
-            '& .MuiFormLabel-root.Mui-focused': {
-              color: 'white',  // Keep label white when focused
-            },
-          }}
-        />
-      </Box>
-
-      {/* DataGrid */}
       <DataGrid
-        rows={filteredData}
+        rows={customerData}
         columns={customersColumns}
         slots={{ toolbar: CustomToolbar }}
         checkboxSelection
