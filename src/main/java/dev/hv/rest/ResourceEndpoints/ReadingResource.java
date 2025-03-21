@@ -10,6 +10,7 @@ import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -23,7 +24,7 @@ import java.util.*;
  */
 @Path("/readings")
 public class ReadingResource {
-
+    private List<Reading> readings;
     DatabaseConnection connection = DatabaseConnection.getInstance();
     CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
     ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
@@ -81,7 +82,7 @@ public class ReadingResource {
         if (reading.getId() == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        Reading existingReading = findReadingByUuid(reading.getId().toString());
+        Reading existingReading = readingDao.getReadingById(reading.getId().toString());
         if (existingReading == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
@@ -116,13 +117,13 @@ public class ReadingResource {
             String responseMessage = String.format("Ablesung erfolgreich aktualisiert - ID der Ablesung: %s, " +
                             "Datum der Ablesung: %s,\n      Art der Ablesung: %s, Zählerstand: %s, Zählernummer: %s, " +
                             "Ersatzzähler: %s, Kommentar: %s,\n      Kunde: %s %s mit ID: %s",
-                    reading.getId(),
-                    reading.getDateOfReading(),
-                    reading.getKindOfMeter(),
-                    reading.getMeterCount(),
-                    reading.getMeterId(),
-                    reading.getSubstitute() != null ? reading.getSubstitute() : "N/A",
-                    reading.getComment() != null ? reading.getComment() : "N/A",
+                    existingReading.getId(),
+                    existingReading.getDateOfReading(),
+                    existingReading.getKindOfMeter(),
+                    existingReading.getMeterCount(),
+                    existingReading.getMeterId(),
+                    existingReading.getSubstitute() != null ? existingReading.getSubstitute() : "N/A",
+                    existingReading.getComment() != null ? existingReading.getComment() : "N/A",
                     customer.getFirstName() != null ? customer.getFirstName() : "N/A",
                     customer.getLastName() != null ? customer.getLastName() : "N/A",
                     customer.getId() != null ? customer.getId().toString() : "N/A");
@@ -148,16 +149,16 @@ public class ReadingResource {
     public Response readingGetById(@PathParam("id") String uuid) {
         try {
             // Abrufen des existierenden Benutzers
-            Reading existingReading = findReadingByUuid(uuid);
+            Reading reading = readingDao.getReadingById(uuid);
 
-            if (existingReading == null) {
+            if (reading == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("{\"status\":\"error\",\"message\":\"Ablesung nicht gefunden\"}")
                         .build();
             }
 
             return Response.status(Response.Status.OK)
-                    .entity(existingReading)
+                    .entity(reading)
                     .build();
 
         } catch (Exception e) {
@@ -190,9 +191,9 @@ public class ReadingResource {
             @QueryParam("end") String date2Str,
             @QueryParam("kindOfMeter") String meterStr
     ) {
-        IReading.KindOfMeter meter;
         LocalDate date1 = parseLocalDate(date1Str);
         LocalDate date2 = parseLocalDate(date2Str);
+
         if (date1Str != null && date1 == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("{\"status\":\"error\",\"message\":\"Start date format has to be YYYY-MM-DD!\"}")
@@ -207,24 +208,25 @@ public class ReadingResource {
             date2 = LocalDate.now();
         }
 
-        try {
-            if (meterStr == null) {
-                meter = IReading.KindOfMeter.UNBEKANNT;
-            } else {
-                meter = IReading.KindOfMeter.valueOf(meterStr.toUpperCase());
+        IReading.KindOfMeter meter = null;
+        if (meterStr != null) {
+            try {
+                meter = IReading.KindOfMeter.valueOf(meterStr.toUpperCase()); // Convert to Enum
+            } catch (IllegalArgumentException e) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"status\":\"error\",\"message\":\"Invalid meter type!\"}")
+                        .build();
             }
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"status\":\"error\",\"message\":\"Invalid kindOfMeter parameter. " +
-                            "Allowed values are: HEIZUNG, STROM, UNBEKANNT and WASSER\"}")
-                    .build();
         }
 
-        List<Reading> readings = readingDao.getAllReadings(meter);
+        List<Reading> readings = readingDao.getAllReadings();
         List<Reading> finalReadings = new ArrayList<>();
-        for (int i = 0; i < readings.size(); i++) {
-            Reading reading = readings.get(i);
-            if (!Objects.equals(reading.getCustomer().getId().toString(), customer) && customer != null) {
+
+        for (Reading reading : readings) {
+            if (customer != null && !Objects.equals(reading.getCustomer().getId().toString(), customer)) {
+                continue;
+            }
+            if (meter != null && reading.getKindOfMeter() != meter) { // Filter by kindOfMeter
                 continue;
             }
             if (validDate(date1, date2, reading.getDateOfReading())) {
@@ -233,12 +235,8 @@ public class ReadingResource {
         }
 
         try {
-            List<Customer> customers = customerDao.getAllCustomers();
-
-            // Einbetten der Kundenliste in ein JSON-Objekt mit dem Schlüssel "readings"
             Map<String, Object> response = new HashMap<>();
             response.put("readings", finalReadings);
-
             return Response.ok(response).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -247,6 +245,7 @@ public class ReadingResource {
                     .build();
         }
     }
+
 
     /**
      * Löscht eine Ablesung anhand ihrer eindeutigen UUID.
@@ -263,15 +262,7 @@ public class ReadingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response readingDelete(@PathParam("id") String uuid) {
         try {
-            Reading existingReading = findReadingByUuid(uuid);
-
-            if (existingReading == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"status\":\"error\",\"message\":\"Ablesung nicht gefunden\"}")
-                        .build();
-            }
-
-            readingDao.deleteReading(existingReading.getKindOfMeter(), uuid);
+            readingDao.deleteReading(uuid);
             return Response.status(Response.Status.OK).build();
 
         } catch (Exception e) {
@@ -313,23 +304,4 @@ public class ReadingResource {
      * @param uuid Die UUID der Ablesung.
      * @return Die gefundene Ablesung oder null, wenn keine Ablesung mit der UUID gefunden wurde.
      */
-    private Reading findReadingByUuid(String uuid) {
-        // Durchlaufe alle vorhandenen Zählertypen
-        for (IReading.KindOfMeter kind : IReading.KindOfMeter.values()) {
-            // Überspringe 'UNBEKANNT' falls gewünscht
-            if (kind == IReading.KindOfMeter.UNBEKANNT) continue;
-
-            try {
-                IReading reading = readingDao.getReadingById(kind, uuid);
-
-                if (reading instanceof Reading) {
-                    return (Reading) reading;
-                }
-            } catch (Exception e) {
-                // Logge Fehler, aber versuche nächsten Zählertyp
-                System.err.println("Fehler bei Suche in " + kind + ": " + e.getMessage());
-            }
-        }
-        return null; // Kein Treffer in allen Kategorien
-    }
 }
