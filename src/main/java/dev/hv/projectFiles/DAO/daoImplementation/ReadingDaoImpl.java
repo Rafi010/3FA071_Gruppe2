@@ -95,82 +95,34 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
 
     /**
      * Holt alle Messwerte einer bestimmten Zählerart aus der Datenbank.
-     * @param kindOfMeter die Art des Zählers
      * @return Liste mit Reading-Objekten
      */
     @Override
-    public List<Reading> getAllReadings(IReading.KindOfMeter kindOfMeter) {
+    public List<Reading> getAllReadings() {
         List<Reading> readings = new ArrayList<>();
 
-        if (kindOfMeter == IReading.KindOfMeter.UNBEKANNT) {
-            List<IReading.KindOfMeter> meterList = Arrays.asList(IReading.KindOfMeter.STROM, IReading.KindOfMeter.WASSER, IReading.KindOfMeter.HEIZUNG);
-            for (int i = 0; i < meterList.size(); i++) {
-                IReading.KindOfMeter currentMeter = meterList.get(i);
+        try {
+            String query = "SELECT * FROM ablesung";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
 
-                String zaehlerstandColumn = "";
-
-                switch (currentMeter) {
-                    case STROM -> zaehlerstandColumn = "zaehlerstand_in_kwh";
-                    case WASSER -> zaehlerstandColumn = "zaehlerstand_in_m3";
-                    case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
-                }
-                String meter = currentMeter.toString().toLowerCase();
-                try {
-                    String query = "SELECT * FROM " + meter;
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    ResultSet rs = stmt.executeQuery();
-
-                    while (rs.next()) {
-                        Reading reading = new Reading();
-                        reading.setId(UUID.fromString(rs.getString("uuid"))); // Kunden-ID
-                        reading.setComment(rs.getString("kommentar")); // Kommentar
-                        reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
-                        reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
-                        reading.setKindOfMeter(currentMeter); // Zählerart
-                        reading.setMeterCount(rs.getDouble(zaehlerstandColumn)); // Zählerstand
-                        reading.setMeterId(rs.getString("zaehlernummer")); // Zählernummer
-                        readings.add(reading); // Messwert zur Liste hinzufügen
-                    }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+            while (rs.next()) {
+                Reading reading = new Reading();
+                reading.setId(UUID.fromString(rs.getString("uuid"))); // Kunden-ID
+                reading.setComment(rs.getString("kommentar")); // Kommentar
+                reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
+                reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
+                reading.setKindOfMeter(IReading.KindOfMeter.valueOf(rs.getString("kindOfMeter"))); // Zählerart
+                reading.setMeterCount(rs.getDouble("zaehlerstand")); // Zählerstand
+                reading.setMeterId(rs.getString("zaehlernummer")); // Zählernummer
+                readings.add(reading); // Messwert zur Liste hinzufügen
             }
-            return readings;
-
-        } else {
-
-            String zaehlerstandColumn = "";
-            // Bestimmung der Spalte basierend auf der Zählerart
-            switch (kindOfMeter) {
-                case STROM -> zaehlerstandColumn = "zaehlerstand_in_kwh";
-                case WASSER -> zaehlerstandColumn = "zaehlerstand_in_m3";
-                case HEIZUNG -> zaehlerstandColumn = "zaehlerstand_in_mwh";
-            }
-
-
-            String meter = kindOfMeter.toString().toLowerCase();
-            try {
-                String query = "SELECT * FROM " + meter;
-                PreparedStatement stmt = connection.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    Reading reading = new Reading();
-                    reading.setId(UUID.fromString(rs.getString("uuid"))); // Kunden-ID
-                    reading.setComment(rs.getString("kommentar")); // Kommentar
-                    reading.setCustomer(customerDao.getCustomerById(rs.getString("kundenid"))); // Kundenobjekt abrufen
-                    reading.setDateOfReading(rs.getDate("datum").toLocalDate()); // Datum
-                    reading.setKindOfMeter(kindOfMeter); // Zählerart
-                    reading.setMeterCount(rs.getDouble(zaehlerstandColumn)); // Zählerstand
-                    reading.setMeterId(rs.getString("zaehlernummer")); // Zählernummer
-                    readings.add(reading); // Messwert zur Liste hinzufügen
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            return readings; // Liste mit Messwerten zurückgeben
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return readings;
     }
+
 
     /**
      * Aktualisiert einen bestehenden Messwert in der Datenbank.
