@@ -77,6 +77,10 @@ const ReadingPage = () => {
         sx={{
           bgcolor: 'background.paper'
         }}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 100 } },
+        }}
+        pageSizeOptions={[50, 100, { value: -1, label: 'All' }]}
       />
     </Box>
   );
