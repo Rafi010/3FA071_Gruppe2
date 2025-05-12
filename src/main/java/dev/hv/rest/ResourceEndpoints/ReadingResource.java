@@ -10,6 +10,7 @@ import dev.hv.projectFiles.DAO.entities.Reading;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -23,7 +24,7 @@ import java.util.*;
  */
 @Path("/readings")
 public class ReadingResource {
-
+    private List<Reading> readings;
     DatabaseConnection connection = DatabaseConnection.getInstance();
     CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
     ReadingDao<Reading> readingDao = new ReadingDaoImpl(connection.getConnection());
