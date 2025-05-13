@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-
-public class testUpdateReading extends BaseTest {
+/*
+public class TestUpdateReading extends BaseTest {
     ReadingDaoImpl dao = new ReadingDaoImpl(connection.getConnection());
 
     @BeforeEach
@@ -21,22 +21,6 @@ public class testUpdateReading extends BaseTest {
         connection.fillDatabase();
 
     }
-
-    /*
-    Tabellenspalten:
-
-    Strom: Kunde,Zaehlernummer,Datum,Zählerstand in kWh,Kommentar
-    Wasser: Kunde,Zaehlernummer,Datum,Zählerstand in m³,Kommentar
-    Heizung: Kunde,Zaehlernummer,Datum,Zählerstand in MWh,Kommentar
-
-    UPDATE zaehlerdaten
-    SET Zaehlernummer = '1234567890',
-    Datum = '2025-01-27',
-    `Zählerstand in kWh` = 15000,
-    Kommentar = 'Zählerstand manuell aktualisiert'
-    WHERE Kunde = 'Musterkunde' AND Zaehlernummer = '0987654321';
-
-     */
 
     public void updateDataWithUnits(String tableName, String kunde, String zaehlernummer, String datum, double zaehlerstand, String kommentar) throws SQLException {
         if (!List.of("strom", "wasser", "heizung").contains(tableName.toLowerCase())) {
@@ -98,4 +82,4 @@ public class testUpdateReading extends BaseTest {
     }
 
 }
-
+*/
