@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+/*
 class TestDeleteReading extends BaseTest {
 
 

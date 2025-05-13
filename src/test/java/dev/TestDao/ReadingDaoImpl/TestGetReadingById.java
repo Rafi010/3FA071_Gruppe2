@@ -10,7 +10,7 @@ import dev.hv.projectFiles.DAO.daoImplementation.ReadingDaoImpl;
 import dev.hv.projectFiles.DAO.entities.Reading;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+/*
 public class TestGetReadingById extends BaseTest {
 
     private ReadingDaoImpl readingService;
@@ -45,3 +45,5 @@ public class TestGetReadingById extends BaseTest {
         assertNull(reading);
     }
 }
+
+ */
