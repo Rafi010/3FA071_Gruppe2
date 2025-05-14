@@ -7,7 +7,7 @@ import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 
 @Provider
-public class    CORSFilter implements ContainerResponseFilter {
+public class CORSFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
@@ -15,5 +15,10 @@ public class    CORSFilter implements ContainerResponseFilter {
         responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         responseContext.getHeaders().add("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
+
+        // WICHTIG: Falls Preflight (OPTIONS), sofort OK senden
+        if ("OPTIONS".equalsIgnoreCase(requestContext.getMethod())) {
+            responseContext.setStatus(200); // Damit Browser nicht blockiert
+        }
     }
 }
