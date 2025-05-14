@@ -1,9 +1,9 @@
 // src/components/CustomToolbar.tsx
-
 import React from 'react';
 import { GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarExportContainer, GridCsvExportMenuItem, GridExportMenuItemProps, useGridApiContext } from "@mui/x-data-grid";
 import { Button, MenuItem } from "@mui/material";
-import { getJson, getXml, exportBlob } from '../utils/customExport';
+import { getJson, getXml, exportBlob } from '../utils/CustomExport';
+import { ExportStatus } from '../utils/ExportStatus'; // Importiere ExportStatus
 import ImportButton from './CustomImportButton';
 
 function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
@@ -13,12 +13,16 @@ function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
   return (
     <MenuItem
       onClick={() => {
-        const jsonString = getJson(apiRef);
-        const blob = new Blob([jsonString], {
-          type: 'text/json',
-        });
-        exportBlob(blob, 'DataGrid_export.json');
-        hideMenu?.();
+        try {
+          const jsonString = getJson(apiRef);
+          const blob = new Blob([jsonString], { type: 'text/json' });
+          exportBlob(blob, 'DataGrid_export.json');
+          ExportStatus.setSuccess(true); // Erfolgreicher Export
+        } catch (error) {
+          ExportStatus.setError('Export JSON failed');
+        } finally {
+          hideMenu?.();
+        }
       }}
     >
       Export JSON
@@ -33,12 +37,16 @@ function XmlExportMenuItem(props: GridExportMenuItemProps<{}>) {
   return (
     <MenuItem
       onClick={() => {
-        const xmlString = getXml(apiRef);
-        const blob = new Blob([xmlString], {
-          type: "application/xml",
-        });
-        exportBlob(blob, "DataGrid_export.xml");
-        hideMenu?.();
+        try {
+          const xmlString = getXml(apiRef);
+          const blob = new Blob([xmlString], { type: "application/xml" });
+          exportBlob(blob, "DataGrid_export.xml");
+          ExportStatus.setSuccess(true); // Erfolgreicher Export
+        } catch (error) {
+          ExportStatus.setError('Export XML failed');
+        } finally {
+          hideMenu?.();
+        }
       }}
     >
       Export XML
