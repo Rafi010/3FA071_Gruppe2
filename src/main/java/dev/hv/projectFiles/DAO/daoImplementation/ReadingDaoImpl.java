@@ -47,7 +47,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
 
         try {
             // SQL-Query für das Einfügen eines neuen Messwerts
-            String query = "INSERT INTO ablesung (uuid, kundenid, zaehlernummer, datum, zaehlerstand, kommentar) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO ablesung (uuid, kundenid, zaehlernummer, datum, zaehlerstand, kommentar, kindOfMeter) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getId().toString());
             stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
@@ -55,6 +55,7 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
             stmt.setDate(4, Date.valueOf(reading.getDateOfReading())); // Datum
             stmt.setDouble(5, reading.getMeterCount()); // Zählerstand
             stmt.setString(6, reading.getComment()); // Kommentar
+            stmt.setString(7, reading.getKindOfMeter().toString()); // Zählerart
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             System.out.println("Es wurden nicht alle erforderlichen Werte des Objekts erfüllt.\nEs wurde nicht in die Datenbank gespeichert.");
@@ -134,14 +135,15 @@ public class ReadingDaoImpl implements ReadingDao<Reading> {
         validateReading(reading);
         try{
             // SQL-Query für das Aktualisieren eines Messwerts
-            String query = "UPDATE ablesung SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, zaehlerstand = ? WHERE uuid = ?";
+            String query = "UPDATE ablesung SET kommentar = ?, kundenid = ?, datum = ?, zaehlernummer = ?, zaehlerstand = ?, kindOfMeter = ? WHERE uuid = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, reading.getComment()); // Kommentar
             stmt.setString(2, reading.getCustomer().getId().toString()); // Kunden-ID
             stmt.setDate(3, Date.valueOf(reading.getDateOfReading())); // Datum
             stmt.setString(4, reading.getMeterId()); // Zählernummer
             stmt.setDouble(5, reading.getMeterCount()); // Zählerstand
-            stmt.setString(6, reading.getId().toString());
+            stmt.setString(6, reading.getKindOfMeter().toString()); // Zählerart
+            stmt.setString(7, reading.getId().toString());
             stmt.executeUpdate(); // SQL ausführen
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException("Error with updating reading: " + e);

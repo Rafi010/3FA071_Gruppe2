@@ -80,21 +80,23 @@ public class ReadingResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response readingPut(@Valid Reading reading) {
         if (reading.getId() == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Ablesung-ID leer!")
+                    .build();
         }
         Reading existingReading = readingDao.getReadingById(reading.getId().toString());
         if (existingReading == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Ablesung mit angegebener ID nicht gefunden!")
+                    .build();
         } else {
             Customer customer = (Customer) reading.getCustomer();
             if (customer.getId() == null){ // Sollte Kunden ID nicht gegeben sein, wird Kunde aus der Ablesung genommen
                 customer = (Customer) existingReading.getCustomer();
             }
-            if (customerDao.getCustomerById(customer.getId().toString()) == null && (customer.getFirstName() == null
-                    || customer.getLastName() == null || customer.getGender() == null)) {
+            if (customerDao.getCustomerById(customer.getId().toString()) == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Kunde zu gegebener ID existiert nicht!\nID korrigieren oder zusätzlich 'firstName', " +
-                                "'lastName' und 'gender' des Kunden angeben, um einen neuen Kundeneintrag anzulegen.")
+                        .entity("Kunde zu gegebener ID existiert nicht!")
                         .build();
             } else {
                 try {
@@ -110,13 +112,13 @@ public class ReadingResource {
             String responseMessage = String.format("Ablesung erfolgreich aktualisiert - ID der Ablesung: %s, " +
                             "Datum der Ablesung: %s,\n      Art der Ablesung: %s, Zählerstand: %s, Zählernummer: %s, " +
                             "Ersatzzähler: %s, Kommentar: %s,\n      Kunde: %s %s mit ID: %s",
-                    existingReading.getId(),
-                    existingReading.getDateOfReading(),
-                    existingReading.getKindOfMeter(),
-                    existingReading.getMeterCount(),
-                    existingReading.getMeterId(),
-                    existingReading.getSubstitute() != null ? existingReading.getSubstitute() : "N/A",
-                    existingReading.getComment() != null ? existingReading.getComment() : "N/A",
+                    reading.getId(),
+                    reading.getDateOfReading(),
+                    reading.getKindOfMeter(),
+                    reading.getMeterCount(),
+                    reading.getMeterId(),
+                    reading.getSubstitute() != null ? existingReading.getSubstitute() : "N/A",
+                    reading.getComment() != null ? existingReading.getComment() : "N/A",
                     customer.getFirstName() != null ? customer.getFirstName() : "N/A",
                     customer.getLastName() != null ? customer.getLastName() : "N/A",
                     customer.getId() != null ? customer.getId().toString() : "N/A");
