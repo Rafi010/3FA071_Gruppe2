@@ -128,7 +128,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
                 // Geburtsdatum prüfen und setzen
                 Date birthDate = rs.getDate("geburtsdatum");
                 if (birthDate != null) {
-                    customer.setBirthDate(birthDate.toLocalDate()); //TODO JSON-Schema verlangt String, überprüfen
+                    customer.setBirthDate(birthDate.toLocalDate());
                 }
 
                 customers.add(customer); // Nutzer zur Liste hinzufügen
