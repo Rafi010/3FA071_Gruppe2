@@ -12,7 +12,7 @@ interface FilterParams {
 const fetchReadings = async ({ queryKey }: { queryKey: [string, FilterParams] }) => {
   const [, { kindOfMeter, start, end, customer }] = queryKey;
 
-  let url = 'http://localhost:8080/readings?';
+  let url = 'http://localhost:8080/readings';
   const params = new URLSearchParams();
 
   // Append parameters conditionally if they exist
@@ -21,7 +21,10 @@ const fetchReadings = async ({ queryKey }: { queryKey: [string, FilterParams] })
   if (end) params.append('end', end);
   if (customer) params.append('customer', customer);
 
-  url += params.toString();
+  const paramString = params.toString();
+  if (paramString) {
+  url += '?' + paramString;
+  }
 
   const response = await fetch(url);
   if (!response.ok) throw new Error('Fehler beim Laden der Daten');
