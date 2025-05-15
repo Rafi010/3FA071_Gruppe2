@@ -165,16 +165,12 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
             deleteStmt.setString(1, id);
             deleteStmt.executeUpdate();
 
-            // Liste der Ablesungstabellen
-            String[] tables = {"heizung", "strom", "wasser"};
 
-            // Update-Abfragen für jede Tabelle
-            for (String table : tables) {
-                String updateQuery = "UPDATE " + table + " SET kundenid = NULL WHERE kundenid = ?";
-                PreparedStatement updateStmt = connection.prepareStatement(updateQuery);
-                updateStmt.setString(1, id);
-                updateStmt.executeUpdate();
-            }
+            String deleteReadingsQuery = "DELETE FROM ablesung WHERE kundenid = ?";
+            PreparedStatement deleteRStmt = connection.prepareStatement(deleteReadingsQuery);
+            deleteRStmt.setString(1, id);
+            deleteRStmt.executeUpdate();
+
 
             // Transaktion erfolgreich abschließen
             connection.commit();
