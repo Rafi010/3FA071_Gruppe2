@@ -22,7 +22,8 @@ public class Server {
             // Konfiguration der verfügbaren Ressourcen-Endpunkte
             ResourceConfig resourceConfig = new ResourceConfig()
                     .packages("dev.hv.rest.ResourceEndpoints")
-                    .register(JacksonFeature.class);
+                    .register(JacksonFeature.class)
+                    .register(CORSFilter.class);
 
             // Initialisiert und startet den Grizzly HTTP-Server
             server = GrizzlyHttpServerFactory.createHttpServer(URI.create(url), resourceConfig);

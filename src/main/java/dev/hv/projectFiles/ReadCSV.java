@@ -12,11 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Diese Klasse liest CSV-Dateien ein und erstellt daraus SQL-kompatible Ausgaben.
+ * Sie unterstützt verschiedene Typen von CSV-Dateien (Heizung, Strom, Wasser) und
+ * generiert für jede Datei eine entsprechende SQL-Datei.
+ */
 public class ReadCSV {
 
     private static final Logger log = LoggerFactory.getLogger(ReadCSV.class);
 
-    // main-Methode ist nicht notwendig, aber für Testzwecke eingebaut
+    /**
+     * Hauptmethode zum Testen der CSV-Verarbeitung.
+     * Diese Methode ist nicht notwendig für den Produktiveinsatz.
+     *
+     * @param args Kommandozeilenargumente (werden hier nicht verwendet)
+     */
     public static void main(String[] args) {
         String csvFile = "src\\main\\resources\\heizung.csv";
         readFlexibleCSV(csvFile, 0);
@@ -26,7 +36,12 @@ public class ReadCSV {
         readFlexibleCSV(csvFile, 2);
     }
 
-    // CSV-Dateien lesen und schreiben, Parameter: Pfad zur CSV-Datei (Beispiel in der main-Methode) und Integer für Heizung (0), Strom (1), Wasser (2)
+    /**
+     * Liest eine CSV-Datei und erstellt eine SQL-kompatible Ausgabe.
+     *
+     * @param csvFile Pfad zur CSV-Datei
+     * @param type    Typ der CSV-Datei (0 für Heizung, 1 für Strom, 2 für Wasser)
+     */
     public static void readFlexibleCSV(String csvFile, int type) {
         try {
             // CSVParser erstellen
@@ -112,6 +127,7 @@ public class ReadCSV {
                 }
             }
 
+            // SQL-Datei schreiben, abhängig vom Typ
             switch (type) {
                 case 0:
                     writeCSV("src\\main\\resources\\heizung_sql.csv", sqlList);
@@ -131,7 +147,12 @@ public class ReadCSV {
         }
     }
 
-
+    /**
+     * Schreibt eine Liste von SQL-Befehlen in eine CSV-Datei.
+     *
+     * @param outputFile Pfad zur Ausgabedatei
+     * @param sqlList    Liste der SQL-Befehle
+     */
     public static void writeCSV(String outputFile, List<String> sqlList) {
         try (CSVWriter writer = (CSVWriter) new CSVWriterBuilder(new FileWriter(outputFile))
                 .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)  // Keine Anführungszeichen um die Felder

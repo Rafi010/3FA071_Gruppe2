@@ -27,37 +27,40 @@ SET
 ;
 --Importieren der CSV-Datei in die Tabelle "heizung"
 LOAD DATA LOCAL INFILE 'src/main/resources/heizung_sql.csv'
-INTO TABLE heizung
+INTO TABLE ablesung
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(uuid, kundenid, zaehlernummer, @datum, zaehlerstand_in_mwh, kommentar)
+(uuid, kundenid, zaehlernummer, @datum, zaehlerstand, kommentar)
 --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
-SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
+SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y')),
+kindOfMeter = 'HEIZUNG'
 ;
 --Importieren der CSV-Datei in dei Tabelle "wasser"
 LOAD DATA LOCAL INFILE 'src/main/resources/wasser_sql.csv'
-INTO TABLE wasser
+INTO TABLE ablesung
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(uuid, kundenid, zaehlernummer, @datum, zaehlerstand_in_m3, kommentar)
+(uuid, kundenid, zaehlernummer, @datum, zaehlerstand, kommentar)
 --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
-SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
+SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y')),
+kindOfMeter = 'WASSER'
 ;
 --Importieren der CSV-Datei in die Tabelle "strom"
 LOAD DATA LOCAL INFILE 'src/main/resources/strom_sql.csv'
-INTO TABLE strom
+INTO TABLE ablesung
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(uuid, kundenid, zaehlernummer, @datum, zaehlerstand_in_kwh, kommentar)
+(uuid, kundenid, zaehlernummer, @datum, zaehlerstand, kommentar)
 --Setzt die Variable "datum" auf NULL, wenn der Wert von "@datum" leer ist; andernfalls wird "@datum" in ein Datum im Format 'DD-MM-YYYY' umgewandelt.
-SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y'))
+SET datum = IF(@datum COLLATE utf8mb4_general_ci = '', NULL, STR_TO_DATE(@datum, '%d.%m.%Y')),
+kindOfMeter = 'STROM'
 ;

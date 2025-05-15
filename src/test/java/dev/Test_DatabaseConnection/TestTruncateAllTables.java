@@ -23,7 +23,7 @@ public class TestTruncateAllTables extends BaseTest {
     @Test
     public void TestTruncateAllTables() {
         Connection conn = connection.getConnection();
-        String[] expectedTables = {"heizung", "strom", "wasser", "kunde"};
+        String[] expectedTables = {"ablesung", "kunde"};
         for (String table : expectedTables) {
             String query = "SELECT COUNT(*) FROM " + table;
             try (PreparedStatement stmt = conn.prepareStatement(query);

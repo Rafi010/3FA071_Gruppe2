@@ -2,6 +2,7 @@ package dev.hv.rest.ResourceEndpoints;
 
 import dev.hv.model.ICustomer;
 import dev.hv.projectFiles.DAO.daoImplementation.CustomerDaoImpl;
+import dev.hv.projectFiles.DAO.daoInterfaces.CustomerDao;
 import dev.hv.projectFiles.DAO.entities.Customer;
 import dev.hv.projectFiles.DatabaseConnection;
 import jakarta.validation.Valid;
@@ -9,30 +10,39 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Path("/customers")
 public class CustomerResource {
 
     DatabaseConnection connection = DatabaseConnection.getInstance();
-    CustomerDaoImpl customerDao = new CustomerDaoImpl(connection.getConnection());
+    CustomerDao<Customer> customerDao = new CustomerDaoImpl(connection.getConnection());
 
     /**
      * Ruft alle Kunden aus der Datenbank ab.
      *
      * @return Eine HTTP-Antwort mit der Liste aller Kunden im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *         200 (OK) - Wenn die Abfrage erfolgreich war.
-     *         500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn die Abfrage erfolgreich war.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response customerGetAll() {
-        List<Customer> customers = customerDao.getAllCustomers();
-        return Response.status(Response.Status.OK)
-                .entity(customers)
-                .build();
+    public Response getAllCustomers() {
+        try {
+            List<Customer> customers = customerDao.getAllCustomers();
+
+            // Einbetten der Kundenliste in ein JSON-Objekt mit dem Schlüssel "customers"
+            Map<String, Object> response = new HashMap<>();
+            response.put("customers", customers);
+
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Ein interner Serverfehler ist aufgetreten\"}")
+                    .build();
+        }
     }
 
     /**
@@ -41,9 +51,9 @@ public class CustomerResource {
      * @param uuid Die eindeutige Identifikationsnummer des Kunden.
      * @return Eine HTTP-Antwort mit den Kundendetails im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *         200 (OK) - Wenn der Kunde gefunden wurde.
-     *         404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
-     *         500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn der Kunde gefunden wurde.
+     *                                 404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @GET
     @Path("/{id}")
@@ -55,7 +65,7 @@ public class CustomerResource {
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"status\":\"error\",\"message\":\"Fehler: Kunde nicht gefunden\"}")
+                        .entity("{\"status\":\"error\",\"message\":\"Kunde nicht gefunden\"}")
                         .build();
             }
 
@@ -124,8 +134,7 @@ public class CustomerResource {
     /**
      * Aktualisiert die Informationen eines bestehenden Kunden.
      *
-     * @param uuid     Die eindeutige Identifikationsnummer des zu aktualisierenden Kunden.
-     * @param customer Das Kundenobjekt mit den aktualisierten Informationen.
+     * @param customer Das Kundenobjekt mit der ID und den aktualisierten Informationen.
      * @return Eine HTTP-Antwort mit einer Bestätigungsnachricht als Plain Text.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
      *                                 200 (OK) - Kunde erfolgreich aktualisiert
@@ -134,18 +143,18 @@ public class CustomerResource {
      *                                 500 (Internal Server Error) - Fehler bei der Aktualisierung
      */
     @PUT
-    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response customerPut(@PathParam("id") String uuid, @Valid Customer customer) {
+    public Response customerPut(@Valid Customer customer) {
         try {
-            if (customer == null) {
+            if (customer == null || customer.getId() == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Fehler Kundenobjekt fehlt oder ist ungültig.")
+                        .entity("Fehler: Kundenobjekt fehlt oder ID ist ungültig.")
                         .build();
             }
-            // Abrufen des existierenden Benutzers
-            Customer existingCustomer = findCustomerByUuid(uuid);
+
+            // Abrufen des existierenden Benutzers anhand der ID aus dem JSON-Body
+            Customer existingCustomer = findCustomerByUuid(customer.getId().toString());
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -157,7 +166,9 @@ public class CustomerResource {
             existingCustomer.setFirstName(customer.getFirstName());
             existingCustomer.setLastName(customer.getLastName());
             existingCustomer.setGender(customer.getGender());
-            existingCustomer.setBirthDate(customer.getBirthDate());
+            if (customer.getBirthDate() != null) {
+                existingCustomer.setBirthDate(customer.getBirthDate());
+            }
 
             // Aktualisieren des Benutzers in der Datenbank
             updateCustomer(existingCustomer);
@@ -209,9 +220,9 @@ public class CustomerResource {
      * @param uuid Die eindeutige Identifikationsnummer des zu löschenden Kunden.
      * @return Eine HTTP-Antwort mit einer Bestätigungsnachricht im JSON-Format.
      * @throws WebApplicationException mit folgenden möglichen Status-Codes:
-     *         200 (OK) - Wenn der Kunde erfolgreich gelöscht wurde.
-     *         404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
-     *         500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
+     *                                 200 (OK) - Wenn der Kunde erfolgreich gelöscht wurde.
+     *                                 404 (Not Found) - Wenn kein Kunde mit der angegebenen UUID existiert.
+     *                                 500 (Internal Server Error) - Bei unerwarteten Fehlern während der Verarbeitung.
      */
     @DELETE
     @Path("/{id}")
@@ -223,7 +234,7 @@ public class CustomerResource {
 
             if (existingCustomer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"status\":\"error\",\"message\":\"Fehler: Kunde nicht gefunden\"}")
+                        .entity("{\"status\":\"error\",\"message\":\"Kunde nicht gefunden\"}")
                         .build();
             }
             customerDao.deleteCustomer(uuid);

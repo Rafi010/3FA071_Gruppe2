@@ -128,7 +128,7 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
                 // Geburtsdatum prüfen und setzen
                 Date birthDate = rs.getDate("geburtsdatum");
                 if (birthDate != null) {
-                    customer.setBirthDate(birthDate.toLocalDate()); //TODO JSON-Schema verlangt String, überprüfen
+                    customer.setBirthDate(birthDate.toLocalDate());
                 }
 
                 customers.add(customer); // Nutzer zur Liste hinzufügen
@@ -165,16 +165,12 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
             deleteStmt.setString(1, id);
             deleteStmt.executeUpdate();
 
-            // Liste der Ablesungstabellen
-            String[] tables = {"heizung", "strom", "wasser"};
 
-            // Update-Abfragen für jede Tabelle
-            for (String table : tables) {
-                String updateQuery = "UPDATE " + table + " SET kundenid = NULL WHERE kundenid = ?";
-                PreparedStatement updateStmt = connection.prepareStatement(updateQuery);
-                updateStmt.setString(1, id);
-                updateStmt.executeUpdate();
-            }
+            String deleteReadingsQuery = "DELETE FROM ablesung WHERE kundenid = ?";
+            PreparedStatement deleteRStmt = connection.prepareStatement(deleteReadingsQuery);
+            deleteRStmt.setString(1, id);
+            deleteRStmt.executeUpdate();
+
 
             // Transaktion erfolgreich abschließen
             connection.commit();
@@ -206,24 +202,34 @@ public class CustomerDaoImpl implements CustomerDao<Customer> {
     public void updateCustomer(Customer customer) {
         validateCustomer(customer);
 
-        // Konvertieren des Geburtsdatums in das SQL-Format
-        LocalDate birthDate = customer.getBirthDate();
-        Date sqlDate = Date.valueOf(birthDate);
-
         try {
             // SQL-Query zum Aktualisieren eines Nutzers
-            String query = "UPDATE kunde SET anrede = ?, vorname = ?, nachname = ?, geburtsdatum = ? WHERE uuid = ?";
-            PreparedStatement stmt = connection.prepareStatement(query); // PreparedStatement erstellen
+            String query = "UPDATE kunde SET anrede = ?, vorname = ?, nachname = ?";
+            // Optionales Hinzufügen des Geburtsdatums, falls es nicht null ist
+            if (customer.getBirthDate() != null) {
+                query += ", geburtsdatum = ?";
+            }
+            query += " WHERE uuid = ?";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, customer.getGender().toString()); // Anrede
             stmt.setString(2, customer.getFirstName()); // Vorname
             stmt.setString(3, customer.getLastName()); // Nachname
-            stmt.setDate(4, sqlDate); // Geburtsdatum
-            stmt.setString(5, customer.getId().toString()); // UUID
+
+            int parameterIndex = 4; // Startindex für den optionalen Parameter
+            if (customer.getBirthDate() != null) {
+                // Konvertieren des Geburtsdatums in das SQL-Format
+                Date sqlDate = Date.valueOf(customer.getBirthDate());
+                stmt.setDate(parameterIndex++, sqlDate); // Geburtsdatum
+            }
+
+            stmt.setString(parameterIndex, customer.getId().toString()); // UUID
             stmt.executeUpdate(); // Query ausführen
         } catch (SQLException e) {
             throw new RuntimeException(e); // Fehlerausgabe im Fehlerfall
         }
     }
+
 
     /**
      * Validiert einen Customer auf seine richtigkeit.

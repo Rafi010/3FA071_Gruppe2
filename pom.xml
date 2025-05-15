@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.hv</groupId>
@@ -23,67 +23,82 @@
 	</properties>
 
 	<dependencies>
-    <dependency>
-      <groupId>org.mybatis</groupId>
-      <artifactId>mybatis</artifactId>
-      <version>3.5.6</version>
-    </dependency>
-
+		<!-- Jersey REST (JAX-RS with Grizzly + Servlet + JSON + DI) -->
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
-			<version>4.0.0-M1</version>
+			<version>3.1.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
-			<version>4.0.0-M1</version>
+			<version>3.1.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-grizzly2-http</artifactId>
-			<version>4.0.0-M1</version>
+			<version>3.1.5</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.glassfish.jersey.archetypes</groupId>
-			<artifactId>jersey-quickstart-grizzly2</artifactId>
-			<version>4.0.0-M1</version>
-		</dependency>
-
-		<!-- Jersey Core -->
-		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-common</artifactId>
-			<version>4.0.0-M1</version> <!-- Use the latest version -->
-		</dependency>
-
-
-		<!-- Jersey HK2 Dependency Injection -->
 		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
-			<version>4.0.0-M1</version>
+			<version>3.1.5</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>4.0.0-M1</version>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>3.1.5</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<version>4.0.0-M1</version>
+			<groupId>org.glassfish.jersey.ext</groupId>
+			<artifactId>jersey-bean-validation</artifactId>
+			<version>3.1.5</version>
+		</dependency>
+
+		<!-- Jersey Core Server (includes ResourceConfig) -->
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-common</artifactId>
+			<version>3.1.5</version>
+		</dependency>
+
+		<!-- MyBatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.5.6</version>
+		</dependency>
+
+		<!-- Database Drivers -->
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>3.4.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.18.2</version> <!-- Ensure this matches your Jackson version -->
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.2.220</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JSON: Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.18.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.18.2</version> <!-- oder gleiche Version wie jackson-databind -->
 		</dependency>
 
 		<dependency>
@@ -93,119 +108,109 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.18.2</version>
 		</dependency>
 
+		<!-- JAXB for XML/JSON bindings -->
 		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>4.0.0-M1</version>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>4.0.3</version>
 		</dependency>
 
+		<!-- Validation -->
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>8.0.2.Final</version>
 		</dependency>
 
-
-		<dependency>
-			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-bean-validation</artifactId>
-			<version>4.0.0-M1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>7.0.1.Final</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.glassfish</groupId>
-			<artifactId>javax.el</artifactId>
-			<version>3.0.0</version>
+			<artifactId>jakarta.el</artifactId>
+			<version>4.0.2</version>
 		</dependency>
 
+		<!-- Env Variables -->
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>dotenv-java</artifactId>
 			<version>3.0.0</version>
 		</dependency>
 
+		<!-- CSV -->
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>5.9</version>
 		</dependency>
 
-		<dependency>
-		  <groupId>org.slf4j</groupId>
-		  <artifactId>slf4j-simple</artifactId>
-		  <version>2.0.7</version>
-		  <scope>test</scope>
-		</dependency>
-
-		<dependency>
-		 	<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.10.0</version>
-			<scope>test</scope>
-		</dependency>
-
+		<!-- Table Formatter -->
 		<dependency>
 			<groupId>org.nocrala.tools.texttablefmt</groupId>
 			<artifactId>text-table-formatter</artifactId>
 			<version>1.2.4</version>
 		</dependency>
 
+		<!-- Logging (Test) -->
 		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-			<version>${mariadb.version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>2.0.7</version>
+			<scope>test</scope>
 		</dependency>
 
-		<!--  JUNIT    -->
+		<!-- JUnit 5 -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.10.3</version>
 			<scope>test</scope>
-			<version>${junit-jupiter.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.10.3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Mockito -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>4.11.0</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>RELEASE</version>
-			<scope>compile</scope>
-		</dependency>
+
+		<!-- PowerMock for Mockito 2 -->
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito2</artifactId>
 			<version>2.0.9</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- TestNG (if still needed) -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>2.2.220</version>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>7.8.0</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Jackson JAX-RS (for Jersey integration) -->
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.10.3</version>
-			<scope>compile</scope>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>2.18.2</version>
 		</dependency>
 
+
 	</dependencies>
+
 
 	<build>
 		<defaultGoal>clean compile install</defaultGoal>
@@ -213,8 +218,8 @@
 		<plugins>
 
 			<!--
-				create folder: run with   
-				mvn antrun:run@createFolder 
+				create folder: run with
+				mvn antrun:run@createFolder
 			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -235,6 +240,19 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>dev.hv.projectFiles.Start</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -247,6 +265,31 @@
 						<testExclude>**/*Test.java</testExclude>
 					</testExcludes> -->
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.6.0</version>
+				<configuration>
+					<!-- put your configurations here -->
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+
+							<!-- This preserves META-INF/services entries for Jersey, Jackson, etc. -->
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
