@@ -80,7 +80,7 @@ public class ReadingResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response readingPut(@Valid Reading reading) {
         if (reading.getId() == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
         Reading existingReading = readingDao.getReadingById(reading.getId().toString());
         if (existingReading == null) {
@@ -90,19 +90,12 @@ public class ReadingResource {
             if (customer.getId() == null){ // Sollte Kunden ID nicht gegeben sein, wird Kunde aus der Ablesung genommen
                 customer = (Customer) existingReading.getCustomer();
             }
-            //Kunde zur DB hinzufügen, wenn nicht vorhanden, sonst wird der Kunde der Ablesung geändert
-            //es werden aber keine Kundenänderungen übernommen, falls andere Namen oder Gender eingegeben werden!
             if (customerDao.getCustomerById(customer.getId().toString()) == null && (customer.getFirstName() == null
                     || customer.getLastName() == null || customer.getGender() == null)) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Kunde zu gegebener ID existiert nicht!\nID korrigieren oder zusätzlich 'firstName', " +
                                 "'lastName' und 'gender' des Kunden angeben, um einen neuen Kundeneintrag anzulegen.")
                         .build();
-            } else if (customerDao.getCustomerById(customer.getId().toString()) == null
-                    && customer.getFirstName() != null
-                    && customer.getLastName() != null
-                    && customer.getGender() != null) {
-                customerDao.addCustomer(customer);
             } else {
                 try {
                     customer = (Customer) customerDao.getCustomerById(customer.getId().toString());
