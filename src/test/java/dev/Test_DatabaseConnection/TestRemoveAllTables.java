@@ -23,7 +23,7 @@ public class TestRemoveAllTables extends BaseTest {
     @Test
     public void TestRemoveAllTables() {
         Connection conn = connection.getConnection();
-        String[] expectedTables = {"heizung", "strom", "wasser", "kunde"};
+        String[] expectedTables = {"ablesung", "kunde"};
         try {
             for (int i = 0; i < expectedTables.length; i++) {
                 String query = "SELECT * FROM " + expectedTables[i];

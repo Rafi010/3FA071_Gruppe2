@@ -36,9 +36,7 @@ class TestCreateAllTables extends BaseTest {
         connection.createAllTables();
 
         try {
-            assertTrue(doesTableExist(conn, "heizung"));
-            assertTrue(doesTableExist(conn, "wasser"));
-            assertTrue(doesTableExist(conn, "strom"));
+            assertTrue(doesTableExist(conn, "ablesung"));
             assertTrue(doesTableExist(conn, "kunde"));
         } catch (SQLException e) {
             fail("SQLException occurred while checking if tables exist: " + e.getMessage());
