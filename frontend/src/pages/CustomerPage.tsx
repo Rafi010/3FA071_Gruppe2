@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-import { useGetData } from "../hooks/data";
-import { red } from "@mui/material/colors";
-import { CustomToolbar } from "../components/CustomToolbar";
-import { read } from "node:fs";
 import { useGetCustomers } from "../hooks/useGetCustomers";
 import Skeleton from '@mui/material/Skeleton';
 import { createCustomer, deleteCustomer, updateCustomer } from "../api/customers";
@@ -30,136 +26,90 @@ import {
   GridSlotProps
 } from '@mui/x-data-grid';  
 import { Snackbar, Alert } from "@mui/material";
+import { CrudDataGrid } from "../components/CrudDataGrid";
 
 export enum DataType {
   Customers = 'customers',
   Readings = 'readings',
 }
 
+type PersonForGrid = Omit<Person, 'birthDate'> & { birthDate: Date | null };
+
 const CustomerPage = () => {
   const { customerData, loading } = useGetCustomers();
-
-  const [rows, setRows] = React.useState<Person[]>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+  const [rows, setRows] = useState<PersonForGrid[]>([]);
 
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
+  
   React.useEffect(() => {
-    if (customerData.length > 0) {
-      setRows(customerData);
-    }
-  }, [customerData]);
+  // Convert birthDate array to Date object for editing in grid
+  const normalizedRows = customerData.map((c) => ({
+    ...c,
+    birthDate: Array.isArray(c.birthDate) 
+      ? new Date(c.birthDate[0], c.birthDate[1] - 1, c.birthDate[2])
+      : c.birthDate ? new Date(c.birthDate) : null,
+  }));
+  setRows(normalizedRows);
+}, [customerData]);
 
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
-  };
-
-  const handleAddCustomer = () => {
+  const addCustomer = (): string => {
     const id = uuidv4();
-    
-    const newCustomer:Person = {
+    const newCustomer: PersonForGrid = {
       id,
       firstName: '',
       lastName: '',
       gender: '',
-      birthDate: [Date.now()],
+      birthDate: null,
       isNew: true,
     };
-
-    setRows((prevRows) => [newCustomer, ...prevRows]);
-
-    setRowModesModel((prevModel: GridRowModesModel) => ({
-      ...prevModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'firstName' },
-    }));
-  }
-
-  const handleEditClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-  };
-
-  const handleSaveClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View },
-    });
-  };
-
-  const removeIsNewFlag = (customer: Person) => {
-    const { isNew, ...customerWithoutIsNew } = customer;
-    return customerWithoutIsNew;
-  };
-
-  const processRowUpdate = async (newRow: Person) => {
-    const { isNew, ...rest } = newRow;
   
-    let sanitizedBirthDate = null;
-    const rawDate = newRow.birthDate;
+    setRows((prev) => [newCustomer, ...prev]);
+    return id;
+  };
   
-    if (Array.isArray(rawDate)) {
-      sanitizedBirthDate = rawDate;
-    } else {
-      const date = new Date(rawDate as any); // cast safely
-      if (!isNaN(date.getTime())) {
-        sanitizedBirthDate = [
-          date.getFullYear(),
-          date.getMonth() + 1,
-          date.getDate(),
-        ];
-      }
-    }
   
-    const customerToSend = {
-      ...rest,
-      birthDate: sanitizedBirthDate,
+  const saveCustomer = async (row: PersonForGrid): Promise<PersonForGrid> => {
+    const { isNew, birthDate, ...data } = row;
+  
+    const birthDateArray = birthDate instanceof Date
+      ? [birthDate.getFullYear(), birthDate.getMonth() + 1, birthDate.getDate()]
+      : null;
+  
+    const sanitized: Person = {
+      ...data,
+      birthDate: birthDateArray,
     };
   
-    try {
-      let savedCustomer: Person;
-      if (isNew) {
-        savedCustomer = await createCustomer(customerToSend);
-      } else {
-        savedCustomer = await updateCustomer(customerToSend);
-      }
+    const saved = isNew
+      ? await createCustomer(sanitized)
+      : await updateCustomer(sanitized);
   
-      setRows(rows.map((row) => (row.id === newRow.id ? savedCustomer : row)));
-      return savedCustomer;
-    } catch (error: any) {
-      setErrorMessage(error.message || 'Unbekannter Fehler');
-      setErrorOpen(true);
-      throw error;
-    }
+    // Convert backend response (with birthDate as number[]) back to PersonForGrid
+    return {
+      ...saved,
+      birthDate: Array.isArray(saved.birthDate)
+        ? new Date(saved.birthDate[0], saved.birthDate[1] - 1, saved.birthDate[2])
+        : saved.birthDate
+          ? new Date(saved.birthDate)
+          : null,
+    };
   };
 
-  const handleDeleteClick = (id: GridRowId) => () => {
-    let response = deleteCustomer(id.toString())
-    setRows(rows.filter((row) => row.id !== id));
+  const removeCustomer = (id: GridRowId): void => {
+    deleteCustomer(id.toString())
+      .then(() => {
+        setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      })
+      .catch((error) => {
+        setErrorMessage('Failed to delete customer');
+        setErrorOpen(true);
+        console.error(error);
+      });
   };
 
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    });
-  };
-
-  const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-    setRowModesModel(newRowModesModel);
-  };
-
-  const handleRowUpdateError = (error: any) => {
-    console.error('Update-Fehler:', error);
-    setErrorMessage(error.message || 'Unbekannter Fehler beim Aktualisieren.');
-    setErrorOpen(true);
-  };
-
-
-
-
-  const customersColumns: GridColDef[] = [
+  const customerColumns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 400 },
     { field: "firstName", headerName: "First Name", width: 200, editable: true },
     { field: "lastName", headerName: "Last Name", width: 200, editable: true },
@@ -182,49 +132,6 @@ const CustomerPage = () => {
         }
     
         return null;
-      }
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      cellClassName: 'actions',
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label="Save"
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label="Cancel"
-              className="textPrimary"
-              onClick={handleCancelClick(id)}
-              color="inherit"
-            />,
-          ];
-        }
-    
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id)}
-            color="inherit"
-          />,
-        ];
       }
     }
   ];
@@ -254,21 +161,14 @@ const CustomerPage = () => {
       {errorMessage}
     </Alert>
   </Snackbar>
-      <DataGrid
-        rows={rows}
-        columns={customersColumns}
-        slots={{ toolbar: () => <CustomToolbar onAddClick={handleAddCustomer} /> }}
-        editMode="row"
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
-        onProcessRowUpdateError={handleRowUpdateError}
-        disableRowSelectionOnClick
-        sx={{
-          bgcolor: 'background.paper'
-        }}
-      />
+      <CrudDataGrid<PersonForGrid>
+            rows={rows}
+            setRows={setRows}
+            columns={customerColumns} // defined same way as before
+            onAdd={addCustomer}
+            onSave={saveCustomer}
+            onDelete={removeCustomer}
+        />
     </Box>
   );
 };

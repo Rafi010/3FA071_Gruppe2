@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
-import { useGetData } from "../hooks/data"; // Import the custom hook
-import { useGetReadings } from "../hooks/useGetReadings";
+import { useGetReadings } from "../hooks/readingHooks";
 import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { WidthNormal } from "@mui/icons-material";
+import { Reading } from "../types/Reading";
 
-// Define the type for each reading item
-interface Reading {
-  customerID: string;
-  id: string;
-  kindOfMeter: string;
-  dateOfReading: number[]; // Format: [year, month, day]
-  meterCount: number;
-  comment: string;
-}
 
 // Function to group data by month and calculate averages
 const processData = (readingsData: Reading[]) => {
@@ -57,7 +48,7 @@ const ChartPage: React.FC = () => {
     }));
   };
 
-  const { readingsData, loading } = useGetReadings(filters);
+  const { data: readingsData = [], isLoading: loading } = useGetReadings();
   const { dates, meterCounts } = processData(readingsData);
 
   const [meter, setMeter
