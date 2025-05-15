@@ -54,7 +54,7 @@ const ReadingPage: React.FC = () => {
 
   // Save reading to backend (create or update) and return normalized row for grid
   const saveReading = async (row: ReadingForGrid): Promise<ReadingForGrid> => {
-    const { isNew, dateOfReading, ...data } = row;
+    const { isNew, dateOfReading} = row;
     const dateArray = dateOfReading instanceof Date
       ? [dateOfReading.getFullYear(), dateOfReading.getMonth() + 1, dateOfReading.getDate()]
       : [1970, 1, 1];
@@ -121,8 +121,11 @@ const ReadingPage: React.FC = () => {
       valueGetter: (value, row) => row.customer?.id || "",
       valueSetter: (value, row) => {
         return {
-          row,
-          customer: { ...(row.customer ?? {}), id: value },
+          ...row,
+          customer: {
+            ...(row.customer ?? {}),
+            id: value,
+          },
         };
       },    
     },

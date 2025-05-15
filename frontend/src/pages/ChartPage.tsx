@@ -1,87 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useGetReadings } from "../hooks/readingHooks";
-import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { WidthNormal } from "@mui/icons-material";
+import {
+  Autocomplete,
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Reading } from "../types/Reading";
 
-
-// Function to group data by month and calculate averages
-const processData = (readingsData: Reading[]) => {
-  const monthlyData: Record<string, { sum: number; count: number }> = {};
-
-  readingsData.forEach((item) => {
-    const [year, month] = item.dateOfReading; // Extract year & month
-    const monthKey = `${year}-${String(month).padStart(2, "0")}`; // Format: YYYY-MM
-
-    if (!monthlyData[monthKey]) {
-      monthlyData[monthKey] = { sum: 0, count: 0 };
-    }
-
-    monthlyData[monthKey].sum += item.meterCount;
-    monthlyData[monthKey].count += 1;
-  });
-
-  // Convert the aggregated data to arrays
-  const dates = Object.keys(monthlyData).sort(); // Sorted months (YYYY-MM)
-  const meterCounts = dates.map(
-    (date) => monthlyData[date].sum / monthlyData[date].count // Calculate average
-  );
-
-  return { dates, meterCounts };
+const formatDate = (dateArray: number[]) => {
+  const [year, month, day] = dateArray;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 };
 
-// ChartComponent that fetches data from useGetData hook
 const ChartPage: React.FC = () => {
-  // Get the data from the custom hook
-  const [filters, setFilters] = useState({
-    kindOfMeter: 'STROM',
-    start: '',
-    end: '',
-    customer: '',
-  });
+  const [meter, setMeter] = useState<"STROM" | "WASSER" | "HEIZUNG">("STROM");
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const { data: readingsData = [], isLoading } = useGetReadings();
 
-  const updateFilter = (key: keyof typeof filters, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value, // Nur das angegebene Feld ändern
-    }));
+  const handleMeterChange = (event: SelectChangeEvent) => {
+    setMeter(event.target.value as "STROM" | "WASSER" | "HEIZUNG");
   };
 
-  const { data: readingsData = [], isLoading: loading } = useGetReadings();
-  const { dates, meterCounts } = processData(readingsData);
+  const uniqueCustomers = useMemo(() => {
+    const seen = new Map<string, { id: string; label: string }>();
+    readingsData.forEach((r) => {
+      if (r.customer?.id && !seen.has(r.customer.id)) {
+        seen.set(r.customer.id, {
+          id: r.customer.id,
+          label: `(${r.customer.id})`,
+        });
+      }
+    });
+    return Array.from(seen.values());
+  }, [readingsData]);
 
-  const [meter, setMeter
-  ] = React.useState('STROM');
+  const filtered = useMemo(() => {
+    if (!selectedCustomerId) return [];
 
-  const handleChange = (event: SelectChangeEvent) => {
-    const newMeter = event.target.value as string;
-    setMeter(newMeter);
-    updateFilter("kindOfMeter", newMeter)
-  };
+    return readingsData
+      .filter((r) => r.kindOfMeter === meter && r.customer?.id === selectedCustomerId)
+      .sort((a, b) => {
+        const [ay, am, ad] = a.dateOfReading;
+        const [by, bm, bd] = b.dateOfReading;
+        return new Date(ay, am - 1, ad).getTime() - new Date(by, bm - 1, bd).getTime();
+      });
+  }, [readingsData, meter, selectedCustomerId]);
+
+  const xLabels = filtered.map((r) => formatDate(r.dateOfReading));
+  const yValues = filtered.map((r) => r.meterCount);
 
   return (
-    <Box p={1}>
-    <FormControl sx={{ width: '120px' }}>
-      <InputLabel id="demo-simple-select-label">Meter</InputLabel>
-      <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
-        value={meter}
-        label="Meter"
-        onChange={handleChange}
-      >
-        <MenuItem value={"STROM"}>Strom</MenuItem>
-        <MenuItem value={"HEIZUNG"}>Heizung</MenuItem>
-        <MenuItem value={"WASSER"}>Wasser</MenuItem>
-      </Select>
-    </FormControl>
-    <LineChart
-      xAxis={[{ data: dates, scaleType: "point" }]} // X-axis labels (months)
-      series={[{ data: meterCounts, area: true }]} // Y-axis values (average meter counts)
-      width={1000}
-      height={600}
-    />
+    <Box p={2}>
+      <Box display="flex" justifyContent="center" gap={2} mb={2} flexWrap="wrap">
+        <FormControl sx={{ width: 150 }}>
+          <InputLabel id="meter-label">Meter</InputLabel>
+          <Select
+            labelId="meter-label"
+            value={meter}
+            label="Meter"
+            onChange={handleMeterChange}
+          >
+            <MenuItem value="STROM">Strom</MenuItem>
+            <MenuItem value="HEIZUNG">Heizung</MenuItem>
+            <MenuItem value="WASSER">Wasser</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Autocomplete
+          sx={{ minWidth: 350 }}
+          options={uniqueCustomers}
+          getOptionLabel={(option) => option.label}
+          renderInput={(params) => <TextField {...params} label="Kunde auswählen" />}
+          onChange={(_, value) => setSelectedCustomerId(value?.id ?? null)}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+        />
+      </Box>
+
+      {isLoading ? (
+        <Typography>Lade Daten…</Typography>
+      ) : !selectedCustomerId ? (
+        <Typography>Bitte einen Kunden auswählen.</Typography>
+      ) : (
+        <LineChart
+          xAxis={[{ data: xLabels, scaleType: "point", label: "Datum" }]}
+          series={[{ data: yValues, label: meter, area: true }]}
+          width={1000}
+          height={600}
+        />
+      )}
     </Box>
   );
 };

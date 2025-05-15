@@ -75,10 +75,9 @@ export function CrudDataGrid<T extends { id: string | number }>({
 
   const processRowUpdate = async (newRow: T) => {
     try {
-      const rowToSave = 'row' in newRow ? (newRow as any).row : newRow;
 
-      console.log("new", rowToSave)
-      const updated = await onSave(rowToSave);
+      console.log("new", newRow)
+      const updated = await onSave(newRow);
       setRows(rows.map((r) => (r.id === updated.id ? updated : r)));
       return updated;
     } catch (err: any) {
