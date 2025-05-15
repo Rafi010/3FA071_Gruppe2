@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS ablesung (
     datum DATE NOT NULL,
     zaehlerstand FLOAT NOT NULL,
     kommentar VARCHAR(255),
-    kindOfMeter VARCHAR(255)
+    kindOfMeter VARCHAR(255) NOT NULL DEFAULT 'UNBEKANNT'
 );
 
 --Erstellt die Tabelle Kunde mit den Spalten UUID, Anrede, Nachname, Vorname und Geburtsdatum.
