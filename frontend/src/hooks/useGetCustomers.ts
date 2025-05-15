@@ -1,12 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-
-interface Person {
-    firstName: string;
-    lastName: string;
-    gender: string;
-    id: string;
-    birthDate: number[] | null;
-  }
+import { Person } from '../types/Person';
 
 const fetchCustomers = async () => {
   const response = await fetch('http://localhost:8080/customers');
@@ -23,7 +16,7 @@ export const useGetCustomers = () => {
 
   return {
     customerData: data || [],  
-    loading: isLoading,       
+    loading: isLoading,
     error,                   
   };
 }

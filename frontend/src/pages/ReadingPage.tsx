@@ -29,15 +29,14 @@ const ReadingPage = () => {
     customer: '',
   });
   const { readingsData, loading } = useGetReadings(filters);
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const readingsColumns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 300 },
     { field: "customer.id", headerName: "Customer ID", width: 300, valueGetter: (value, row) => {
-      const customerID = row.customer.id;
+      const customerID = row.customer?.id;
       return customerID
       }, 
     },
-    { field: "id", headerName: "ID", width: 300 },
     { field: "kindOfMeter", headerName: "Kind of Meter", width: 150 },
     { field: "dateOfReading", headerName: "Date", width: 150,
         valueGetter: (value, row) => {
@@ -70,10 +69,10 @@ const ReadingPage = () => {
       <DataGrid
         rows={readingsData}
         columns={readingsColumns}
-        slots={{ toolbar: CustomToolbar }}
-        checkboxSelection
+        slots={{ toolbar: () => <CustomToolbar onAddClick={function (): void {
+          throw new Error("Function not implemented.");
+        } }  /> }}
         disableRowSelectionOnClick
-        onRowSelectionModelChange={(selection) => setSelectedRows(selection as string[])}
         sx={{
           bgcolor: 'background.paper'
         }}

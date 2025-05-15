@@ -19,7 +19,9 @@ export const ExportView = () => {
       <DataGrid
         rows={rows}
         columns={columns}
-        slots={{ toolbar: CustomToolbar }}
+        slots={{ toolbar: () => <CustomToolbar onAddClick={function (): void {
+          throw new Error('Function not implemented.');
+        } } /> }}
       />
     </div>
   );

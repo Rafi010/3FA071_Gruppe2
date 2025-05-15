@@ -1,10 +1,11 @@
 // src/components/CustomToolbar.tsx
 import React from 'react';
 import { GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarExportContainer, GridCsvExportMenuItem, GridExportMenuItemProps, useGridApiContext } from "@mui/x-data-grid";
-import { Button, MenuItem } from "@mui/material";
+import { Box, Button, IconButton, MenuItem, Tooltip } from "@mui/material";
 import { getJson, getXml, exportBlob } from '../utils/CustomExport';
 import { ExportStatus } from '../utils/ExportStatus'; // Importiere ExportStatus
 import ImportButton from './CustomImportButton';
+import AddIcon from '@mui/icons-material/Add';
 
 function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
   const apiRef = useGridApiContext();
@@ -64,14 +65,37 @@ function CustomExportButton(props: any) {
   );
 }
 
-export function CustomToolbar() {
+function CustomAddButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Tooltip title="Add record">
+      <IconButton onClick={onClick}>
+        <AddIcon />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
+type CustomToolbarProps = {
+  onAddClick: () => void;
+};
+
+
+
+export function CustomToolbar({ onAddClick }: CustomToolbarProps) {
   return (
     <GridToolbarContainer>
-      <GridToolbarColumnsButton />
-      <GridToolbarFilterButton />
-      <GridToolbarDensitySelector />
-      <CustomExportButton />
-      <ImportButton/>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <Box>
+          <GridToolbarColumnsButton />
+          <GridToolbarFilterButton />
+          <GridToolbarDensitySelector />
+          <CustomExportButton />
+          <ImportButton />
+        </Box>
+        <Box>
+          <CustomAddButton onClick={onAddClick} />
+        </Box>
+      </Box>
     </GridToolbarContainer>
   );
 }
