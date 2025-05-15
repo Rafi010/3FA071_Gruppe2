@@ -48,7 +48,7 @@ export const createReading = async (reading: Reading): Promise<Reading> => {
   if (!response.ok) throw new Error('Fehler beim Erstellen des Messwerts');
 
   // Fetch full reading data by id
-  const fetchResponse = await fetch(`${BASE_URL_READINGS}/${reading.meterId}`);
+  const fetchResponse = await fetch(`${BASE_URL_READINGS}/${reading.id}`);
   if (!fetchResponse.ok) throw new Error('Fehler beim Abrufen des erstellten Messwerts');
 
   const fullReadingData = await fetchResponse.json();
