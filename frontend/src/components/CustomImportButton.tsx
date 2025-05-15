@@ -1,13 +1,31 @@
 // src/components/CustomImportButton.tsx
 
-import React, { useRef } from 'react';
-import { Button } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Button, Menu, MenuItem } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-// Generische POST-Funktion
+// Hilfsfunktionen zur Normalisierung
+const normalizeReading = (r: any) => {
+  const fallback = { ...r };
+  if (!r.kindOfMeter || !["STROM", "HEIZUNG", "WASSER", "UNBEKANNT"].includes(r.kindOfMeter.toUpperCase())) {
+    fallback.kindOfMeter = "UNBEKANNT";
+  }
+  if (fallback.substitute === undefined) fallback.substitute = false;
+  if (fallback.comment === undefined) fallback.comment = null;
+  return fallback;
+};
+
+const normalizeCustomer = (c: any) => {
+  const fallback = { ...c };
+  if (!["M", "W", "D", "U"].includes(fallback.gender)) {
+    fallback.gender = "U";
+  }
+  return fallback;
+};
+
 const postEntity = async (endpoint: string, payload: any) => {
   const response = await fetch(`${API_BASE}${endpoint}`, {
     method: 'POST',
@@ -34,11 +52,25 @@ const useImportMutation = () => {
 function CustomImportButton() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mutation = useImportMutation();
+  const queryClient = useQueryClient();
+
+  const [importType, setImportType] = useState<'jsonXml' | 'csvCustomer' | 'csvReading'>('jsonXml');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = (type?: 'jsonXml' | 'csvCustomer' | 'csvReading') => {
+    setAnchorEl(null);
+    if (type) {
+      setImportType(type);
+      fileInputRef.current?.click();
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-
-    console.log("📂 Datei ausgewählt");
-
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -46,13 +78,17 @@ function CustomImportButton() {
       const isJson = file.name.endsWith('.json');
       const text = await file.text();
 
-      if (isJson) {
-        const data = JSON.parse(text);
-        await importJson(data);
+      if (importType === 'jsonXml') {
+        if (isJson) {
+          const data = JSON.parse(text);
+          await importJson(data);
+        } else {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(text, 'application/xml');
+          await importXml(xmlDoc);
+        }
       } else {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(text, 'application/xml');
-        await importXml(xmlDoc);
+        alert('CSV-Import wird noch implementiert.');
       }
 
       alert('Import erfolgreich!');
@@ -66,17 +102,23 @@ function CustomImportButton() {
 
   const importJson = async (data: any) => {
     if (data.customer) {
-      await mutation.mutateAsync({ endpoint: '/customers', data });
+      const normalized = { customer: normalizeCustomer(data.customer) };
+      await mutation.mutateAsync({ endpoint: '/customers', data: normalized });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
     } else if (data.reading) {
-      await mutation.mutateAsync({ endpoint: '/readings', data });
+      const normalized = { reading: normalizeReading(data.reading) };
+      await mutation.mutateAsync({ endpoint: '/readings', data: normalized });
+      queryClient.invalidateQueries({ queryKey: ['readings'] });
     } else if (data.customers && Array.isArray(data.customers)) {
       for (const c of data.customers) {
-        await mutation.mutateAsync({ endpoint: '/customers', data: { customer: c } });
+        await mutation.mutateAsync({ endpoint: '/customers', data: { customer: normalizeCustomer(c) } });
       }
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
     } else if (data.readings && Array.isArray(data.readings)) {
       for (const r of data.readings) {
-        await mutation.mutateAsync({ endpoint: '/readings', data: { reading: r} });
+        await mutation.mutateAsync({ endpoint: '/readings', data: { reading: normalizeReading(r) } });
       }
+      queryClient.invalidateQueries({ queryKey: ['readings'] });
     } else {
       throw new Error("Unbekanntes JSON-Format");
     }
@@ -93,8 +135,9 @@ function CustomImportButton() {
       for (const el of Array.from(items)) {
         const obj: any = {};
         Array.from(el.children).forEach(c => obj[c.tagName] = c.textContent);
-        await mutation.mutateAsync({ endpoint: '/customers', data: { customer: obj } });
+        await mutation.mutateAsync({ endpoint: '/customers', data: { customer: normalizeCustomer(obj) } });
       }
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
     } else if (readings) {
       const items = readings.getElementsByTagName('reading');
       for (const el of Array.from(items)) {
@@ -103,29 +146,32 @@ function CustomImportButton() {
           if (c.tagName === 'customer') {
             const cust: any = {};
             Array.from(c.children).forEach(cc => cust[cc.tagName] = cc.textContent);
-            obj.customer = cust;
+            obj.customer = normalizeCustomer(cust);
           } else {
             obj[c.tagName] = c.textContent;
           }
         });
-        await mutation.mutateAsync({ endpoint: '/readings', data: { reading: obj } });
+        await mutation.mutateAsync({ endpoint: '/readings', data: { reading: normalizeReading(obj) } });
       }
+      queryClient.invalidateQueries({ queryKey: ['readings'] });
     } else if (singleCustomer && !singleCustomer.parentElement?.tagName.toLowerCase().includes('customers')) {
       const obj: any = {};
       Array.from(singleCustomer.children).forEach(c => obj[c.tagName] = c.textContent);
-      await mutation.mutateAsync({ endpoint: '/customers', data: { customer: obj } });
+      await mutation.mutateAsync({ endpoint: '/customers', data: { customer: normalizeCustomer(obj) } });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
     } else if (singleReading && !singleReading.parentElement?.tagName.toLowerCase().includes('readings')) {
       const obj: any = {};
       Array.from(singleReading.children).forEach(c => {
         if (c.tagName === 'customer') {
           const cust: any = {};
           Array.from(c.children).forEach(cc => cust[cc.tagName] = cc.textContent);
-          obj.customer = cust;
+          obj.customer = normalizeCustomer(cust);
         } else {
           obj[c.tagName] = c.textContent;
         }
       });
-      await mutation.mutateAsync({ endpoint: '/readings', data: { reading: obj } });
+      await mutation.mutateAsync({ endpoint: '/readings', data: { reading: normalizeReading(obj) } });
+      queryClient.invalidateQueries({ queryKey: ['readings'] });
     } else {
       throw new Error("Unbekanntes XML-Format");
     }
@@ -144,11 +190,16 @@ function CustomImportButton() {
         variant="text"
         size="small"
         startIcon={<UploadFileIcon />}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={handleMenuClick}
         disabled={mutation.isPending}
       >
         Import
       </Button>
+      <Menu anchorEl={anchorEl} open={open} onClose={() => handleMenuClose()}>
+        <MenuItem onClick={() => handleMenuClose('jsonXml')}>JSON / XML</MenuItem>
+        <MenuItem onClick={() => handleMenuClose('csvCustomer')}>CSV Customer</MenuItem>
+        <MenuItem onClick={() => handleMenuClose('csvReading')}>CSV Reading</MenuItem>
+      </Menu>
     </>
   );
 }
