@@ -4,19 +4,27 @@ import React, { useRef, useState } from 'react';
 import { Button, Menu, MenuItem } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import Papa from 'papaparse';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 // Hilfsfunktionen zur Normalisierung
 const normalizeReading = (r: any) => {
   const fallback = { ...r };
-  if (!r.kindOfMeter || !["STROM", "HEIZUNG", "WASSER", "UNBEKANNT"].includes(r.kindOfMeter.toUpperCase())) {
+
+  const kind = (r.kindOfMeter || "").toUpperCase().trim();
+  if (!["STROM", "HEIZUNG", "WASSER", "UNBEKANNT"].includes(kind)) {
     fallback.kindOfMeter = "UNBEKANNT";
+  } else {
+    fallback.kindOfMeter = kind;
   }
-  if (fallback.substitute === undefined) fallback.substitute = false;
+
+  fallback.substitute = r.substitute === true || r.substitute === "true";
   if (fallback.comment === undefined) fallback.comment = null;
+
   return fallback;
 };
+
 
 const normalizeCustomer = (c: any) => {
   const fallback = { ...c };
@@ -75,10 +83,10 @@ function CustomImportButton() {
     if (!file) return;
 
     try {
-      const isJson = file.name.endsWith('.json');
       const text = await file.text();
 
       if (importType === 'jsonXml') {
+        const isJson = file.name.endsWith('.json');
         if (isJson) {
           const data = JSON.parse(text);
           await importJson(data);
@@ -87,8 +95,10 @@ function CustomImportButton() {
           const xmlDoc = parser.parseFromString(text, 'application/xml');
           await importXml(xmlDoc);
         }
-      } else {
-        alert('CSV-Import wird noch implementiert.');
+      } else if (importType === 'csvCustomer') {
+        await importCsvCustomer(text);
+      } else if (importType === 'csvReading') {
+        await importCsvReading(text);
       }
 
       alert('Import erfolgreich!');
@@ -98,6 +108,39 @@ function CustomImportButton() {
     } finally {
       e.target.value = '';
     }
+  };
+
+  const importCsvCustomer = async (csv: string) => {
+    const { data } = Papa.parse(csv, { header: true, skipEmptyLines: true });
+    for (const raw of data as any[]) {
+      const customer = normalizeCustomer(raw);
+      await mutation.mutateAsync({ endpoint: '/customers', data: { customer } });
+    }
+    queryClient.invalidateQueries({ queryKey: ['customers'] });
+  };
+
+  const importCsvReading = async (csv: string) => {
+    const { data } = Papa.parse(csv, { header: true, skipEmptyLines: true });
+    for (const raw of data as any[]) {
+      const reading = normalizeReading({
+        id: raw.id,
+        dateOfReading: raw.dateOfReading,
+        kindOfMeter: raw.kindOfMeter,
+        meterCount: parseFloat(raw.meterCount),
+        meterId: raw.meterId,
+        substitute: raw.substitute === 'true',
+        comment: raw.comment,
+        customer: normalizeCustomer({
+          id: raw['customer.id'],
+          firstName: raw['customer.firstName'],
+          lastName: raw['customer.lastName'],
+          gender: raw['customer.gender'],
+          birthDate: raw['customer.birthDate'] || null
+        })
+      });
+      await mutation.mutateAsync({ endpoint: '/readings', data: { reading } });
+    }
+    queryClient.invalidateQueries({ queryKey: ['readings'] });
   };
 
   const importJson = async (data: any) => {
@@ -183,7 +226,7 @@ function CustomImportButton() {
         type="file"
         ref={fileInputRef}
         style={{ display: 'none' }}
-        accept=".json,.xml"
+        accept=".json,.xml,.csv"
         onChange={handleFileChange}
       />
       <Button
